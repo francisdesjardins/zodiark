@@ -8,7 +8,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.zodiark</groupId>
-    <artifactId>wowza</artifactId>
+    <artifactId>zodiark-wowza</artifactId>
     <name>Zodiark Wowza</name>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>

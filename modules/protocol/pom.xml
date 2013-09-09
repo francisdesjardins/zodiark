@@ -8,7 +8,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.zodiark</groupId>
-    <artifactId>protocol</artifactId>
+    <artifactId>zodiark-protocol</artifactId>
     <name>Zodiark Protocol</name>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
