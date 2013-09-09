@@ -1,1 +1,1 @@
-# Zodiark: A NettoSphere/Atmosphere Streaming Platform
+# Zodiark: OnDemand Streaming Platform
