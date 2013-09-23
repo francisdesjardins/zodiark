@@ -13,7 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.server;
+package org.zodiark.server.service;
 
-public class Version {
+import org.atmosphere.cpr.AtmosphereResource;
+import org.zodiark.protocol.Envelope;
+
+public interface ServiceHandler {
+
+    public ServiceHandler handle(AtmosphereResource r, Envelope e);
+
 }
