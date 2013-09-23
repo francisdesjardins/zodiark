@@ -44,7 +44,7 @@ public enum ActorValue {
             case "monitor":
                 return MONITOR;
             default:
-                throw new IllegalStateException("Illegal value " + value);
+                throw new IllegalStateException("Invalid value " + value);
         }
     }
 

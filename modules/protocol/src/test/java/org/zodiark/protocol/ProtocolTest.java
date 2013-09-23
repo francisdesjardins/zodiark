@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.AssertJUnit.fail;
 
 public class ProtocolTest {
 
@@ -32,6 +33,45 @@ public class ProtocolTest {
             "    \"uuid\": \"234-456-w2dsce3-29sj3\",\n" +
             "    \"to\": \"SUBSCRIBER\",\n" +
             "    \"from\": \"SERVER\",\n" +
+            "    \"protocol\": \"zodiark/1.0\",\n" +
+            "    \"message\": {\n" +
+            "        \"path\": \"/REACT/EXECUTION/CREATE_SESSION\",\n" +
+            "        \"data\": \"\\\"{\\\"foo\\\": \\\"bar \\\"}\\\"\"\n" +
+            "    }\n" +
+            "}";
+
+    private final static String testInvalidEnvelopPath = "{\n" +
+            "    \"path\": \"/ZOOO/Action\",\n" +
+            "    \"traceId\": \"0\",\n" +
+            "    \"uuid\": \"234-456-w2dsce3-29sj3\",\n" +
+            "    \"to\": \"SUBSCRIBER\",\n" +
+            "    \"from\": \"SERVER\",\n" +
+            "    \"protocol\": \"zodiark/1.0\",\n" +
+            "    \"message\": {\n" +
+            "        \"path\": \"/REACT/EXECUTION/CREATE_SESSION\",\n" +
+            "        \"data\": \"\\\"{\\\"foo\\\": \\\"bar \\\"}\\\"\"\n" +
+            "    }\n" +
+            "}";
+
+    private final static String testInvalidTo = "{\n" +
+            "    \"path\": \"/REQUEST/Action\",\n" +
+            "    \"traceId\": \"0\",\n" +
+            "    \"uuid\": \"234-456-w2dsce3-29sj3\",\n" +
+            "    \"to\": \"Yooo\",\n" +
+            "    \"from\": \"SERVER\",\n" +
+            "    \"protocol\": \"zodiark/1.0\",\n" +
+            "    \"message\": {\n" +
+            "        \"path\": \"/REACT/EXECUTION/CREATE_SESSION\",\n" +
+            "        \"data\": \"\\\"{\\\"foo\\\": \\\"bar \\\"}\\\"\"\n" +
+            "    }\n" +
+            "}";
+
+    private final static String testInvalidFrom = "{\n" +
+            "    \"path\": \"/REQUEST/Action\",\n" +
+            "    \"traceId\": \"0\",\n" +
+            "    \"uuid\": \"234-456-w2dsce3-29sj3\",\n" +
+            "    \"to\": \"SUBSCRIBER\",\n" +
+            "    \"from\": \"UYTIU\",\n" +
             "    \"protocol\": \"zodiark/1.0\",\n" +
             "    \"message\": {\n" +
             "        \"path\": \"/REACT/EXECUTION/CREATE_SESSION\",\n" +
@@ -50,12 +90,55 @@ public class ProtocolTest {
 
     }
 
+    @Test
+    public void testInvalidEnvelopPath() throws IOException {
+        IllegalStateException ex = null;
+        try {
+            Envelope e = mapper.readValue(testInvalidEnvelopPath, Envelope.class);
 
+            assertNotNull(e);
 
+            e.getPath().toString();
+            fail();
+        } catch (com.fasterxml.jackson.databind.JsonMappingException jme) {
+            ex = IllegalStateException.class.cast(jme.getCause());
+        }
+        assertEquals(IllegalStateException.class, ex.getClass());
+        assertEquals(ex.getMessage(), "Invalid value zooo");
+    }
 
+    @Test
+    public void testInvalidFrom() throws IOException {
+        IllegalStateException ex = null;
+        try {
+            Envelope e = mapper.readValue(testInvalidFrom, Envelope.class);
 
+            assertNotNull(e);
 
+            e.getPath().toString();
+            fail();
+        } catch (com.fasterxml.jackson.databind.JsonMappingException jme) {
+            ex = IllegalStateException.class.cast(jme.getCause());
+        }
+        assertEquals(IllegalStateException.class, ex.getClass());
+        assertEquals(ex.getMessage(), "Invalid value uytiu");
+    }
 
+    @Test
+    public void testInvalidTo() throws IOException {
+        IllegalStateException ex = null;
+        try {
+            Envelope e = mapper.readValue(testInvalidTo, Envelope.class);
 
+            assertNotNull(e);
+
+            e.getPath().toString();
+            fail();
+        } catch (com.fasterxml.jackson.databind.JsonMappingException jme) {
+            ex = IllegalStateException.class.cast(jme.getCause());
+        }
+        assertEquals(IllegalStateException.class, ex.getClass());
+        assertEquals(ex.getMessage(), "Invalid value yooo");
+    }
 
 }
