@@ -15,5 +15,27 @@
  */
 package org.zodiark.protocol;
 
-public class Version {
+import com.fasterxml.jackson.annotation.JsonCreator;
+
+public class To {
+
+    private ActorValue to;
+
+    public To() {
+        to = ActorValue.SERVER;
+    }
+
+    @JsonCreator
+    public To(ActorValue to) {
+        this.to = to;
+    }
+
+    public ActorValue getTo() {
+        return to;
+    }
+
+    public void setTo(ActorValue to) {
+        this.to = to;
+    }
+
 }

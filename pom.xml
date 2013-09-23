@@ -59,6 +59,16 @@
                 <artifactId>wasync</artifactId>
                 <version>${wasync.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.atmosphere</groupId>
+                <artifactId>wasync</artifactId>
+                <version>${wasync.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>com.fasterxml.jackson.core</groupId>
+              <artifactId>jackson-databind</artifactId>
+              <version>2.2.2</version>
+            </dependency>
 
             <!-- Test -->
             <dependency>
@@ -253,11 +263,11 @@
     <properties>
         <distMgmtSnapshotsUrl>http://oss.sonatype.org/content/repositories/snapshots</distMgmtSnapshotsUrl>
         <surefire.redirectTestOutputToFile>false</surefire.redirectTestOutputToFile>
-        <source.property>1.6</source.property>
-        <target.property>1.6</target.property>
-        <atmosphere.version>2.0.0-SNAPSHOT</atmosphere.version>
-        <nettosphere.version>2.0.0-SNAPSHOT</nettosphere.version>
-        <wasync.version>1.0.0-SNAPSHOT</wasync.version>
+        <source.property>1.7</source.property>
+        <target.property>1.7</target.property>
+        <atmosphere.version>2.0.0</atmosphere.version>
+        <nettosphere.version>2.0.0</nettosphere.version>
+        <wasync.version>1.0.0</wasync.version>
     </properties>
 </project>
 
