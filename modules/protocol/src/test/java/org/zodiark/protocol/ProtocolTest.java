@@ -107,38 +107,5 @@ public class ProtocolTest {
         assertEquals(ex.getMessage(), "Invalid value zooo");
     }
 
-    @Test
-    public void testInvalidFrom() throws IOException {
-        IllegalStateException ex = null;
-        try {
-            Envelope e = mapper.readValue(testInvalidFrom, Envelope.class);
-
-            assertNotNull(e);
-
-            e.getPath().toString();
-            fail();
-        } catch (com.fasterxml.jackson.databind.JsonMappingException jme) {
-            ex = IllegalStateException.class.cast(jme.getCause());
-        }
-        assertEquals(IllegalStateException.class, ex.getClass());
-        assertEquals(ex.getMessage(), "Invalid value uytiu");
-    }
-
-    @Test
-    public void testInvalidTo() throws IOException {
-        IllegalStateException ex = null;
-        try {
-            Envelope e = mapper.readValue(testInvalidTo, Envelope.class);
-
-            assertNotNull(e);
-
-            e.getPath().toString();
-            fail();
-        } catch (com.fasterxml.jackson.databind.JsonMappingException jme) {
-            ex = IllegalStateException.class.cast(jme.getCause());
-        }
-        assertEquals(IllegalStateException.class, ex.getClass());
-        assertEquals(ex.getMessage(), "Invalid value yooo");
-    }
 
 }

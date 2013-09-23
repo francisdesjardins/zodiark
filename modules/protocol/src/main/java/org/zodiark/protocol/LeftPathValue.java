@@ -17,7 +17,7 @@ package org.zodiark.protocol;
 
 public enum LeftPathValue {
 
-    REQUEST("request"), RESPONSE("response"), MESSAGE("message"), REACT("react");
+    REQUEST("/request"), RESPONSE("/response"), MESSAGE("/message"), REACT("/react");
 
     private final String value;
 

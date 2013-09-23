@@ -15,26 +15,27 @@
  */
 package org.zodiark.protocol;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-
 public class From {
 
-    private ActorValue from;
+    private String from;
 
     public From() {
-        this.from = ActorValue.SERVER;
+        this.from = ActorValue.SERVER.name();
     }
 
-    @JsonCreator
-    public From(ActorValue from) {
+    public From(String from) {
         this.from = from;
     }
 
-    public ActorValue getFrom() {
+    public From(ActorValue from) {
+        this.from = from.value();
+    }
+
+    public String getFrom() {
         return from;
     }
 
-    public void setFrom(ActorValue from) {
+    public void setFrom(String from) {
         this.from = from;
     }
 

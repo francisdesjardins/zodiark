@@ -27,6 +27,18 @@ public class Envelope {
     private Protocol protocol;
     private String uuid;
 
+    private Envelope(Builder b) {
+        this.path = b.path;
+        this.traceId = b.traceId;
+        this.to = b.to;
+        this.from = b.from;
+        this.message = b.message;
+        this.protocol = b.protocol;
+    }
+
+    public Envelope(){
+    }
+
     public Path getPath() {
         return path;
     }
@@ -88,5 +100,51 @@ public class Envelope {
     @JsonProperty("uuid")
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public final static class Builder {
+        private Path path = new Path(LeftPathValue.REQUEST, RightPathValue.ACTION);
+        private TraceId traceId = new TraceId();
+        private To to = new To(ActorValue.SERVER.name());
+        private From from = new From(ActorValue.STREAM_SERVER);
+        private Message message;
+        private Protocol protocol = new Protocol();
+
+        public Builder path(Path path) {
+            this.path = path;
+            return this;
+        }
+
+        public Builder traceId(TraceId traceId) {
+            this.traceId = traceId;
+            return this;
+        }
+
+        public Builder to(To to) {
+            this.to = to;
+            return this;
+        }
+
+        public Builder from(From from) {
+            this.from = from;
+            return this;
+        }
+
+        public Builder message(Message message) {
+            this.message = message;
+            return this;
+        }
+
+        public Builder protocol(Protocol protocol) {
+            this.protocol = protocol;
+            return this;
+        }
+
+        public Envelope build() {
+            if (message == null) {
+                throw new NullPointerException("message is null");
+            }
+            return new Envelope(this);
+        }
     }
 }

@@ -17,7 +17,7 @@ package org.zodiark.protocol;
 
 public class Message {
 
-    private Path path;
+    private String path;
     private String data;
 
     public Message(){
@@ -25,15 +25,15 @@ public class Message {
     }
 
     public Message(Path path, String message) {
-        this.path = path;
+        this.path = path.toString();
         this.data = message;
     }
 
-    public Path getPath() {
+    public String getPath() {
         return path;
     }
 
-    public void setPath(Path path) {
+    public void setPath(String path) {
         this.path = path;
     }
 

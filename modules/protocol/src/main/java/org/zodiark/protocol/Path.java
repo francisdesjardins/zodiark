@@ -19,6 +19,13 @@ public class Path {
 
     private String path;
 
+    public Path(LeftPathValue l, RightPathValue r) {
+        this.path = l.value() + r.value();
+    }
+
+    public Path(){
+    }
+
     public Path(String path) {
         this.path = "/" + LeftPathValue.deserialize(path) + "/" + RightPathValue.deserialize(path);
     }
@@ -27,8 +34,9 @@ public class Path {
         return path;
     }
 
-    public void setPath(String path) {
+    public Path setPath(String path) {
         this.path = path;
+        return this;
     }
 
     @Override

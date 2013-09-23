@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ActorValue {
 
-    SUBCRIBER("subscriber"), PUBLISHER("publisher"), STREAM_SERVER("stream_server"), SERVER("server"), MONITOR("monitor");
+    SUBCRIBER("/subscriber"), PUBLISHER("/publisher"), STREAM_SERVER("/stream_server"), SERVER("/server"), MONITOR("/monitor");
 
     private final String value;
 

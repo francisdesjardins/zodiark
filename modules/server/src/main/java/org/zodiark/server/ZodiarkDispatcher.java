@@ -49,6 +49,7 @@ public class ZodiarkDispatcher extends OnMessage<String> {
     @Override
     public void onMessage(AtmosphereResponse response, String message) throws IOException {
         try {
+            logger.info("{}", message);
             Envelope e = mapper.readValue(message, Envelope.class);
             logger.info("{}", e);
             serviceLocator.dispatch(response.resource(), e);

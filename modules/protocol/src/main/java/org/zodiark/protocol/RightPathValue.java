@@ -17,7 +17,7 @@ package org.zodiark.protocol;
 
 public enum RightPathValue {
 
-    ACTION("action"), COMMAND("command"), SYSTEMS("systems"), EXECUTION("execution");
+    ACTION("/action"), COMMAND("/command"), SYSTEMS("/systems"), EXECUTION("/execution");
 
     private final String value;
 
