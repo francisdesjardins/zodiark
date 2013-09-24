@@ -18,11 +18,11 @@ package org.zodiark.server.service;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 
-@Service(path="/jmx")
-public class JmxService implements ServiceHandler {
+@Service(path="/echo")
+public class EchoService implements ServiceHandler {
 
     @Override
-    public ServiceHandler handle(AtmosphereResource r, Envelope e) {
-        return this;
+    public Envelope handle(AtmosphereResource r, Envelope e) {
+        return e;
     }
 }

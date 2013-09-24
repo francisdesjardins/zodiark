@@ -15,23 +15,37 @@
  */
 package org.zodiark.server.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 
+import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ServiceLocatorImpl implements ServiceLocator {
 
     private final static Logger logger = LoggerFactory.getLogger(ServiceLocatorImpl.class);
     private final ConcurrentHashMap<String, ServiceHandler> services = new ConcurrentHashMap<>();
-
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public ServiceLocator dispatch(AtmosphereResource r, Envelope e) {
         logger.debug("Dispatching Envelop {} to {}", e, r.uuid());
 
+        ServiceHandler serviceHandler = services.get(e.getMessage().getPath().toString());
+        if (serviceHandler != null) {
+            Envelope response  = serviceHandler.handle(r, e);
+            if (response != null) {
+                try {
+                    r.getResponse().write(mapper.writeValueAsString(e));
+                } catch (IOException e1) {
+                   logger.error("{}", e);
+                }
+            }
+        }
         return this;
     }
 

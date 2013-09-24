@@ -28,10 +28,13 @@ public class ZodiarkDecoder implements Decoder<String, Envelope> {
 
     @Override
     public Envelope decode(Event event, String s) {
-        try {
-            return mapper.readValue(s, Envelope.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (event.equals(Event.MESSAGE)) {
+            try {
+                return mapper.readValue(s, Envelope.class);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
+        return null;
     }
 }

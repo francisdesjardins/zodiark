@@ -144,7 +144,7 @@ public class ZodiarkClient {
         ZodiarkClient c = new Builder().path("http://127.0.0.1:8080").event(new EventListener() {
             @Override
             public void onEnvelop(Envelope e) {
-                Thread.dumpStack();
+                logger.info("Received Envelope {}", e);
             }
 
             @Override
@@ -158,7 +158,7 @@ public class ZodiarkClient {
                 Thread.dumpStack();
             }
         }).build();
-        c.open().send(new Envelope.Builder().message(new Message(new Path().setPath("/jmx"), "This is a test")).build());
+        c.open().send(new Envelope.Builder().message(new Message(new Path().setPath("/echo"), "This is a test")).build());
     }
 
     public static class Builder {

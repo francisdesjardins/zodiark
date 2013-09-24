@@ -20,6 +20,6 @@ import org.zodiark.protocol.Envelope;
 
 public interface ServiceHandler {
 
-    public ServiceHandler handle(AtmosphereResource r, Envelope e);
+    public Envelope handle(AtmosphereResource r, Envelope e);
 
 }
