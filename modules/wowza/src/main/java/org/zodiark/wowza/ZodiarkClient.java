@@ -158,7 +158,9 @@ public class ZodiarkClient {
                 Thread.dumpStack();
             }
         }).build();
-        c.open().send(new Envelope.Builder().message(new Message(new Path().setPath("/echo"), "This is a test")).build());
+        Path p = new Path();
+        p.setPath("/echo");
+        c.open().send(new Envelope.Builder().message(new Message(p, "This is a test")).build());
     }
 
     public static class Builder {

@@ -34,9 +34,8 @@ public class Path {
         return path;
     }
 
-    public Path setPath(String path) {
+    public void setPath(String path) {
         this.path = path;
-        return this;
     }
 
     @Override

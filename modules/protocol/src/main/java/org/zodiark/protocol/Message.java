@@ -21,7 +21,6 @@ public class Message {
     private String data;
 
     public Message(){
-
     }
 
     public Message(Path path, String message) {

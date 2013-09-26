@@ -19,60 +19,60 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Envelope {
 
-    private Path path;
-    private TraceId traceId;
-    private To to;
-    private From from;
+    private String path;
+    private String traceId;
+    private String to;
+    private String from;
     private Message message;
-    private Protocol protocol;
+    private String protocol;
     private String uuid;
 
     private Envelope(Builder b) {
-        this.path = b.path;
-        this.traceId = b.traceId;
-        this.to = b.to;
-        this.from = b.from;
+        this.path = b.path.getPath();
+        this.traceId = b.traceId.getId();
+        this.to = b.to.getTo();
+        this.from = b.from.getFrom();
         this.message = b.message;
-        this.protocol = b.protocol;
+        this.protocol = b.protocol.toString();
     }
 
     public Envelope(){
     }
 
-    public Path getPath() {
+    public String getPath() {
         return path;
     }
 
     @JsonProperty("path")
     public void setPath(Path path) {
-        this.path = path;
+        this.path = path.getPath();
     }
 
-    public TraceId getTraceId() {
+    public String getTraceId() {
         return traceId;
     }
 
     @JsonProperty("traceId")
     public void setTraceId(TraceId traceId) {
-        this.traceId = traceId;
+        this.traceId = traceId.getId();
     }
 
-    public To getTo() {
+    public String getTo() {
         return to;
     }
 
     @JsonProperty("to")
     public void setTo(To to) {
-        this.to = to;
+        this.to = to.getTo();
     }
 
-    public From getFrom() {
+    public String getFrom() {
         return from;
     }
 
     @JsonProperty("from")
     public void setFrom(From from) {
-        this.from = from;
+        this.from = from.getFrom();
     }
 
     public Message getMessage() {
@@ -84,13 +84,13 @@ public class Envelope {
         this.message = message;
     }
 
-    public Protocol getProtocol() {
-        return protocol;
+    public String getProtocol() {
+        return protocol.toString();
     }
 
     @JsonProperty("protocol")
     public void setProtocol(Protocol protocol) {
-        this.protocol = protocol;
+        this.protocol = protocol.toString();
     }
 
     public String getUuid() {
