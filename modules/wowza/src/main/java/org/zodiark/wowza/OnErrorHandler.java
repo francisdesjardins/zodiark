@@ -17,11 +17,16 @@ package org.zodiark.wowza;
 
 import org.zodiark.protocol.Envelope;
 
-public interface EventListener {
+import java.io.IOException;
 
-    public void onEnvelop(Envelope e);
+public abstract class OnErrorHandler implements EventHandler {
+    @Override
+    public boolean onEnvelop(Envelope e) throws IOException {
+        return false;
+    }
 
-    public void onError(Throwable t);
-
-    public void onClose();
+    @Override
+    public boolean onClose() {
+        return false;
+    }
 }

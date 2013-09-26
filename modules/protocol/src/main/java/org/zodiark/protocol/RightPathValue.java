@@ -17,32 +17,42 @@ package org.zodiark.protocol;
 
 public enum RightPathValue {
 
-    ACTION("/action"), COMMAND("/command"), SYSTEMS("/systems"), EXECUTION("/execution");
+    ACTION("/action"), COMMAND("/command"), SYSTEMS("/systems"), EXECUTION("/execution"), CUSTOM("/custom");
 
-    private final String value;
+    private String value;
 
     RightPathValue(String value) {
         this.value = value;
     }
 
     public static RightPathValue deserialize(String v) {
-        String value = v.split("/")[2].toLowerCase();
-        switch (value) {
-            case "action":
-                return ACTION;
-            case "command":
-                return COMMAND;
-            case "execution":
-                return EXECUTION;
-            case "systems":
-                return SYSTEMS;
-            default:
-                throw new IllegalStateException("Invalid value " + value);
+        String[] s = v.split("/");
+        if (s.length > 2) {
+            String value = s[2].toLowerCase();
+            switch (value) {
+                case "action":
+                    return ACTION;
+                case "command":
+                    return COMMAND;
+                case "execution":
+                    return EXECUTION;
+                case "systems":
+                    return SYSTEMS;
+                default:
+                    return CUSTOM.value(value);
+            }
+        } else {
+            return CUSTOM.value("");
         }
     }
 
     final String value() {
-        return this.value;
+        return this.value.toLowerCase();
+    }
+
+    final RightPathValue value(String value) {
+        this.value = value;
+        return this;
     }
 
 }

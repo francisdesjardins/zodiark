@@ -31,8 +31,7 @@ import org.zodiark.protocol.Message;
 import org.zodiark.protocol.Path;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -42,6 +41,7 @@ public class ZodiarkClient {
 
     private final Builder b;
     private Socket socket = null;
+    private final ConcurrentLinkedQueue<EventHandler> events = new ConcurrentLinkedQueue<>();
 
     protected ZodiarkClient(Builder b) {
         this.b = b;
@@ -51,6 +51,11 @@ public class ZodiarkClient {
         if (socket != null) {
             socket.close();
         }
+    }
+
+    public ZodiarkClient handle(EventHandler e) {
+        events.add(e);
+        return this;
     }
 
     public ZodiarkClient open() throws IOException {
@@ -79,9 +84,9 @@ public class ZodiarkClient {
 
             @Override
             public void on(Envelope e) {
-                for (EventListener event : b.events) {
+                for (EventHandler event : events) {
                     try {
-                        event.onEnvelop(e);
+                        if (event.onEnvelop(e)) events.remove(event);
                     } catch (Exception ex) {
                         logger.error("", ex);
                     }
@@ -91,9 +96,9 @@ public class ZodiarkClient {
 
             @Override
             public void on(Throwable t) {
-                for (EventListener event : b.events) {
+                for (EventHandler event : events) {
                     try {
-                        event.onError(t);
+                        if (event.onError(t)) events.remove(event);
                     } catch (Exception ex) {
                         logger.error("", ex);
                     }
@@ -102,9 +107,9 @@ public class ZodiarkClient {
         }).on(Event.CLOSE.name(), new Function<String>() {
             @Override
             public void on(String t) {
-                for (EventListener event : b.events) {
+                for (EventHandler event : events) {
                     try {
-                        event.onClose();
+                        if (event.onClose()) events.remove(event);
                     } catch (Exception ex) {
                         logger.error("", ex);
                     }
@@ -141,26 +146,21 @@ public class ZodiarkClient {
             args = new String[]{"http://127.0.0.1:8080"};
         }
 
-        ZodiarkClient c = new Builder().path("http://127.0.0.1:8080").event(new EventListener() {
+        final ZodiarkClient c = new Builder().path(args[0]).build();
+        c.handle(new OnEnvelopHandler() {
             @Override
-            public void onEnvelop(Envelope e) {
-                logger.info("Received Envelope {}", e);
+            public boolean onEnvelop(Envelope e) throws IOException {
+                logger.info("Received {}", e);
+                c.handle(new OnEnvelopHandler() {
+                    @Override
+                    public boolean onEnvelop(Envelope e) throws IOException {
+                        logger.info("Final {}", e);
+                        return false;
+                    }
+                }).send(Envelope.newClientReply(e, e.getMessage()));
+                return true;
             }
-
-            @Override
-            public void onError(Throwable t) {
-                Thread.dumpStack();
-
-            }
-
-            @Override
-            public void onClose() {
-                Thread.dumpStack();
-            }
-        }).build();
-        Path p = new Path();
-        p.setPath("/echo");
-        c.open().send(new Envelope.Builder().message(new Message(p, "This is a test")).build());
+        }).open().send(Envelope.newClientToServerRequest(new Message(new Path("/echo"), "This is a test")));
     }
 
     public static class Builder {
@@ -168,7 +168,6 @@ public class ZodiarkClient {
         private String servicePath;
         private Encoder<Envelope, String> encoder = new ZodiarkEncoder();
         private Decoder<String, Envelope> decoder = new ZodiarkDecoder();
-        private final List<EventListener> events = new ArrayList<EventListener>();
 
         public Builder path(String servicePath) {
             this.servicePath = servicePath;
@@ -182,11 +181,6 @@ public class ZodiarkClient {
 
         public Builder decode(Decoder<String, Envelope> decoder) {
             this.decoder = decoder;
-            return this;
-        }
-
-        public Builder event(EventListener e) {
-            events.add(e);
             return this;
         }
 

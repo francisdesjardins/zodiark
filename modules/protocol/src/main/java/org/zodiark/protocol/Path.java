@@ -15,9 +15,15 @@
  */
 package org.zodiark.protocol;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Path {
 
     private String path;
+    @JsonIgnore
+    private String left;
+    @JsonIgnore
+    private String right;
 
     public Path(LeftPathValue l, RightPathValue r) {
         this.path = l.value() + r.value();
@@ -26,8 +32,14 @@ public class Path {
     public Path(){
     }
 
+    public Path(String left, String right) {
+        this.path = left + right;
+    }
+
     public Path(String path) {
-        this.path = "/" + LeftPathValue.deserialize(path) + "/" + RightPathValue.deserialize(path);
+        left = LeftPathValue.deserialize(path).value();
+        right = RightPathValue.deserialize(path).value();
+        this.path = left + right;
     }
 
     public String getPath() {
@@ -41,5 +53,13 @@ public class Path {
     @Override
     public String toString() {
         return path;
+    }
+
+    public String left(){
+        return left;
+    }
+
+    public String right(){
+        return right();
     }
 }

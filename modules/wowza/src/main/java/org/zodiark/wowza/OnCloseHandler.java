@@ -13,29 +13,20 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.protocol;
+package org.zodiark.wowza;
 
-public class TraceId {
+import org.zodiark.protocol.Envelope;
 
-    private int id;
+import java.io.IOException;
 
-    public TraceId() {
-        id = 0;
+public abstract class OnCloseHandler implements EventHandler {
+    @Override
+    public boolean onEnvelop(Envelope e) throws IOException {
+        return false;
     }
 
-    public TraceId(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public TraceId nextId(){
-        return new TraceId(id++);
+    @Override
+    public boolean onError(Throwable t) {
+        return false;
     }
 }

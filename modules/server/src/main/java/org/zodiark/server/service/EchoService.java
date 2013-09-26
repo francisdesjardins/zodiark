@@ -23,6 +23,6 @@ public class EchoService implements ServiceHandler {
 
     @Override
     public Envelope handle(AtmosphereResource r, Envelope e) {
-        return e;
+        return Envelope.newServerReply(e, e.getMessage());
     }
 }

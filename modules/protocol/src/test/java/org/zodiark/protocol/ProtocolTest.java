@@ -29,7 +29,7 @@ public class ProtocolTest {
     private ObjectMapper mapper = new ObjectMapper();
     private final static String testEnvelope = "{\n" +
             "    \"path\": \"/REQUEST/Action\",\n" +
-            "    \"traceId\": \"0\",\n" +
+            "    \"traceId\": 0,\n" +
             "    \"uuid\": \"234-456-w2dsce3-29sj3\",\n" +
             "    \"to\": \"SUBSCRIBER\",\n" +
             "    \"from\": \"SERVER\",\n" +
@@ -84,15 +84,15 @@ public class ProtocolTest {
         Envelope e = mapper.readValue(testEnvelope, Envelope.class);
 
         assertNotNull(e);
-        assertEquals(e.getPath().toString(), "/REQUEST/ACTION");
-        assertEquals(e.getTraceId().toString(), "0");
+        assertEquals(e.getPath().toString(), "/REQUEST/ACTION".toLowerCase());
+        assertEquals(e.getTraceId(), 0);
         assertEquals(e.getUuid(), "234-456-w2dsce3-29sj3");
 
     }
 
     @Test
-    public void testInvalidEnvelopPath() throws IOException {
-        IllegalStateException ex = null;
+    public void testInvalidEnvelop() throws IOException {
+        IOException ex = null;
         try {
             Envelope e = mapper.readValue(testInvalidEnvelopPath, Envelope.class);
 
@@ -101,10 +101,9 @@ public class ProtocolTest {
             e.getPath().toString();
             fail();
         } catch (com.fasterxml.jackson.databind.JsonMappingException jme) {
-            ex = IllegalStateException.class.cast(jme.getCause());
+            ex = jme;
         }
-        assertEquals(IllegalStateException.class, ex.getClass());
-        assertEquals(ex.getMessage(), "Invalid value zooo");
+        assertEquals(com.fasterxml.jackson.databind.JsonMappingException.class, ex.getClass());
     }
 
 

@@ -15,7 +15,6 @@
  */
 package org.zodiark.server.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.slf4j.Logger;
@@ -35,12 +34,16 @@ public class ServiceLocatorImpl implements ServiceLocator {
     public ServiceLocator dispatch(AtmosphereResource r, Envelope e) {
         logger.debug("Dispatching Envelop {} to {}", e, r.uuid());
 
+        if (e.getUuid().isEmpty()) {
+            e.setUuid(r.uuid());
+        }
+
         ServiceHandler serviceHandler = services.get(e.getMessage().getPath().toString());
         if (serviceHandler != null) {
             Envelope response  = serviceHandler.handle(r, e);
             if (response != null) {
                 try {
-                    r.getResponse().write(mapper.writeValueAsString(e));
+                    r.getResponse().write(mapper.writeValueAsString(response));
                 } catch (IOException e1) {
                    logger.error("{}", e);
                 }

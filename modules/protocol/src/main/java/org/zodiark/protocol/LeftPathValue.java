@@ -17,9 +17,9 @@ package org.zodiark.protocol;
 
 public enum LeftPathValue {
 
-    REQUEST("/request"), RESPONSE("/response"), MESSAGE("/message"), REACT("/react");
+    REQUEST("/request"), RESPONSE("/response"), MESSAGE("/message"), REACT("/react"), OK("ok"), CUSTOM("custom");
 
-    private final String value;
+    private String value;
 
     LeftPathValue(String value) {
         this.value = value;
@@ -37,12 +37,16 @@ public enum LeftPathValue {
             case "react":
                 return REACT;
             default:
-                throw new IllegalStateException("Invalid value " + value);
+                return CUSTOM.value(v);
         }
     }
 
     final String value() {
-        return this.value;
+        return this.value.toLowerCase();
     }
 
+    final LeftPathValue value(String value) {
+        this.value = value;
+        return this;
+    }
 }
