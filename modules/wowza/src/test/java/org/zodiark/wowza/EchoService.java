@@ -13,10 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.server.service;
+package org.zodiark.wowza;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
+import org.zodiark.server.service.Service;
+import org.zodiark.server.service.ServiceHandler;
 
 @Service(path="/echo")
 public class EchoService implements ServiceHandler {
