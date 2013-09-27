@@ -59,7 +59,7 @@ public class ZodiarkClientTest {
     }
 
     private ZodiarkServer server;
-    private int port = 8080;
+    private int port = findFreePort();
 
     @BeforeClass
     public void startZodiark() {
