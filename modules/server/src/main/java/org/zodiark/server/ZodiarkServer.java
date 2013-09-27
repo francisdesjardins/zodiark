@@ -20,9 +20,9 @@ import org.atmosphere.nettosphere.Config;
 import org.atmosphere.nettosphere.Nettosphere;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zodiark.server.service.Service;
 import org.zodiark.server.service.ServiceHandler;
 import org.zodiark.server.service.ServiceLocatorFactory;
+import org.zodiark.service.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;

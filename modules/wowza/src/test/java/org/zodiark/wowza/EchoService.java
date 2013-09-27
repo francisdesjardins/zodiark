@@ -17,7 +17,7 @@ package org.zodiark.wowza;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
-import org.zodiark.server.service.Service;
+import org.zodiark.service.Service;
 import org.zodiark.server.service.ServiceHandler;
 
 @Service(path="/echo")

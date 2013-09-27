@@ -20,6 +20,7 @@ import org.atmosphere.config.AtmosphereAnnotation;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zodiark.service.Service;
 
 @AtmosphereAnnotation(Service.class)
 public class ServiceProcessor implements Processor {
