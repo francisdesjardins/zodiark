@@ -41,7 +41,7 @@ public class ZodiarkClient {
 
     private final Builder b;
     private Socket socket = null;
-    private final ConcurrentLinkedQueue<EventHandler> events = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<EnvelopeHandler> events = new ConcurrentLinkedQueue<>();
 
     protected ZodiarkClient(Builder b) {
         this.b = b;
@@ -53,7 +53,7 @@ public class ZodiarkClient {
         }
     }
 
-    public ZodiarkClient handle(EventHandler e) {
+    public ZodiarkClient handler(EnvelopeHandler e) {
         events.add(e);
         return this;
     }
@@ -84,7 +84,7 @@ public class ZodiarkClient {
 
             @Override
             public void on(Envelope e) {
-                for (EventHandler event : events) {
+                for (EnvelopeHandler event : events) {
                     try {
                         if (event.onEnvelop(e)) events.remove(event);
                     } catch (Exception ex) {
@@ -96,7 +96,7 @@ public class ZodiarkClient {
 
             @Override
             public void on(Throwable t) {
-                for (EventHandler event : events) {
+                for (EnvelopeHandler event : events) {
                     try {
                         if (event.onError(t)) events.remove(event);
                     } catch (Exception ex) {
@@ -107,7 +107,7 @@ public class ZodiarkClient {
         }).on(Event.CLOSE.name(), new Function<String>() {
             @Override
             public void on(String t) {
-                for (EventHandler event : events) {
+                for (EnvelopeHandler event : events) {
                     try {
                         if (event.onClose()) events.remove(event);
                     } catch (Exception ex) {
@@ -147,11 +147,11 @@ public class ZodiarkClient {
         }
 
         final ZodiarkClient c = new Builder().path(args[0]).build();
-        c.handle(new OnEnvelopHandler() {
+        c.handler(new OnEnvelopHandler() {
             @Override
             public boolean onEnvelop(Envelope e) throws IOException {
                 logger.info("Received {}", e);
-                c.handle(new OnEnvelopHandler() {
+                c.handler(new OnEnvelopHandler() {
                     @Override
                     public boolean onEnvelop(Envelope e) throws IOException {
                         logger.info("Final {}", e);

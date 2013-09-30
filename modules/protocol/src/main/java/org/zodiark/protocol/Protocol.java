@@ -18,7 +18,7 @@ package org.zodiark.protocol;
 public class Protocol {
 
     private String version = "1.0";
-    private String name = "zordiark";
+    private String name = "zodiark";
 
     public Protocol() {
     }

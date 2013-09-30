@@ -19,6 +19,20 @@
             <scope>test</scope>
             <classifier>jdk15</classifier>
         </dependency>
+
+        <dependency>
+            <groupId>org.zodiark</groupId>
+            <artifactId>zodiark-server</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.zodiark</groupId>
+            <artifactId>zodiark-protocol</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <resources>

@@ -106,13 +106,13 @@ public class Envelope {
     @Override
     public String toString() {
         return "{" +
-                "path='" + path + '\'' +
-                ", traceId=" + traceId +
-                ", to='" + to + '\'' +
-                ", from='" + from + '\'' +
-                ", message=" + message +
-                ", protocol='" + protocol + '\'' +
-                ", uuid='" + uuid + '\'' +
+                "path:'" + path + '\'' +
+                ", traceId:" + traceId +
+                ", to:'" + to + '\'' +
+                ", from:'" + from + '\'' +
+                ", message:" + message +
+                ", protocol:'" + protocol + '\'' +
+                ", uuid:'" + uuid + '\'' +
                 '}';
     }
 

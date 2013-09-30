@@ -81,6 +81,7 @@ public class ProtocolTest {
 
     @Test
     public void testCreateEnvelope() throws IOException {
+        System.out.println(testEnvelope);
         Envelope e = mapper.readValue(testEnvelope, Envelope.class);
 
         assertNotNull(e);

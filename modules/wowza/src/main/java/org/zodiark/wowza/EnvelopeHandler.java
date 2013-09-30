@@ -19,14 +19,11 @@ import org.zodiark.protocol.Envelope;
 
 import java.io.IOException;
 
-public abstract class OnCloseHandler implements EnvelopeHandler {
-    @Override
-    public boolean onEnvelop(Envelope e) throws IOException {
-        return false;
-    }
+public interface EnvelopeHandler {
 
-    @Override
-    public boolean onError(Throwable t) {
-        return false;
-    }
+    public boolean onEnvelop(Envelope e) throws IOException;
+
+    public boolean onError(Throwable t);
+
+    public boolean onClose();
 }

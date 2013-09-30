@@ -15,7 +15,7 @@
  */
 package org.zodiark.wowza;
 
-public abstract class OnEnvelopHandler implements EventHandler {
+public abstract class OnEnvelopHandler implements EnvelopeHandler {
     @Override
     public boolean onError(Throwable t) {
         return false;

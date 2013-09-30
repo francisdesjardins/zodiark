@@ -43,4 +43,12 @@ public class Message {
     public void setData(String data) {
         this.data = data;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "path:'" + path + '\'' +
+                ", data:'" + data + '\'' +
+                '}';
+    }
 }

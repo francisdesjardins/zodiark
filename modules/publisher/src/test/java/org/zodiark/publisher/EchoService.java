@@ -13,17 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.wowza;
+package org.zodiark.publisher;
 
+import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
+import org.zodiark.server.service.ServiceHandler;
+import org.zodiark.service.Service;
 
-import java.io.IOException;
+@Service(path="/echo")
+public class EchoService implements ServiceHandler {
 
-public interface EventHandler {
-
-    public boolean onEnvelop(Envelope e) throws IOException;
-
-    public boolean onError(Throwable t);
-
-    public boolean onClose();
+    @Override
+    public Envelope handle(AtmosphereResource r, Envelope e) {
+        return Envelope.newServerReply(e, e.getMessage());
+    }
 }

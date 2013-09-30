@@ -59,7 +59,7 @@ public class ZodiarkClientTest {
     }
 
     private ZodiarkServer server;
-    private int port = findFreePort();
+    private int port = 8080;
 
     @BeforeClass
     public void startZodiark() {
@@ -78,7 +78,7 @@ public class ZodiarkClientTest {
         final AtomicReference<Envelope> answer = new AtomicReference<>();
         final ZodiarkClient c = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
         final CountDownLatch latch = new CountDownLatch(1);
-        c.handle(new OnEnvelopHandler() {
+        c.handler(new OnEnvelopHandler() {
             @Override
             public boolean onEnvelop(Envelope e) throws IOException {
                 answer.set(e);
@@ -102,10 +102,10 @@ public class ZodiarkClientTest {
         final AtomicReference<Envelope> answer = new AtomicReference<>();
         final ZodiarkClient c = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
         final CountDownLatch latch = new CountDownLatch(1);
-        c.handle(new OnEnvelopHandler() {
+        c.handler(new OnEnvelopHandler() {
             @Override
             public boolean onEnvelop(Envelope e) throws IOException {
-                c.handle(new OnEnvelopHandler() {
+                c.handler(new OnEnvelopHandler() {
                     @Override
                     public boolean onEnvelop(Envelope e) throws IOException {
                         answer.set(e);

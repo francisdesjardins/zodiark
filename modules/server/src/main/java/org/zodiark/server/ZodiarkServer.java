@@ -47,6 +47,11 @@ public class ZodiarkServer {
         return this;
     }
 
+    public ZodiarkServer serve(String path) {
+        builder.resource(path);
+        return this;
+    }
+
     public ZodiarkServer on() {
         if (server == null) {
             listen(URI.create("http://127.0.0.1:8080"));

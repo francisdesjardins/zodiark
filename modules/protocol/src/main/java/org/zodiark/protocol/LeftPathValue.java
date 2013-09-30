@@ -26,7 +26,7 @@ public enum LeftPathValue {
     }
 
     public static LeftPathValue deserialize(String v) {
-        String value = v.split("/")[1].toLowerCase();
+        String value = v.length() > 1 ? v.split("/")[1].toLowerCase() : v.toLowerCase();
         switch (value) {
             case "request":
                 return REQUEST;

@@ -19,7 +19,7 @@ import org.zodiark.protocol.Envelope;
 
 import java.io.IOException;
 
-public abstract class OnErrorHandler implements EventHandler {
+public abstract class OnErrorHandler implements EnvelopeHandler {
     @Override
     public boolean onEnvelop(Envelope e) throws IOException {
         return false;
