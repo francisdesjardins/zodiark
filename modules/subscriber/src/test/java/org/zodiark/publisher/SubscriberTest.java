@@ -25,7 +25,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.URI;
 
-public class PublisherTest {
+public class SubscriberTest {
 
     public final static String TEST = "This is a test";
 
@@ -60,7 +60,7 @@ public class PublisherTest {
                 .serve("./modules/publisher/src/test/resources")
                 .serve("./modules/publisher/src/main/webapp/javascript").on();
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 //        String a = "";
 //        while (!(a.equals("quit"))) {
 //            a = br.readLine();
