@@ -19,9 +19,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 import org.zodiark.server.ZodiarkServer;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.URI;
 
@@ -51,7 +49,7 @@ public class SubscriberTest {
     }
 
     private ZodiarkServer server;
-    private int port = 8080;
+    private int port = findFreePort();
 
     @Test
     public void startZodiark() throws IOException {

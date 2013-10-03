@@ -38,6 +38,7 @@ public class ServiceProcessor implements Processor {
 
         Service s = annotatedClass.getAnnotation(Service.class);
         try {
+            logger.info("Registering @Service {}", annotatedClass.getName());
             serviceLocator.register(s.path(), ServiceHandler.class.cast(annotatedClass.newInstance()));
         } catch (Exception e) {
             logger.error("Unable to register {}", annotatedClass, e);

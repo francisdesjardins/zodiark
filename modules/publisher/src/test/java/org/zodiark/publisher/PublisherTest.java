@@ -51,7 +51,7 @@ public class PublisherTest {
     }
 
     private ZodiarkServer server;
-    private int port = 8080;
+    private int port = findFreePort();;
 
     @Test
     public void startZodiark() throws IOException {

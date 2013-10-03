@@ -34,6 +34,7 @@ public class ZodiarkServer {
     private final static Logger logger = LoggerFactory.getLogger(ZodiarkServer.class);
     private final Config.Builder builder = new Config.Builder();
     private Nettosphere server;
+    private boolean autodetectService = true;
 
     public ZodiarkServer() {
         builder.resource(ZodiarkDispatcher.class)
@@ -53,6 +54,10 @@ public class ZodiarkServer {
     }
 
     public ZodiarkServer on() {
+        if (autodetectService) {
+           builder.initParam(ApplicationConfig.ANNOTATION_PACKAGE, Service.class.getPackage().getName());
+        }
+
         if (server == null) {
             listen(URI.create("http://127.0.0.1:8080"));
         }
@@ -69,6 +74,7 @@ public class ZodiarkServer {
         } catch (Exception e) {
             logger.error("Unable to create Service {}", annotatedClass, e);
         }
+        autodetectService = false;
         return this;
     }
 
