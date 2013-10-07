@@ -27,6 +27,18 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Service {
 
+    /**
+     * The path that maps the {@link org.zodiark.server.service.ServiceHandler} to the request
+     * @return the path, or '/' if not defined
+     */
     String path() default "/";
+
+    /**
+     * If a class annotated with this annotation set the nativeService to true, the service will not be registered with
+     * the {@link org.zodiark.server.service.ServiceLocator}. This is useful when a Service is fully handled by
+     * Atmosphere like a chat or any service that doesn't requires special handling.
+     * @return false by default
+     */
+    boolean nativeService() default false;
 
 }
