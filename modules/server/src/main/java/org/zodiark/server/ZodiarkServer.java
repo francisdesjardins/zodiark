@@ -84,8 +84,12 @@ public class ZodiarkServer {
     }
 
     public static void main(String[] args) throws IOException {
-        ZodiarkServer z = new ZodiarkServer();
-        z.on();
+        String staticPath = "./modules/server/src/main/resources";
+        if (args != null && args.length > 0) {
+            staticPath = args[0];
+        }
+
+        ZodiarkServer z = new ZodiarkServer().serve(staticPath).on();
         String a = "";
         logger.info("Server started on port {}", 8080);
         logger.info("Type quit to stop the server");
@@ -93,6 +97,7 @@ public class ZodiarkServer {
         while (!(a.equals("quit"))) {
             a = br.readLine();
         }
+        z.off();
         System.exit(-1);
     }
 
