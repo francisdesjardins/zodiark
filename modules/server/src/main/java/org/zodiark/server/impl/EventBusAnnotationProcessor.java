@@ -22,8 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusFactory;
-import org.zodiark.server.EventBusListener;
-import org.zodiark.service.On;
+import org.zodiark.server.Service;
+import org.zodiark.server.annotation.On;
 
 @AtmosphereAnnotation(On.class)
 public class EventBusAnnotationProcessor implements Processor {
@@ -31,7 +31,7 @@ public class EventBusAnnotationProcessor implements Processor {
     private final EventBus eventBus;
     private Logger logger = LoggerFactory.getLogger(EventBusAnnotationProcessor.class);
 
-    public EventBusAnnotationProcessor(){
+    public EventBusAnnotationProcessor() {
         eventBus = EventBusFactory.getDefault().eventBus();
     }
 
@@ -42,7 +42,7 @@ public class EventBusAnnotationProcessor implements Processor {
         On s = annotatedClass.getAnnotation(On.class);
         try {
             logger.info("Registering @EventBusListener {}", annotatedClass.getName());
-            eventBus.on(s.value(), EventBusListener.class.cast(annotatedClass.newInstance()));
+            eventBus.on(s.value(), (Service) framework.newClassInstance(annotatedClass));
         } catch (Exception e) {
             logger.error("Unable to register {}", annotatedClass, e);
         }

@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBus;
-import org.zodiark.server.EventBusListener;
+import org.zodiark.server.Service;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultEventBus implements EventBus {
 
     private final static Logger logger = LoggerFactory.getLogger(DefaultEventBus.class);
-    private final ConcurrentHashMap<String, EventBusListener> services = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Service> services = new ConcurrentHashMap<>();
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
@@ -40,7 +40,7 @@ public class DefaultEventBus implements EventBus {
             e.setUuid(r.uuid());
         }
 
-        EventBusListener eventBusListener = services.get(e.getMessage().getPath().toString());
+        Service eventBusListener = services.get(e.getMessage().getPath().toString());
         if (eventBusListener != null) {
             Envelope response  = eventBusListener.on(r, e);
             if (response != null) {
@@ -55,9 +55,14 @@ public class DefaultEventBus implements EventBus {
     }
 
     @Override
-    public EventBus on(String path, EventBusListener e) {
-        logger.debug("{} => {}", path, e);
-        services.put(path, e);
+    public EventBus on(String eventName, Service e) {
+        logger.debug("{} => {}", eventName, e);
+        services.put(eventName, e);
         return this;
+    }
+
+    @Override
+    public Service service(Class<? extends Service> clazz) {
+        return null;
     }
 }

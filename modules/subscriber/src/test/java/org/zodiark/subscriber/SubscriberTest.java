@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.publisher;
+package org.zodiark.subscriber;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -54,7 +54,7 @@ public class SubscriberTest {
     @Test
     public void startZodiark() throws IOException {
         server = new ZodiarkServer().listen(URI.create("http://127.0.0.1:" + port))
-                .service(Echo.class)
+                .service(EchoService.class)
                 .serve("./modules/publisher/src/test/resources")
                 .serve("./modules/publisher/src/main/webapp/javascript").on();
 

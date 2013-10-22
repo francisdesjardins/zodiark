@@ -27,6 +27,7 @@ import org.atmosphere.interceptor.HeartbeatInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
+import org.zodiark.server.annotation.Inject;
 
 import java.io.IOException;
 
@@ -42,7 +43,9 @@ public class EnvelopeDigester extends OnMessage<String> {
 
     private final ObjectMapper mapper = new ObjectMapper();
     private Logger logger = LoggerFactory.getLogger(EnvelopeDigester.class);
-    private final EventBus eventBus = EventBusFactory.getDefault().eventBus();
+
+    @Inject
+    public EventBus eventBus;
 
     @Override
     public void onMessage(AtmosphereResponse response, String message) throws IOException {

@@ -18,31 +18,8 @@ package org.zodiark.server;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 
-public interface EventBus {
-    /**
-     * Fire an {@link Envelope} received by the {@link AtmosphereResource}
-     *
-     * @param r
-     * @param e
-     * @return
-     */
-    EventBus fire(AtmosphereResource r, Envelope e);
+public interface Service {
 
-    /**
-     * Register a {@link Service}
-     *
-     * @param eventName
-     * @param e
-     * @return
-     */
-    EventBus on(String eventName, Service e);
-
-    /**
-     * Return the {@link Service} associated with the clazz
-     *
-     * @param clazz
-     * @return
-     */
-    Service service(Class<? extends Service> clazz);
+    public Envelope on(AtmosphereResource r, Envelope e);
 
 }

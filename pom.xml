@@ -281,8 +281,8 @@
         <surefire.redirectTestOutputToFile>false</surefire.redirectTestOutputToFile>
         <source.property>1.7</source.property>
         <target.property>1.7</target.property>
-        <atmosphere.version>2.0.3</atmosphere.version>
-        <nettosphere.version>2.0.2</nettosphere.version>
+        <atmosphere.version>2.1.0-SNAPSHOT</atmosphere.version>
+        <nettosphere.version>2.1.0-SNAPSHOT</nettosphere.version>
         <logback.version>1.0.13</logback.version>
         <wasync.version>1.1.0</wasync.version>
     </properties>

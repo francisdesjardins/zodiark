@@ -13,23 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service;
+package org.zodiark.publisher;
 
+import org.atmosphere.cpr.AtmosphereResource;
+import org.zodiark.protocol.Envelope;
+import org.zodiark.server.Service;
+import org.zodiark.server.annotation.On;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+@On("/echo")
+public class EchoService implements Service {
 
-@Target({ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface On {
-
-    /**
-     * The event name to get notified.
-     */
-    String value() default "/";
-
+    @Override
+    public Envelope on(AtmosphereResource r, Envelope e) {
+        return Envelope.newServerReply(e, e.getMessage());
+    }
 }

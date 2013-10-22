@@ -20,23 +20,26 @@ import org.atmosphere.nettosphere.Config;
 import org.atmosphere.nettosphere.Nettosphere;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zodiark.service.On;
+import org.zodiark.server.annotation.On;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ZodiarkServer {
 
     private final static Logger logger = LoggerFactory.getLogger(ZodiarkServer.class);
     private final Config.Builder builder = new Config.Builder();
     private Nettosphere server;
-    private boolean autodetectService = true;
+    private final List<String> packages = new ArrayList<String>();
 
     public ZodiarkServer() {
         builder.resource(EnvelopeDigester.class)
-                .initParam(ApplicationConfig.CUSTOM_ANNOTATION_PACKAGE, On.class.getPackage().getName());
+                .initParam(ApplicationConfig.CUSTOM_ANNOTATION_PACKAGE, On.class.getPackage().getName())
+                .initParam(ApplicationConfig.OBJECT_FACTORY, ZodiarkObjectFactory.class.getName());
     }
 
     public ZodiarkServer listen(URI uri) {
@@ -52,9 +55,10 @@ public class ZodiarkServer {
     }
 
     public ZodiarkServer on() {
-        if (autodetectService) {
-           builder.initParam(ApplicationConfig.ANNOTATION_PACKAGE, On.class.getPackage().getName());
+        if (packages.isEmpty()) {
+            packages.add(On.class.getName());
         }
+        builder.initParam(ApplicationConfig.ANNOTATION_PACKAGE, toList());
 
         if (server == null) {
             listen(URI.create("http://127.0.0.1:8080"));
@@ -63,17 +67,26 @@ public class ZodiarkServer {
         return this;
     }
 
-    public ZodiarkServer service(Class<? extends EventBusListener> annotatedClass) {
-        On s = annotatedClass.getAnnotation(On.class);
-        if (s == null) throw new IllegalStateException(annotatedClass.getName() + " must be annotated with @Service");
-
-        try {
-            EventBusFactory.getDefault().eventBus().on(s.value(), EventBusListener.class.cast(annotatedClass.newInstance()));
-        } catch (Exception e) {
-            logger.error("Unable to create Service {}", annotatedClass, e);
+    public ZodiarkServer service(Class<? extends Service> annotatedClass) {
+        if (!server.isStarted()) {
+            packages.add(annotatedClass.getName());
+        } else {
+            On s = annotatedClass.getAnnotation(On.class);
+            try {
+                EventBusFactory.getDefault().eventBus().on(s.value(), server.framework().newClassInstance(annotatedClass));
+            } catch (Exception e) {
+                logger.error("Unable to create Service {}", annotatedClass, e);
+            }
         }
-        autodetectService = false;
         return this;
+    }
+
+    private String toList() {
+        StringBuilder b = new StringBuilder();
+        for (String p : packages) {
+            b.append(p).append(",");
+        }
+        return b.toString();
     }
 
     public ZodiarkServer off() {

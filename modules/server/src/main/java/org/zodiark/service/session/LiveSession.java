@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 High-Level Technologies
+ * Copyright 2013 Jeanfrancois Arcand
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,18 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.publisher;
+package org.zodiark.service.session;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
-import org.zodiark.server.EventBusListener;
-import org.zodiark.service.On;
+import org.zodiark.server.Service;
+import org.zodiark.server.annotation.On;
 
-@On("/echo")
-public class Echo implements EventBusListener {
-
+@On("/create/{endpoint}/")
+public class LiveSession implements Service {
     @Override
     public Envelope on(AtmosphereResource r, Envelope e) {
-        return Envelope.newServerReply(e, e.getMessage());
+        return null;
     }
 }

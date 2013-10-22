@@ -13,13 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.server;
+package org.zodiark.subscriber;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
+import org.zodiark.server.Service;
+import org.zodiark.server.annotation.On;
 
-public interface EventBusListener {
+@On("/echo")
+public class EchoService implements Service {
 
-    public Envelope on(AtmosphereResource r, Envelope e);
-
+    @Override
+    public Envelope on(AtmosphereResource r, Envelope e) {
+        return Envelope.newServerReply(e, e.getMessage());
+    }
 }

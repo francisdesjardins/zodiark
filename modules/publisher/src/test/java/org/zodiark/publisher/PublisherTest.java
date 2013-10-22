@@ -56,7 +56,7 @@ public class PublisherTest {
     @Test
     public void startZodiark() throws IOException {
         server = new ZodiarkServer().listen(URI.create("http://127.0.0.1:" + port))
-                .service(Echo.class)
+                .service(EchoService.class)
                 .serve("./modules/publisher/src/test/resources")
                 .serve("./modules/publisher/src/main/webapp/javascript").on();
 

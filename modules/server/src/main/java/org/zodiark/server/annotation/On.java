@@ -13,18 +13,23 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.publisher;
+package org.zodiark.server.annotation;
 
-import org.atmosphere.cpr.AtmosphereResource;
-import org.zodiark.protocol.Envelope;
-import org.zodiark.server.EventBusListener;
-import org.zodiark.service.On;
 
-@On("/echo")
-public class Echo implements EventBusListener {
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    @Override
-    public Envelope on(AtmosphereResource r, Envelope e) {
-        return Envelope.newServerReply(e, e.getMessage());
-    }
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface On {
+
+    /**
+     * The event name to get notified.
+     */
+    String value() default "/";
+
 }

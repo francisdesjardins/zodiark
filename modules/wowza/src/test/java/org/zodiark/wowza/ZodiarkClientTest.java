@@ -73,7 +73,7 @@ public class ZodiarkClientTest {
 
     @Test
     public void echoTest() throws IOException, InterruptedException {
-        server.service(Echo.class);
+        server.service(EchoService.class);
 
         final AtomicReference<Envelope> answer = new AtomicReference<>();
         final ZodiarkClient c = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
@@ -97,7 +97,7 @@ public class ZodiarkClientTest {
 
     @Test
     public void echoPingPongTest() throws IOException, InterruptedException {
-        server.service(Echo.class);
+        server.service(EchoService.class);
 
         final AtomicReference<Envelope> answer = new AtomicReference<>();
         final ZodiarkClient c = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 High-Level Technologies
+ * Copyright 2013 Jeanfrancois Arcand
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,36 +13,22 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.server;
+package org.zodiark.service.wowza;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
+import org.zodiark.server.Service;
+import org.zodiark.server.annotation.Inject;
+import org.zodiark.server.annotation.On;
 
-public interface EventBus {
-    /**
-     * Fire an {@link Envelope} received by the {@link AtmosphereResource}
-     *
-     * @param r
-     * @param e
-     * @return
-     */
-    EventBus fire(AtmosphereResource r, Envelope e);
+@On("/register/{endpoint}/")
+public class WowzaService implements Service {
 
-    /**
-     * Register a {@link Service}
-     *
-     * @param eventName
-     * @param e
-     * @return
-     */
-    EventBus on(String eventName, Service e);
+    @Inject
+    public org.zodiark.server.EventBus evenBus;
 
-    /**
-     * Return the {@link Service} associated with the clazz
-     *
-     * @param clazz
-     * @return
-     */
-    Service service(Class<? extends Service> clazz);
-
+    @Override
+    public Envelope on(AtmosphereResource r, Envelope e) {
+        return null;
+    }
 }
