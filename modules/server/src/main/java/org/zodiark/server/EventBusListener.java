@@ -13,16 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.server.service;
+package org.zodiark.server;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 
-public interface EventBus {
+public interface EventBusListener {
 
-    public EventBus fire(AtmosphereResource r, Envelope e);
-
-    public EventBus on(String path, EventBusListener e);
-
+    public Envelope on(AtmosphereResource r, Envelope e);
 
 }

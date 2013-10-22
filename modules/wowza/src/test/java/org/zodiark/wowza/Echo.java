@@ -17,7 +17,7 @@ package org.zodiark.wowza;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
-import org.zodiark.server.service.EventBusListener;
+import org.zodiark.server.EventBusListener;
 import org.zodiark.service.On;
 
 @On("/echo")

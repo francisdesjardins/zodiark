@@ -13,27 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.server.service;
+package org.zodiark.server;
 
-public class EventBusFactory {
+import org.atmosphere.cpr.AtmosphereResource;
+import org.zodiark.protocol.Envelope;
 
-    private static EventBusFactory factory;
-    private final EventBus eventBus;
+public interface EventBus {
 
-    private EventBusFactory() {
-        eventBus = new DefaultEventBus();
-    }
+    public EventBus fire(AtmosphereResource r, Envelope e);
 
-    public final synchronized static EventBusFactory getDefault() {
-        if (factory == null) {
-            factory = new EventBusFactory();
-        }
-        return factory;
-    }
+    public EventBus on(String path, EventBusListener e);
 
-
-    public EventBus eventBus() {
-        return eventBus;
-    }
 
 }
