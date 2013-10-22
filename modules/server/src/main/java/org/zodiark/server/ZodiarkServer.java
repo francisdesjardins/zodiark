@@ -20,9 +20,9 @@ import org.atmosphere.nettosphere.Config;
 import org.atmosphere.nettosphere.Nettosphere;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zodiark.server.service.ServiceHandler;
-import org.zodiark.server.service.ServiceLocatorFactory;
-import org.zodiark.service.Service;
+import org.zodiark.server.service.EventBusListener;
+import org.zodiark.server.service.EventBusFactory;
+import org.zodiark.service.On;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,8 +37,8 @@ public class ZodiarkServer {
     private boolean autodetectService = true;
 
     public ZodiarkServer() {
-        builder.resource(ZodiarkDispatcher.class)
-                .initParam(ApplicationConfig.CUSTOM_ANNOTATION_PACKAGE, Service.class.getPackage().getName());
+        builder.resource(EnvelopeDigester.class)
+                .initParam(ApplicationConfig.CUSTOM_ANNOTATION_PACKAGE, On.class.getPackage().getName());
     }
 
     public ZodiarkServer listen(URI uri) {
@@ -55,7 +55,7 @@ public class ZodiarkServer {
 
     public ZodiarkServer on() {
         if (autodetectService) {
-           builder.initParam(ApplicationConfig.ANNOTATION_PACKAGE, Service.class.getPackage().getName());
+           builder.initParam(ApplicationConfig.ANNOTATION_PACKAGE, On.class.getPackage().getName());
         }
 
         if (server == null) {
@@ -65,12 +65,12 @@ public class ZodiarkServer {
         return this;
     }
 
-    public ZodiarkServer service(Class<? extends ServiceHandler> annotatedClass) {
-        Service s = annotatedClass.getAnnotation(Service.class);
+    public ZodiarkServer service(Class<? extends EventBusListener> annotatedClass) {
+        On s = annotatedClass.getAnnotation(On.class);
         if (s == null) throw new IllegalStateException(annotatedClass.getName() + " must be annotated with @Service");
 
         try {
-            ServiceLocatorFactory.getDefault().locator().register(s.path(), ServiceHandler.class.cast(annotatedClass.newInstance()));
+            EventBusFactory.getDefault().eventBus().on(s.value(), EventBusListener.class.cast(annotatedClass.newInstance()));
         } catch (Exception e) {
             logger.error("Unable to create Service {}", annotatedClass, e);
         }

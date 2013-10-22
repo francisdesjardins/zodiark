@@ -26,12 +26,10 @@ import org.atmosphere.cpr.BroadcasterFactory;
 import org.atmosphere.cpr.MetaBroadcaster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zodiark.service.Service;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Service(nativeService = true)
 @ManagedService(path = "/chat/{room: [a-zA-Z][a-zA-Z_0-9]*}")
 public class ChatService {
     private final Logger logger = LoggerFactory.getLogger(ChatService.class);

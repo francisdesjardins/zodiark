@@ -17,14 +17,14 @@ package org.zodiark.publisher;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
-import org.zodiark.server.service.ServiceHandler;
-import org.zodiark.service.Service;
+import org.zodiark.server.service.EventBusListener;
+import org.zodiark.service.On;
 
-@Service(path="/echo")
-public class EchoService implements ServiceHandler {
+@On("/echo")
+public class Echo implements EventBusListener {
 
     @Override
-    public Envelope handle(AtmosphereResource r, Envelope e) {
+    public Envelope on(AtmosphereResource r, Envelope e) {
         return Envelope.newServerReply(e, e.getMessage());
     }
 }

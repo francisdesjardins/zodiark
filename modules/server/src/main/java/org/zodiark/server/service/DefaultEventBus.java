@@ -24,23 +24,23 @@ import org.zodiark.protocol.Envelope;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ServiceLocatorImpl implements ServiceLocator {
+public class DefaultEventBus implements EventBus {
 
-    private final static Logger logger = LoggerFactory.getLogger(ServiceLocatorImpl.class);
-    private final ConcurrentHashMap<String, ServiceHandler> services = new ConcurrentHashMap<>();
+    private final static Logger logger = LoggerFactory.getLogger(DefaultEventBus.class);
+    private final ConcurrentHashMap<String, EventBusListener> services = new ConcurrentHashMap<>();
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public ServiceLocator dispatch(AtmosphereResource r, Envelope e) {
+    public EventBus fire(AtmosphereResource r, Envelope e) {
         logger.debug("Dispatching Envelop {} to {}", e, r.uuid());
 
         if (e.getUuid().isEmpty()) {
             e.setUuid(r.uuid());
         }
 
-        ServiceHandler serviceHandler = services.get(e.getMessage().getPath().toString());
-        if (serviceHandler != null) {
-            Envelope response  = serviceHandler.handle(r, e);
+        EventBusListener eventBusListener = services.get(e.getMessage().getPath().toString());
+        if (eventBusListener != null) {
+            Envelope response  = eventBusListener.on(r, e);
             if (response != null) {
                 try {
                     r.getResponse().write(mapper.writeValueAsString(response));
@@ -53,7 +53,7 @@ public class ServiceLocatorImpl implements ServiceLocator {
     }
 
     @Override
-    public ServiceLocator register(String path, ServiceHandler e) {
+    public EventBus on(String path, EventBusListener e) {
         logger.debug("{} => {}", path, e);
         services.put(path, e);
         return this;

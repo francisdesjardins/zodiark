@@ -13,18 +13,27 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.wowza;
+package org.zodiark.server.service;
 
-import org.atmosphere.cpr.AtmosphereResource;
-import org.zodiark.protocol.Envelope;
-import org.zodiark.service.Service;
-import org.zodiark.server.service.ServiceHandler;
+public class EventBusFactory {
 
-@Service(path="/echo")
-public class EchoService implements ServiceHandler {
+    private static EventBusFactory factory;
+    private final EventBus eventBus;
 
-    @Override
-    public Envelope handle(AtmosphereResource r, Envelope e) {
-        return Envelope.newServerReply(e, e.getMessage());
+    private EventBusFactory() {
+        eventBus = new DefaultEventBus();
     }
+
+    public final synchronized static EventBusFactory getDefault() {
+        if (factory == null) {
+            factory = new EventBusFactory();
+        }
+        return factory;
+    }
+
+
+    public EventBus eventBus() {
+        return eventBus;
+    }
+
 }

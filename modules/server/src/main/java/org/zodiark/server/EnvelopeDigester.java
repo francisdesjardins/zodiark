@@ -27,8 +27,8 @@ import org.atmosphere.interceptor.HeartbeatInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
-import org.zodiark.server.service.ServiceLocator;
-import org.zodiark.server.service.ServiceLocatorFactory;
+import org.zodiark.server.service.EventBus;
+import org.zodiark.server.service.EventBusFactory;
 
 import java.io.IOException;
 
@@ -40,18 +40,18 @@ import java.io.IOException;
                 HeartbeatInterceptor.class,
                 TrackMessageSizeInterceptor.class}
 )
-public class ZodiarkDispatcher extends OnMessage<String> {
+public class EnvelopeDigester extends OnMessage<String> {
 
     private final ObjectMapper mapper = new ObjectMapper();
-    private Logger logger = LoggerFactory.getLogger(ZodiarkDispatcher.class);
-    private final ServiceLocator serviceLocator = ServiceLocatorFactory.getDefault().locator();
+    private Logger logger = LoggerFactory.getLogger(EnvelopeDigester.class);
+    private final EventBus eventBus = EventBusFactory.getDefault().eventBus();
 
     @Override
     public void onMessage(AtmosphereResponse response, String message) throws IOException {
         try {
             logger.debug("{}", message);
             Envelope e = mapper.readValue(message, Envelope.class);
-            serviceLocator.dispatch(response.resource(), e);
+            eventBus.fire(response.resource(), e);
         } catch (Exception ex) {
             logger.error("", ex);
             response.resource().close();

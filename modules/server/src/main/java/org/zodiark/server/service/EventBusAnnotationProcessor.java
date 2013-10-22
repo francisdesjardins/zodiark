@@ -20,26 +20,26 @@ import org.atmosphere.config.AtmosphereAnnotation;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zodiark.service.Service;
+import org.zodiark.service.On;
 
-@AtmosphereAnnotation(Service.class)
-public class ServiceProcessor implements Processor {
+@AtmosphereAnnotation(On.class)
+public class EventBusAnnotationProcessor implements Processor {
 
-    private final ServiceLocator serviceLocator;
-    private Logger logger = LoggerFactory.getLogger(ServiceProcessor.class);
+    private final EventBus eventBus;
+    private Logger logger = LoggerFactory.getLogger(EventBusAnnotationProcessor.class);
 
-    public ServiceProcessor(){
-        serviceLocator = ServiceLocatorFactory.getDefault().locator();
+    public EventBusAnnotationProcessor(){
+        eventBus = EventBusFactory.getDefault().eventBus();
     }
 
 
     @Override
     public void handle(AtmosphereFramework framework, Class<?> annotatedClass) {
 
-        Service s = annotatedClass.getAnnotation(Service.class);
+        On s = annotatedClass.getAnnotation(On.class);
         try {
-            logger.info("Registering @Service {}", annotatedClass.getName());
-            serviceLocator.register(s.path(), ServiceHandler.class.cast(annotatedClass.newInstance()));
+            logger.info("Registering @EventBusListener {}", annotatedClass.getName());
+            eventBus.on(s.value(), EventBusListener.class.cast(annotatedClass.newInstance()));
         } catch (Exception e) {
             logger.error("Unable to register {}", annotatedClass, e);
         }

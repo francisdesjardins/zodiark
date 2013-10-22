@@ -25,20 +25,11 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Service {
+public @interface On {
 
     /**
-     * The path that maps the {@link org.zodiark.server.service.ServiceHandler} to the request
-     * @return the path, or '/' if not defined
+     * The event name to get notified.
      */
-    String path() default "/";
-
-    /**
-     * If a class annotated with this annotation set the nativeService to true, the service will not be registered with
-     * the {@link org.zodiark.server.service.ServiceLocator}. This is useful when a Service is fully handled by
-     * Atmosphere like a chat or any service that doesn't requires special handling.
-     * @return false by default
-     */
-    boolean nativeService() default false;
+    String value() default "/";
 
 }

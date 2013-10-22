@@ -15,25 +15,11 @@
  */
 package org.zodiark.server.service;
 
-public class ServiceLocatorFactory {
+import org.atmosphere.cpr.AtmosphereResource;
+import org.zodiark.protocol.Envelope;
 
-    private static ServiceLocatorFactory factory;
-    private final ServiceLocator serviceLocator;
+public interface EventBusListener {
 
-    private ServiceLocatorFactory() {
-        serviceLocator = new ServiceLocatorImpl();
-    }
-
-    public final synchronized static ServiceLocatorFactory getDefault() {
-        if (factory == null) {
-            factory = new ServiceLocatorFactory();
-        }
-        return factory;
-    }
-
-
-    public ServiceLocator locator() {
-        return serviceLocator;
-    }
+    public Envelope on(AtmosphereResource r, Envelope e);
 
 }
