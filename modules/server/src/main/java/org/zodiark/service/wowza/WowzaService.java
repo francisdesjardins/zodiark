@@ -28,10 +28,6 @@ public class WowzaService implements Service {
     public org.zodiark.server.EventBus evenBus;
 
     @Override
-    public void on(Envelope e, Object r) {
-    }
-
-    @Override
     public void on(Envelope e, Object r, EventBusListener l) {
     }
 }

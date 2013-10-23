@@ -22,9 +22,6 @@ import org.zodiark.server.annotation.On;
 
 @On("/create/{endpoint}/")
 public class LiveSession implements Service {
-    @Override
-    public void on(Envelope e, Object r) {
-    }
 
     @Override
     public void on(Envelope e, Object r, EventBusListener l) {

@@ -19,8 +19,6 @@ import org.zodiark.protocol.Envelope;
 
 public interface Service {
 
-    void on(Envelope e, Object r);
-
     void on(Envelope e, Object r, EventBusListener l);
 
 }

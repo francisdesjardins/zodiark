@@ -28,7 +28,7 @@ public class EchoService implements Service {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public void on(Envelope e, Object r) {
+    public void on(Envelope e, Object r, EventBusListener l) {
         try {
             AtmosphereResource.class.cast(r).write(mapper.writeValueAsString(Envelope.newServerReply(e, e.getMessage())));
         } catch (JsonProcessingException e1) {
@@ -36,8 +36,4 @@ public class EchoService implements Service {
         }
     }
 
-    @Override
-    public void on(Envelope e, Object r, EventBusListener l) {
-
-    }
 }

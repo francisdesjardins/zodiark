@@ -15,7 +15,6 @@
  */
 package org.zodiark.server.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +29,19 @@ public class DefaultEventBus implements EventBus {
 
     private final static Logger logger = LoggerFactory.getLogger(DefaultEventBus.class);
     private final ConcurrentHashMap<String, Service> services = new ConcurrentHashMap<>();
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final EventBusListener l = new EventBusListener() {
+        @Override
+        public void completed(Service s, Object response) {
+        }
+    };
 
     @Override
     public EventBus fire(Envelope e, Object o) {
+        return fire(e, o, l);
+    }
+
+    @Override
+    public EventBus fire(Envelope e, Object o, EventBusListener l) {
         Service s = services.get(e.getMessage().getPath().toString());
         if (AtmosphereResource.class.isAssignableFrom(o.getClass())) {
             AtmosphereResource r = AtmosphereResource.class.cast(o);
@@ -43,18 +51,12 @@ public class DefaultEventBus implements EventBus {
                 e.setUuid(r.uuid());
             }
 
-            if (s != null) {
-                s.on(e, r);
-            }
-        } else {
-            s.on(e, o);
+        }
+
+        if (s != null) {
+            s.on(e, o, l);
         }
         return this;
-    }
-
-    @Override
-    public EventBus fire(Envelope e, Object r, EventBusListener l) {
-        return null;
     }
 
     @Override
