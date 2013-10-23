@@ -21,17 +21,26 @@ import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
-import org.zodiark.server.Service;
+import org.zodiark.service.Service;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Synchronous EventBus implementation.
+ */
 public class DefaultEventBus implements EventBus {
 
     private final static Logger logger = LoggerFactory.getLogger(DefaultEventBus.class);
     private final ConcurrentHashMap<String, Service> services = new ConcurrentHashMap<>();
     private final EventBusListener l = new EventBusListener() {
         @Override
-        public void completed(Service s, Object response) {
+        public void completed(Object response) {
+            logger.trace("completed", response);
+        }
+
+        @Override
+        public void failed(Object response) {
+            logger.trace("failed", response);
         }
     };
 
@@ -56,6 +65,18 @@ public class DefaultEventBus implements EventBus {
         if (s != null) {
             s.on(e, o, l);
         }
+        return this;
+    }
+
+    @Override
+    public EventBus fire(String e, Object r, EventBusListener l) {
+        return fire(e, r, l);
+    }
+
+    @Override
+    public EventBus fire(String message, Object o) {
+        Service s = services.get(message);
+        s.on(o, l);
         return this;
     }
 

@@ -13,24 +13,26 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.init;
+package org.zodiark.service.util;
 
-import org.zodiark.protocol.Envelope;
-import org.zodiark.server.EventBusListener;
-import org.zodiark.server.Service;
-import org.zodiark.server.annotation.Inject;
-import org.zodiark.server.annotation.On;
-
-/**
- * Create the session associated with a remote endpoint.
- */
-@On("/init/{endpoint}")
-public class InitService implements Service {
-
-    @Inject
-    public org.zodiark.server.EventBus evenBus;
+public class LoopbackRESTService implements RESTService {
+    @Override
+    public <T> T get(String uri, Class<T> c) {
+        return null;
+    }
 
     @Override
-    public void on(Envelope e, Object r, EventBusListener l) {
+    public <T> T put(String uri, Object o, Class<T> result) {
+        return null;
+    }
+
+    @Override
+    public <T> T post(String uri, Object o, Class<T> result) {
+        return null;
+    }
+
+    @Override
+    public <T> T delete(String uri, Object o, Class<T> result) {
+        return null;
     }
 }

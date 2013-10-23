@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusFactory;
-import org.zodiark.server.Service;
+import org.zodiark.service.Service;
 import org.zodiark.server.annotation.On;
 
 @AtmosphereAnnotation(On.class)

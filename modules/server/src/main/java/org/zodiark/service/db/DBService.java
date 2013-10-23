@@ -13,22 +13,19 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.session;
+package org.zodiark.service.db;
 
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.service.Service;
-import org.zodiark.server.annotation.On;
 
-@On("/create/{endpoint}/")
-public class LiveSession implements Service {
+public interface DBService extends Service {
 
     @Override
-    public void on(Envelope e, Object r, EventBusListener l) {
-    }
+    public void on(Envelope e, Object r, EventBusListener l) ;
 
     @Override
-    public void on(Object r, EventBusListener l) {
-    }
+    public void on(Object r, EventBusListener l);
 
 }
+

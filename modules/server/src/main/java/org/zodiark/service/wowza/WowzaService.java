@@ -16,18 +16,24 @@
 package org.zodiark.service.wowza;
 
 import org.zodiark.protocol.Envelope;
+import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
-import org.zodiark.server.Service;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
+import org.zodiark.service.Service;
 
 @On("/register/{endpoint}/")
 public class WowzaService implements Service {
 
     @Inject
-    public org.zodiark.server.EventBus evenBus;
+    public EventBus evenBus;
 
     @Override
     public void on(Envelope e, Object r, EventBusListener l) {
     }
+
+    @Override
+    public void on(Object r, EventBusListener l) {
+    }
+
 }

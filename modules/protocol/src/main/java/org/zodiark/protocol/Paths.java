@@ -13,22 +13,15 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.session;
+package org.zodiark.protocol;
 
-import org.zodiark.protocol.Envelope;
-import org.zodiark.server.EventBusListener;
-import org.zodiark.service.Service;
-import org.zodiark.server.annotation.On;
+/**
+ * @author Jeanfrancois Arcand
+ */
+public interface Paths {
 
-@On("/create/{endpoint}/")
-public class LiveSession implements Service {
+    String CREATE_SESSION = "/REACT/EXECUTION/CREATE_SESSION";
 
-    @Override
-    public void on(Envelope e, Object r, EventBusListener l) {
-    }
-
-    @Override
-    public void on(Object r, EventBusListener l) {
-    }
+    String LOAD_CONFIG = "/REACT/EXECUTION/LOADCONFIG";
 
 }

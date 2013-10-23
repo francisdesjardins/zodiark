@@ -13,22 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.session;
+package org.zodiark.service.util;
 
-import org.zodiark.protocol.Envelope;
-import org.zodiark.server.EventBusListener;
-import org.zodiark.service.Service;
-import org.zodiark.server.annotation.On;
+public interface RESTService {
 
-@On("/create/{endpoint}/")
-public class LiveSession implements Service {
+    <T> T get(String uri, Class<T> c);
 
-    @Override
-    public void on(Envelope e, Object r, EventBusListener l) {
-    }
+    <T> T put(String uri, Object o, Class<T> result);
 
-    @Override
-    public void on(Object r, EventBusListener l) {
-    }
+    <T> T post(String uri, Object o, Class<T> result);
+
+    <T> T delete(String uri, Object o, Class<T> result);
 
 }
+

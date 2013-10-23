@@ -15,11 +15,46 @@
  */
 package org.zodiark.service.publisher;
 
+import org.atmosphere.cpr.AtmosphereResource;
+import org.zodiark.protocol.Message;
 import org.zodiark.server.Endpoint;
 
 public class PublisherEndpoint implements Endpoint {
+
+    private final String uuid;
+    private PublisherConfig config;
+    private final Message message;
+    private final AtmosphereResource resource;
+
+    public PublisherEndpoint(String uuid, Message message, AtmosphereResource resource) {
+        this.uuid = uuid;
+        this.message = message;
+        this.resource = resource;
+    }
+
+    public String uuid() {
+        return uuid;
+    }
+
+    public PublisherEndpoint config(PublisherConfig config) {
+        this.config = config;
+        return this;
+    }
+
+    public PublisherConfig config() {
+        return config;
+    }
+
     @Override
     public TYPE type() {
         return TYPE.PUBLISHER;
+    }
+
+    public Message message() {
+        return message;
+    }
+
+    public AtmosphereResource resource() {
+        return resource;
     }
 }

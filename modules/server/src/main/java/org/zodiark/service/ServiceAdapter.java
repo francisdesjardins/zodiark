@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 High-Level Technologies
+ * Copyright 2013 Jeanfrancois Arcand
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,33 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.publisher;
+package org.zodiark.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBusListener;
-import org.zodiark.server.annotation.Inject;
-import org.zodiark.service.Service;
-import org.zodiark.server.annotation.On;
 
-@On("/echo")
-public class EchoService implements Service {
-    @Inject
-    public ObjectMapper mapper;
-
+public class ServiceAdapter implements Service {
     @Override
     public void on(Envelope e, Object r, EventBusListener l) {
-        try {
-            AtmosphereResource.class.cast(r).write(mapper.writeValueAsString(Envelope.newServerReply(e, e.getMessage())));
-        } catch (JsonProcessingException e1) {
-            e1.printStackTrace();
-        }
     }
 
     @Override
     public void on(Object r, EventBusListener l) {
     }
-
 }

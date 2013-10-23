@@ -15,15 +15,20 @@
  */
 package org.zodiark.server;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereObjectFactory;
 import org.zodiark.server.annotation.Inject;
+import org.zodiark.service.util.LoopbackRESTService;
+import org.zodiark.service.util.RESTService;
 
 import java.lang.reflect.Field;
 
 public class ZodiarkObjectFactory implements AtmosphereObjectFactory{
 
     private final EventBus evenBus = EventBusFactory.getDefault().eventBus();
+    private final ObjectMapper mapper = new ObjectMapper();
+    private RESTService restService = new LoopbackRESTService();
 
     @Override
     public <T> T newClassInstance(AtmosphereFramework atmosphereFramework, Class<T> tClass) throws InstantiationException, IllegalAccessException {
@@ -31,10 +36,15 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory{
         T instance = tClass.newInstance();
 
         Field[] fields = tClass.getDeclaredFields();
-
         for (Field field : fields) {
             if (field.isAnnotationPresent(Inject.class)) {
-                field.set(instance, evenBus);
+                if (field.getType().isAssignableFrom(ObjectMapper.class)) {
+                    field.set(instance, mapper);
+                } else if (field.getType().isAssignableFrom(EventBus.class)) {
+                    field.set(instance, evenBus);
+                } else if (field.getType().isAssignableFrom(RESTService.class)) {
+                    field.set(instance, restService);
+                }
             }
         }
         return instance;

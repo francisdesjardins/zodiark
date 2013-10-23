@@ -13,12 +13,15 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.server;
+package org.zodiark.service;
 
 import org.zodiark.protocol.Envelope;
+import org.zodiark.server.EventBusListener;
 
 public interface Service {
 
     void on(Envelope e, Object r, EventBusListener l);
+
+    void on(Object r, EventBusListener l);
 
 }

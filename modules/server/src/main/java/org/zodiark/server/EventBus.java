@@ -16,6 +16,7 @@
 package org.zodiark.server;
 
 import org.zodiark.protocol.Envelope;
+import org.zodiark.service.Service;
 
 public interface EventBus {
 
@@ -23,8 +24,12 @@ public interface EventBus {
 
     EventBus fire(Envelope e, Object r, EventBusListener l);
 
+    EventBus fire(String e, Object r, EventBusListener l);
+
+    EventBus fire(String e, Object r);
+
     /**
-     * Register a {@link Service}
+     * Register a {@link org.zodiark.service.Service}
      *
      * @param eventName
      * @param e

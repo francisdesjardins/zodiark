@@ -15,19 +15,23 @@
  */
 package org.zodiark.service.publisher;
 
+import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBusListener;
-import org.zodiark.server.Service;
-import org.zodiark.server.annotation.Inject;
-import org.zodiark.server.annotation.On;
+import org.zodiark.service.Service;
 
-@On("/{endpoint}")
-public class PublisherService implements Service {
-
-    @Inject
-    public org.zodiark.server.EventBus evenBus;
+public interface PublisherService extends Service {
 
     @Override
-    public void on(Envelope e, Object r, EventBusListener l) {
-    }
+    public void on(Envelope e, Object r, EventBusListener l) ;
+
+    @Override
+    public void on(Object r, EventBusListener l);
+
+    public PublisherEndpoint init(Envelope e, AtmosphereResource resource);
+
+    public PublisherEndpoint config(Envelope e);
+
+    public void error(Envelope e, PublisherEndpoint p);
 }
+

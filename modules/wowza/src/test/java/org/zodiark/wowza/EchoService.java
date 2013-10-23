@@ -20,12 +20,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBusListener;
-import org.zodiark.server.Service;
+import org.zodiark.service.Service;
+import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 
 @On("/echo")
 public class EchoService implements Service {
-    private final ObjectMapper mapper = new ObjectMapper();
+
+    @Inject
+    public ObjectMapper mapper;
 
     @Override
     public void on(Envelope e, Object r, EventBusListener l) {
@@ -36,4 +39,7 @@ public class EchoService implements Service {
         }
     }
 
+    @Override
+    public void on(Object r, EventBusListener l) {
+    }
 }

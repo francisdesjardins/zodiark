@@ -17,5 +17,7 @@ package org.zodiark.server;
 
 public interface EventBusListener<T> {
 
-    void completed(Service s, T response);
+    void completed(T response);
+
+    void failed(T response);
 }
