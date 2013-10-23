@@ -15,16 +15,30 @@
  */
 package org.zodiark.subscriber;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
+import org.zodiark.server.EventBusListener;
 import org.zodiark.server.Service;
 import org.zodiark.server.annotation.On;
 
 @On("/echo")
 public class EchoService implements Service {
 
+    private final ObjectMapper mapper = new ObjectMapper();
+
     @Override
-    public Envelope on(AtmosphereResource r, Envelope e) {
-        return Envelope.newServerReply(e, e.getMessage());
+    public void on(Envelope e, Object r) {
+        try {
+            AtmosphereResource.class.cast(r).write(mapper.writeValueAsString(Envelope.newServerReply(e, e.getMessage())));
+        } catch (JsonProcessingException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    @Override
+    public void on(Envelope e, Object r, EventBusListener l) {
+
     }
 }

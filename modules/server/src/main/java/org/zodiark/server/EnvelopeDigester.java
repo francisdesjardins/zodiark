@@ -52,7 +52,7 @@ public class EnvelopeDigester extends OnMessage<String> {
         try {
             logger.debug("{}", message);
             Envelope e = mapper.readValue(message, Envelope.class);
-            eventBus.fire(response.resource(), e);
+            eventBus.fire(e, response.resource());
         } catch (Exception ex) {
             logger.error("", ex);
             response.resource().close();

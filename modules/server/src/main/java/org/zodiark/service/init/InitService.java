@@ -15,8 +15,8 @@
  */
 package org.zodiark.service.init;
 
-import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
+import org.zodiark.server.EventBusListener;
 import org.zodiark.server.Service;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
@@ -31,7 +31,10 @@ public class InitService implements Service {
     public org.zodiark.server.EventBus evenBus;
 
     @Override
-    public Envelope on(AtmosphereResource r, Envelope e) {
-        return null;
+    public void on(Envelope e, Object r) {
+    }
+
+    @Override
+    public void on(Envelope e, Object r, EventBusListener l) {
     }
 }

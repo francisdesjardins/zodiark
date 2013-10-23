@@ -21,9 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBus;
+import org.zodiark.server.EventBusListener;
 import org.zodiark.server.Service;
 
-import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultEventBus implements EventBus {
@@ -33,25 +33,28 @@ public class DefaultEventBus implements EventBus {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public EventBus fire(AtmosphereResource r, Envelope e) {
-        logger.debug("Dispatching Envelop {} to {}", e, r.uuid());
+    public EventBus fire(Envelope e, Object o) {
+        Service s = services.get(e.getMessage().getPath().toString());
+        if (AtmosphereResource.class.isAssignableFrom(o.getClass())) {
+            AtmosphereResource r = AtmosphereResource.class.cast(o);
+            logger.debug("Dispatching Envelop {} to {}", e, r.uuid());
 
-        if (e.getUuid().isEmpty()) {
-            e.setUuid(r.uuid());
-        }
-
-        Service eventBusListener = services.get(e.getMessage().getPath().toString());
-        if (eventBusListener != null) {
-            Envelope response  = eventBusListener.on(r, e);
-            if (response != null) {
-                try {
-                    r.getResponse().write(mapper.writeValueAsString(response));
-                } catch (IOException e1) {
-                   logger.error("{}", e);
-                }
+            if (e.getUuid().isEmpty()) {
+                e.setUuid(r.uuid());
             }
+
+            if (s != null) {
+                s.on(e, r);
+            }
+        } else {
+            s.on(e, o);
         }
         return this;
+    }
+
+    @Override
+    public EventBus fire(Envelope e, Object r, EventBusListener l) {
+        return null;
     }
 
     @Override
@@ -59,6 +62,11 @@ public class DefaultEventBus implements EventBus {
         logger.debug("{} => {}", eventName, e);
         services.put(eventName, e);
         return this;
+    }
+
+    @Override
+    public EventBus off(String eventName) {
+        return null;
     }
 
     @Override
