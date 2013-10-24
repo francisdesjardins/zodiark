@@ -44,4 +44,6 @@ public interface WowzaEndpointService {
      * @return this
      */
     public WowzaEndpointService disconnected(WowzaEndpoint endpoint);
+
+    public WowzaEndpoint lookup(String wowzaName);
 }

@@ -25,6 +25,7 @@ public class PublisherEndpoint implements Endpoint {
     private PublisherConfig config;
     private final Message message;
     private final AtmosphereResource resource;
+    private String wowzaServer;
 
     public PublisherEndpoint(String uuid, Message message, AtmosphereResource resource) {
         this.uuid = uuid;
@@ -56,5 +57,14 @@ public class PublisherEndpoint implements Endpoint {
 
     public AtmosphereResource resource() {
         return resource;
+    }
+
+    public String wowzaServer() {
+        return wowzaServer;
+    }
+
+    public PublisherEndpoint wowzaServer(String wowzaServer) {
+        this.wowzaServer = wowzaServer;
+        return this;
     }
 }

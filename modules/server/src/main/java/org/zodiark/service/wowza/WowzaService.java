@@ -21,6 +21,7 @@ import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.Service;
+import org.zodiark.service.publisher.PublisherEndpoint;
 
 @On("/register/{endpoint}/")
 public class WowzaService implements Service {
@@ -28,12 +29,27 @@ public class WowzaService implements Service {
     @Inject
     public EventBus evenBus;
 
+    @Inject
+    public WowzaEndpointService wowzaService;
+
     @Override
     public void on(Envelope e, Object r, EventBusListener l) {
+
+        // TODO We are getting the response from Wowza. We need to dispatch
+        // (1) we are getting called when wowza client connect
+        // (2) we are getting called when the Publisher is getting accepted
+        // (3) Notify the LiveSession service we are ready.
+        // (4) The Liveshow will creates call back the Publisher so it can connect.
+
     }
 
     @Override
-    public void on(Object r, EventBusListener l) {
+    public void on(Object message, EventBusListener l) {
+        if (PublisherEndpoint.class.isAssignableFrom(message.getClass())) {
+            PublisherEndpoint p = PublisherEndpoint.class.cast(message);
+            WowzaEndpoint w = wowzaService.lookup(p.wowzaServer());
+            w.isConnected(p, l);
+        }
     }
 
 }

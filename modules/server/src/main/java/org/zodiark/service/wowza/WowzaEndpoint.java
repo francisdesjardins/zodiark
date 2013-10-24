@@ -15,7 +15,10 @@
  */
 package org.zodiark.service.wowza;
 
+import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.server.Endpoint;
+import org.zodiark.server.EventBusListener;
+import org.zodiark.service.publisher.PublisherEndpoint;
 
 import java.util.List;
 
@@ -26,10 +29,12 @@ public class WowzaEndpoint implements Endpoint {
 
     private final String uri;
     private final List<Endpoint> supportedEndpoints;
+    private final AtmosphereResource resource;
 
-    public WowzaEndpoint(String uri, List<Endpoint> supportedEndpoints) {
+    public WowzaEndpoint(AtmosphereResource resource, String uri, List<Endpoint> supportedEndpoints) {
         this.uri = uri;
         this.supportedEndpoints = supportedEndpoints;
+        this.resource = resource;
     }
 
     public String uri() {
@@ -43,5 +48,11 @@ public class WowzaEndpoint implements Endpoint {
 
     public List<Endpoint> supportedEndpoints() {
         return supportedEndpoints;
+    }
+
+    public void isConnected(PublisherEndpoint p, EventBusListener l) {
+
+        // TODO: Send a message to wowza.
+        //resource.write();
     }
 }
