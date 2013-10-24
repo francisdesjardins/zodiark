@@ -49,9 +49,36 @@ public class PublisherServiceImpl implements PublisherService {
             case Paths.CREATE_SESSION:
                 init(e, AtmosphereResource.class.cast(r));
                 break;
+            case Paths.CREATE_SHOW:
+                createShow(e,  AtmosphereResource.class.cast(r));
+                break;
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
         }
+    }
+
+    public void createShow(final Envelope e, AtmosphereResource cast) {
+        String uuid = e.getUuid();
+        PublisherEndpoint p = endpoints.get(uuid);
+        if (p == null) {
+            throw new IllegalStateException("No Publisher associated with " + uuid);
+        }
+
+        eventBus.fire("/wowza/connect", p, new EventBusListener() {
+            @Override
+            public void completed(Object response) {
+                if (PublisherEndpoint.class.isAssignableFrom(response.getClass())) {
+                    // TODO: Send OK to the Publisher
+                }
+            }
+
+            @Override
+            public void failed(Object response) {
+                if (PublisherEndpoint.class.isAssignableFrom(response.getClass())) {
+                    error(e, PublisherEndpoint.class.cast(response));
+                }
+            }
+        });
     }
 
     @Override
@@ -107,7 +134,7 @@ public class PublisherServiceImpl implements PublisherService {
             @Override
             public void completed(Object response) {
                 if (PublisherEndpoint.class.isAssignableFrom(response.getClass())) {
-                    // OK, we are ready to return the response.
+                    // TODO: OK, we are ready to return the response.
                 }
             }
 

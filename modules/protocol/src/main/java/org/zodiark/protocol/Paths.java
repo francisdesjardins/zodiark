@@ -24,4 +24,5 @@ public interface Paths {
 
     String LOAD_CONFIG = "/REACT/EXECUTION/LOADCONFIG";
 
+    String CREATE_SHOW = "/REACT/EXECUTION/CREATESHOW";
 }
