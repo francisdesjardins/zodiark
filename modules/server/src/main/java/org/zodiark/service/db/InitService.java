@@ -15,6 +15,7 @@
  */
 package org.zodiark.service.db;
 
+import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
@@ -34,7 +35,7 @@ public class InitService implements DBService {
     public RESTService restService;
 
     @Override
-    public void on(Envelope e, Object r, EventBusListener l) {
+    public void on(Envelope e, AtmosphereResource r, EventBusListener l) {
     }
 
     @Override

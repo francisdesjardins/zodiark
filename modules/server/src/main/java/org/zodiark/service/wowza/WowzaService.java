@@ -15,6 +15,7 @@
  */
 package org.zodiark.service.wowza;
 
+import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
@@ -32,14 +33,16 @@ public class WowzaService implements Service {
     @Inject
     public WowzaEndpointService wowzaService;
 
+
     @Override
-    public void on(Envelope e, Object r, EventBusListener l) {
+    public void on(Envelope e, AtmosphereResource r, EventBusListener l) {
 
         // TODO We are getting the response from Wowza. We need to dispatch
         // (1) we are getting called when wowza client connect
         // (2) we are getting called when the Publisher is getting accepted
         // (3) Notify the LiveSession service we are ready.
         // (4) The Liveshow will creates call back the Publisher so it can connect.
+
 
     }
 

@@ -15,6 +15,7 @@
  */
 package org.zodiark.service.session;
 
+import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.service.Service;
@@ -24,7 +25,7 @@ import org.zodiark.server.annotation.On;
 public class LiveSession implements Service {
 
     @Override
-    public void on(Envelope e, Object r, EventBusListener l) {
+    public void on(Envelope e, AtmosphereResource r, EventBusListener l) {
     }
 
     @Override

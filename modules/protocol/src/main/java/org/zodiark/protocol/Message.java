@@ -19,6 +19,7 @@ public class Message {
 
     private String path;
     private String data;
+    private String uuid;
 
     public Message(){
     }
@@ -42,6 +43,14 @@ public class Message {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    public String getUUID() {
+        return uuid;
+    }
+
+    public void setUUID(String uuid) {
+        this.uuid = uuid;
     }
 
     @Override

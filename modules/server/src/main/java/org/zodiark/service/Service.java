@@ -15,12 +15,13 @@
  */
 package org.zodiark.service;
 
+import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBusListener;
 
 public interface Service {
 
-    void on(Envelope e, Object r, EventBusListener l);
+    void on(Envelope e, AtmosphereResource r, EventBusListener l);
 
     void on(Object r, EventBusListener l);
 

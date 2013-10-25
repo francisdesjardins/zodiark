@@ -15,12 +15,13 @@
  */
 package org.zodiark.service;
 
+import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBusListener;
 
 public class ServiceAdapter implements Service {
     @Override
-    public void on(Envelope e, Object r, EventBusListener l) {
+    public void on(Envelope e, AtmosphereResource r, EventBusListener l) {
     }
 
     @Override

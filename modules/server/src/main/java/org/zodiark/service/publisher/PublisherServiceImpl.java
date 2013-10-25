@@ -43,22 +43,27 @@ public class PublisherServiceImpl implements PublisherService {
     public ObjectMapper mapper;
 
     @Override
-    public void on(Envelope e, Object r, EventBusListener l) {
+    public void on(Envelope e, AtmosphereResource r, EventBusListener l) {
         switch (e.getMessage().getPath()) {
             case Paths.LOAD_CONFIG:
             case Paths.CREATE_SESSION:
-                init(e, AtmosphereResource.class.cast(r));
+                init(e, r);
                 break;
-            case Paths.CREATE_SHOW:
-                createShow(e,  AtmosphereResource.class.cast(r));
+            case Paths.WOWZA_PUBLISHER_RESPONSE_OK:
+                createShow(e);
+                break;
+            case Paths.WOWZA_PUBLISHER_RESPONSE_ERROR:
+                String uuid = e.getMessage().getUUID();
+                PublisherEndpoint p = endpoints.get(uuid);
+                error(e, p);
                 break;
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
         }
     }
 
-    public void createShow(final Envelope e, AtmosphereResource cast) {
-        String uuid = e.getUuid();
+    public void createShow(final Envelope e) {
+        String uuid = e.getMessage().getUUID();
         PublisherEndpoint p = endpoints.get(uuid);
         if (p == null) {
             throw new IllegalStateException("No Publisher associated with " + uuid);

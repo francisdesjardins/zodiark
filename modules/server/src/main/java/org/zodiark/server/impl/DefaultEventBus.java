@@ -45,12 +45,12 @@ public class DefaultEventBus implements EventBus {
     };
 
     @Override
-    public EventBus fire(Envelope e, Object o) {
+    public EventBus fire(Envelope e, AtmosphereResource o) {
         return fire(e, o, l);
     }
 
     @Override
-    public EventBus fire(Envelope e, Object o, EventBusListener l) {
+    public EventBus fire(Envelope e, AtmosphereResource o, EventBusListener l) {
         Service s = services.get(e.getMessage().getPath().toString());
         if (AtmosphereResource.class.isAssignableFrom(o.getClass())) {
             AtmosphereResource r = AtmosphereResource.class.cast(o);

@@ -23,7 +23,7 @@ import org.zodiark.service.Service;
 public interface PublisherService extends Service {
 
     @Override
-    public void on(Envelope e, Object r, EventBusListener l) ;
+    public void on(Envelope e, AtmosphereResource r, EventBusListener l) ;
 
     @Override
     public void on(Object r, EventBusListener l);
@@ -34,6 +34,7 @@ public interface PublisherService extends Service {
 
     public void error(Envelope e, PublisherEndpoint p);
 
-    public void createShow(Envelope e, AtmosphereResource cast);
+    public void createShow(Envelope e);
+
 }
 

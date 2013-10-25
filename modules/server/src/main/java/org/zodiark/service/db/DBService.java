@@ -15,6 +15,7 @@
  */
 package org.zodiark.service.db;
 
+import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.service.Service;
@@ -22,7 +23,7 @@ import org.zodiark.service.Service;
 public interface DBService extends Service {
 
     @Override
-    public void on(Envelope e, Object r, EventBusListener l) ;
+    public void on(Envelope e, AtmosphereResource r, EventBusListener l) ;
 
     @Override
     public void on(Object r, EventBusListener l);

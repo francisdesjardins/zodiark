@@ -30,7 +30,7 @@ public class EchoService implements Service {
     public ObjectMapper mapper;
 
     @Override
-    public void on(Envelope e, Object r, EventBusListener l) {
+    public void on(Envelope e, AtmosphereResource r, EventBusListener l) {
         try {
             AtmosphereResource.class.cast(r).write(mapper.writeValueAsString(Envelope.newServerReply(e, e.getMessage())));
         } catch (JsonProcessingException e1) {

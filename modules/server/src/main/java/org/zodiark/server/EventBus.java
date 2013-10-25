@@ -15,14 +15,15 @@
  */
 package org.zodiark.server;
 
+import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.service.Service;
 
 public interface EventBus {
 
-    EventBus fire(Envelope e, Object r);
+    EventBus fire(Envelope e, AtmosphereResource r);
 
-    EventBus fire(Envelope e, Object r, EventBusListener l);
+    EventBus fire(Envelope e, AtmosphereResource r, EventBusListener l);
 
     EventBus fire(String e, Object r, EventBusListener l);
 
