@@ -18,18 +18,35 @@ package org.zodiark.service.session;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBusListener;
-import org.zodiark.service.Service;
 import org.zodiark.server.annotation.On;
+import org.zodiark.service.Service;
+import org.zodiark.service.publisher.PublisherEndpoint;
+
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @On("/create/{endpoint}/")
 public class LiveSession implements Service {
+
+    private ConcurrentLinkedQueue<PublisherSession> sessions = new ConcurrentLinkedQueue<>();
 
     @Override
     public void on(Envelope e, AtmosphereResource r, EventBusListener l) {
     }
 
     @Override
-    public void on(Object r, EventBusListener l) {
+    public void on(Object message, EventBusListener l) {
+
+        if (PublisherEndpoint.class.isAssignableFrom(message.getClass())) {
+            PublisherEndpoint p = PublisherEndpoint.class.cast(message);
+            // TODO: The Implementation Class should be injected and read from config.
+            PublisherSession s = new PublisherSessionImpl(p);
+
+            sessions.offer(s);
+
+            // TODO: Add session's logic
+            l.completed(p);
+        }
+
     }
 
 }

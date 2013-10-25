@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @On("/publisher")
 public class PublisherServiceImpl implements PublisherService {
 
-    private final ConcurrentHashMap<String, PublisherEndpoint> endpoints = new ConcurrentHashMap<String, PublisherEndpoint>();
+    private final ConcurrentHashMap<String, PublisherEndpoint> endpoints = new ConcurrentHashMap<>();
     private final Logger logger = LoggerFactory.getLogger(PublisherServiceImpl.class);
 
     @Inject
@@ -49,8 +49,10 @@ public class PublisherServiceImpl implements PublisherService {
             case Paths.CREATE_SESSION:
                 init(e, r);
                 break;
-            case Paths.WOWZA_PUBLISHER_RESPONSE_OK:
+            case Paths.PUBLISHER_REQUEST_SHOW:
                 createShow(e);
+            case Paths.WOWZA_PUBLISHER_RESPONSE_OK:
+                startShow(e);
                 break;
             case Paths.WOWZA_PUBLISHER_RESPONSE_ERROR:
                 String uuid = e.getMessage().getUUID();
@@ -64,26 +66,58 @@ public class PublisherServiceImpl implements PublisherService {
 
     public void createShow(final Envelope e) {
         String uuid = e.getMessage().getUUID();
+        PublisherEndpoint p = retrieve(uuid);
+
+        eventBus.fire("/wowza/connect", p, new EventBusListener<PublisherEndpoint>() {
+            @Override
+            public void completed(PublisherEndpoint p) {
+                // TODO: Proper Message
+                Message m = new Message();
+                response(e, p, m);
+            }
+
+            @Override
+            public void failed(PublisherEndpoint p) {
+                error(e, p);
+            }
+        });
+    }
+
+    @Override
+    public void startShow(final Envelope e) {
+        String uuid = e.getMessage().getUUID();
+        PublisherEndpoint p = retrieve(uuid);
+        eventBus.fire("/livesession/create", p, new EventBusListener<PublisherEndpoint>() {
+            @Override
+            public void completed(PublisherEndpoint p) {
+                Message m = new Message();
+                response(e, p, m);
+            }
+
+            @Override
+            public void failed(PublisherEndpoint p) {
+                error(e, p);
+            }
+        });
+    }
+
+    @Override
+    public void response(Envelope e, PublisherEndpoint p, Message m) {
+        AtmosphereResource r = p.resource();
+        Envelope newResponse = Envelope.newServerReply(e, m);
+        try {
+            r.write(mapper.writeValueAsString(newResponse));
+        } catch (JsonProcessingException e1) {
+            logger.debug("Unable to write {} {}", p, m);
+        }
+    }
+
+    PublisherEndpoint retrieve(String uuid) {
         PublisherEndpoint p = endpoints.get(uuid);
         if (p == null) {
             throw new IllegalStateException("No Publisher associated with " + uuid);
         }
-
-        eventBus.fire("/wowza/connect", p, new EventBusListener() {
-            @Override
-            public void completed(Object response) {
-                if (PublisherEndpoint.class.isAssignableFrom(response.getClass())) {
-                    // TODO: Send OK to the Publisher
-                }
-            }
-
-            @Override
-            public void failed(Object response) {
-                if (PublisherEndpoint.class.isAssignableFrom(response.getClass())) {
-                    error(e, PublisherEndpoint.class.cast(response));
-                }
-            }
-        });
+        return p;
     }
 
     @Override
@@ -97,19 +131,15 @@ public class PublisherServiceImpl implements PublisherService {
         if (p == null) {
             p = new PublisherEndpoint(uuid, e.getMessage(), resource);
             endpoints.put(uuid, p);
-            eventBus.fire("/db/init", p, new EventBusListener() {
+            eventBus.fire("/db/init", p, new EventBusListener<PublisherEndpoint>() {
                 @Override
-                public void completed(Object response) {
-                    if (PublisherEndpoint.class.isAssignableFrom(response.getClass())) {
-                        lookupConfig(e, PublisherEndpoint.class.cast(response));
-                    }
+                public void completed(PublisherEndpoint p) {
+                    lookupConfig(e, p);
                 }
 
                 @Override
-                public void failed(Object response) {
-                    if (PublisherEndpoint.class.isAssignableFrom(response.getClass())) {
-                        error(e, PublisherEndpoint.class.cast(response));
-                    }
+                public void failed(PublisherEndpoint p) {
+                    error(e, p);
                 }
             });
         }
@@ -135,19 +165,15 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     private void lookupConfig(final Envelope e, PublisherEndpoint p) {
-        eventBus.fire("/db/config", p, new EventBusListener() {
+        eventBus.fire("/db/config", p, new EventBusListener<PublisherEndpoint>() {
             @Override
-            public void completed(Object response) {
-                if (PublisherEndpoint.class.isAssignableFrom(response.getClass())) {
-                    // TODO: OK, we are ready to return the response.
-                }
+            public void completed(PublisherEndpoint p) {
+                lookupConfig(e, p);
             }
 
             @Override
-            public void failed(Object response) {
-                if (PublisherEndpoint.class.isAssignableFrom(response.getClass())) {
-                    error(e, PublisherEndpoint.class.cast(response));
-                }
+            public void failed(PublisherEndpoint p) {
+                error(e, p);
             }
         });
     }

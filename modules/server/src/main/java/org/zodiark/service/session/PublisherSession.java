@@ -13,21 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.protocol;
+package org.zodiark.service.session;
 
-/**
- * @author Jeanfrancois Arcand
- */
-public interface Paths {
+import org.zodiark.service.publisher.PublisherEndpoint;
+import org.zodiark.service.subscriber.SubscriberEndpoint;
 
-    String CREATE_SESSION = "/REACT/EXECUTION/CREATE_SESSION";
+import java.util.List;
 
-    String LOAD_CONFIG = "/REACT/EXECUTION/LOADCONFIG";
+public interface PublisherSession {
 
-    String PUBLISHER_REQUEST_SHOW = "/REACT/EXECUTION/CREATESHOW";
+    public PublisherEndpoint publisher();
 
-    String WOWZA_PUBLISHER_RESPONSE_OK = "/REACT/OK";
-
-    String WOWZA_PUBLISHER_RESPONSE_ERROR = "/REACT/ERROR";
+    public List<SubscriberEndpoint> susbcribers();
 
 }

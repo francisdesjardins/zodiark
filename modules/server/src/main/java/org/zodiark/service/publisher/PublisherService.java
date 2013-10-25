@@ -17,6 +17,7 @@ package org.zodiark.service.publisher;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
+import org.zodiark.protocol.Message;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.service.Service;
 
@@ -35,6 +36,10 @@ public interface PublisherService extends Service {
     public void error(Envelope e, PublisherEndpoint p);
 
     public void createShow(Envelope e);
+
+    public void startShow(Envelope e);
+
+    public void response(Envelope e, PublisherEndpoint p, Message m);
 
 }
 
