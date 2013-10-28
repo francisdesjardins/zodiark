@@ -26,7 +26,7 @@ import org.zodiark.service.publisher.PublisherEndpoint;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-@On("/create/{endpoint}/")
+@On("/streaming")
 public class StreamingSessionServiceImpl implements StreamingSessionService {
 
     @Inject

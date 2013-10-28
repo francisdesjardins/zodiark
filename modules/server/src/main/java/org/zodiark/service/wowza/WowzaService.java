@@ -15,10 +15,14 @@
  */
 package org.zodiark.service.wowza;
 
-import org.zodiark.server.annotation.On;
+import org.atmosphere.cpr.AtmosphereResource;
+import org.zodiark.protocol.Envelope;
+import org.zodiark.protocol.Message;
 import org.zodiark.service.Service;
 
-@On("/register/{endpoint}/")
 public interface WowzaService extends Service {
 
+    void connected(Envelope e, AtmosphereResource r);
+
+    void response(Envelope e, AtmosphereResource r, Message m);
 }

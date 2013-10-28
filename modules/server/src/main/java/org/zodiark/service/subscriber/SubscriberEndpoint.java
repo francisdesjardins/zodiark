@@ -18,6 +18,10 @@ package org.zodiark.service.subscriber;
 import org.zodiark.server.Endpoint;
 
 public class SubscriberEndpoint implements Endpoint {
+
+    private String uuid;
+
+
     @Override
     public Endpoint.TYPE type() {
         return TYPE.SUBSCRIBER;
@@ -26,5 +30,10 @@ public class SubscriberEndpoint implements Endpoint {
     @Override
     public void terminate() {
 
+    }
+
+    @Override
+    public String uuid() {
+        return uuid;
     }
 }

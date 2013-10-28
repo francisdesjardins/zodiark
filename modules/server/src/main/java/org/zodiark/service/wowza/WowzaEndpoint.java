@@ -16,10 +16,12 @@
 package org.zodiark.service.wowza;
 
 import org.atmosphere.cpr.AtmosphereResource;
+import org.zodiark.protocol.Message;
 import org.zodiark.server.Endpoint;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.service.publisher.PublisherEndpoint;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -27,15 +29,13 @@ import java.util.List;
  */
 public class WowzaEndpoint implements Endpoint {
 
-    private final String uri;
-    private final List<Endpoint> supportedEndpoints;
-    private final AtmosphereResource resource;
+    private String uuid;
+    private String uri;
+    private final List<Endpoint> supportedEndpoints = new LinkedList<Endpoint>();
+    private AtmosphereResource resource;
+    private Message message;
 
-    public WowzaEndpoint(AtmosphereResource resource, String uri, List<Endpoint> supportedEndpoints) {
-        this.uri = uri;
-        this.supportedEndpoints = supportedEndpoints;
-        this.resource = resource;
-    }
+    public WowzaEndpoint(){}
 
     public String uri() {
         return uri;
@@ -51,6 +51,11 @@ public class WowzaEndpoint implements Endpoint {
 
     }
 
+    @Override
+    public String uuid() {
+        return null;
+    }
+
     public List<Endpoint> supportedEndpoints() {
         return supportedEndpoints;
     }
@@ -59,5 +64,20 @@ public class WowzaEndpoint implements Endpoint {
 
         // TODO: Send a message to wowza.
         //resource.write();
+    }
+
+    public WowzaEndpoint uuid(String uuid) {
+        this.uuid = uuid;
+        return this;
+    }
+
+    public WowzaEndpoint message(Message m) {
+        this.message = m;
+        return this;
+    }
+
+    public WowzaEndpoint resource(AtmosphereResource r) {
+        this.resource = r;
+        return this;
     }
 }

@@ -21,10 +21,10 @@ import org.zodiark.server.Endpoint;
 
 public class PublisherEndpoint implements Endpoint {
 
-    private final String uuid;
+    private String uuid;
     private PublisherConfig config;
-    private final Message message;
-    private final AtmosphereResource resource;
+    private Message message;
+    private AtmosphereResource resource;
     private String wowzaServer;
 
     public PublisherEndpoint(String uuid, Message message, AtmosphereResource resource) {
@@ -46,6 +46,16 @@ public class PublisherEndpoint implements Endpoint {
         return config;
     }
 
+    public PublisherEndpoint message(Message message) {
+        this.message = message;
+        return this;
+    }
+
+    public PublisherEndpoint uuid(String uuid) {
+        this.uuid = uuid;
+        return this;
+    }
+
     @Override
     public TYPE type() {
         return TYPE.PUBLISHER;
@@ -63,12 +73,17 @@ public class PublisherEndpoint implements Endpoint {
         return resource;
     }
 
-    public String wowzaServer() {
+    public String wowzaServerUUID() {
         return wowzaServer;
     }
 
-    public PublisherEndpoint wowzaServer(String wowzaServer) {
+    public PublisherEndpoint wowzaServerUUID(String wowzaServer) {
         this.wowzaServer = wowzaServer;
+        return this;
+    }
+
+    public PublisherEndpoint resource(AtmosphereResource resource) {
+        this.resource = resource;
         return this;
     }
 }

@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.protocol.Paths;
+import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
@@ -42,12 +43,15 @@ public class PublisherServiceImpl implements PublisherService {
     @Inject
     public ObjectMapper mapper;
 
+    @Inject
+    Context context;
+
     @Override
     public void on(Envelope e, AtmosphereResource r, EventBusListener l) {
         switch (e.getMessage().getPath()) {
             case Paths.LOAD_CONFIG:
             case Paths.CREATE_USER_SESSION:
-                createPublishereSession(e, r);
+                createPublisherSession(e, r);
                 break;
             case Paths.CREATE_STREAMING_SESSION:
                 createStreamingSession(e);
@@ -134,11 +138,13 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Override
-    public PublisherEndpoint createPublishereSession(final Envelope e, AtmosphereResource resource) {
+    public PublisherEndpoint createPublisherSession(final Envelope e, AtmosphereResource resource) {
         String uuid = e.getUuid();
         PublisherEndpoint p = endpoints.get(uuid);
         if (p == null) {
-            p = new PublisherEndpoint(uuid, e.getMessage(), resource);
+            p = context.newInstance(PublisherEndpoint.class);
+            p.uuid(uuid).message(e.getMessage()).resource(resource);
+
             endpoints.put(uuid, p);
             eventBus.fire(Paths.DB_INIT, p, new EventBusListener<PublisherEndpoint>() {
                 @Override

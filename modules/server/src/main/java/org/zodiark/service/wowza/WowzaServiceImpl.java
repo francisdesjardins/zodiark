@@ -15,14 +15,23 @@
  */
 package org.zodiark.service.wowza;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cpr.AtmosphereResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
+import org.zodiark.protocol.Message;
+import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
+import org.zodiark.server.annotation.On;
 import org.zodiark.service.publisher.PublisherEndpoint;
 
+@On("/wowza")
 public class WowzaServiceImpl implements WowzaService {
+    private final Logger logger = LoggerFactory.getLogger(WowzaServiceImpl.class);
 
     @Inject
     public EventBus evenBus;
@@ -30,16 +39,21 @@ public class WowzaServiceImpl implements WowzaService {
     @Inject
     public WowzaEndpointManager wowzaManager;
 
+    @Inject
+    public Context context;
+
+    @Inject
+    public ObjectMapper mapper;
+
 
     @Override
     public void on(Envelope e, AtmosphereResource r, EventBusListener l) {
-
-        // TODO We are getting the response from Wowza. We need to dispatch
-        // (1) we are getting called when wowza client connect
-        // (2) we are getting called when the Publisher is getting accepted
-        // (3) Notify the LiveSession service we are ready.
-        // (4) The Liveshow will creates call back the Publisher so it can connect.
-
+        String uuid = e.getUuid();
+        WowzaEndpoint endpoint = wowzaManager.lookup(uuid);
+        Message m = e.getMessage();
+        if (endpoint == null) {
+            connected(e, r);
+        }
 
     }
 
@@ -48,8 +62,31 @@ public class WowzaServiceImpl implements WowzaService {
     public void on(Object message, EventBusListener l) {
         if (PublisherEndpoint.class.isAssignableFrom(message.getClass())) {
             PublisherEndpoint p = PublisherEndpoint.class.cast(message);
-            WowzaEndpoint w = wowzaManager.lookup(p.wowzaServer());
+            WowzaEndpoint w = wowzaManager.lookup(p.wowzaServerUUID());
             w.isReady(p, l);
+        }
+    }
+
+    @Override
+    public void connected(Envelope e, AtmosphereResource r) {
+
+        String uuid = e.getUuid();
+        Message m = e.getMessage();
+
+        wowzaManager.bind(context.newInstance(WowzaEndpoint.class).uuid(uuid).message(m).resource(r));
+        Message responseMessage = new Message();
+        // TODO: m.setPath
+        m.setData("OK");
+        response(e, r, responseMessage);
+    }
+
+    @Override
+    public void response(Envelope e, AtmosphereResource r, Message m) {
+        Envelope newResponse = Envelope.newServerReply(e, m);
+        try {
+            r.write(mapper.writeValueAsString(newResponse));
+        } catch (JsonProcessingException e1) {
+            logger.debug("Unable to write {}", e);
         }
     }
 }

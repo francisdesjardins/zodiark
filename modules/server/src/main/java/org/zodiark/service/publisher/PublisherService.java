@@ -29,7 +29,7 @@ public interface PublisherService extends Service {
     @Override
     public void on(Object r, EventBusListener l);
 
-    public PublisherEndpoint createPublishereSession(Envelope e, AtmosphereResource resource);
+    public PublisherEndpoint createPublisherSession(Envelope e, AtmosphereResource resource);
 
     public PublisherEndpoint config(Envelope e);
 

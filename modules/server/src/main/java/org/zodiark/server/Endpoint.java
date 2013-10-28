@@ -26,4 +26,6 @@ public interface Endpoint {
 
     public void terminate();
 
+    public String uuid();
+
 }
