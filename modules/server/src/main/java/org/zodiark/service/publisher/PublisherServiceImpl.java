@@ -44,7 +44,7 @@ public class PublisherServiceImpl implements PublisherService {
     public ObjectMapper mapper;
 
     @Inject
-    Context context;
+    public Context context;
 
     @Override
     public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {

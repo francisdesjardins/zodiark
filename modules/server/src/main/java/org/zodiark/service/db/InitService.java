@@ -17,7 +17,6 @@ package org.zodiark.service.db;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
-import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
@@ -27,9 +26,6 @@ import org.zodiark.service.util.RESTService;
 
 @On("/db/init")
 public class InitService implements DBService {
-
-    @Inject
-    public EventBus evenBus;
 
     @Inject
     public RESTService restService;

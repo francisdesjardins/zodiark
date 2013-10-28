@@ -16,6 +16,8 @@
 package org.zodiark.server.impl;
 
 import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.util.DefaultEndpointMapper;
+import org.atmosphere.util.EndpointMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
@@ -30,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DefaultEventBus implements EventBus {
 
+    private final EndpointMapper<Service> mapper = new DefaultEndpointMapper<>();
     private final static Logger logger = LoggerFactory.getLogger(DefaultEventBus.class);
     private final ConcurrentHashMap<String, Service> services = new ConcurrentHashMap<>();
     private final EventBusListener l = new EventBusListener() {
@@ -51,7 +54,8 @@ public class DefaultEventBus implements EventBus {
 
     @Override
     public EventBus fire(Envelope e, AtmosphereResource o, EventBusListener l) {
-        Service s = services.get(e.getMessage().getPath().toString());
+        Service s = mapper.map(e.getMessage().getPath(), services); //services.get(e.getMessage().getPath().toString());
+
         if (AtmosphereResource.class.isAssignableFrom(o.getClass())) {
             AtmosphereResource r = AtmosphereResource.class.cast(o);
             logger.debug("Dispatching Envelop {} to {}", e, r.uuid());
@@ -64,6 +68,9 @@ public class DefaultEventBus implements EventBus {
 
         if (s != null) {
             s.serve(e, o, l);
+        } else {
+            // error();
+            logger.debug(("Unmapped Service {}"), e);
         }
         return this;
     }
@@ -75,7 +82,7 @@ public class DefaultEventBus implements EventBus {
 
     @Override
     public EventBus fire(String message, Object o) {
-        Service s = services.get(message);
+        Service s = mapper.map(message, services); //services.get(message);
         s.serve(message, o, l);
         return this;
     }

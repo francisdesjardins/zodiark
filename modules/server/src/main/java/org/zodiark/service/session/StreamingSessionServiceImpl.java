@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class StreamingSessionServiceImpl implements StreamingSessionService {
 
     @Inject
-    Context context;
+    public Context context;
 
     private ConcurrentHashMap<String, StreamingSession> sessions = new ConcurrentHashMap<>();
 
