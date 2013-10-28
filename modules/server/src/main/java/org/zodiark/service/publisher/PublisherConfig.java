@@ -15,5 +15,17 @@
  */
 package org.zodiark.service.publisher;
 
+import org.zodiark.service.session.StreamingSession;
+
 public class PublisherConfig {
+
+    private final StreamingSession.TYPE streamingSessionType;
+
+    public PublisherConfig(StreamingSession.TYPE streamingSessionType) {
+        this.streamingSessionType = streamingSessionType;
+    }
+
+    public StreamingSession.TYPE sessionType() {
+        return streamingSessionType;
+    }
 }

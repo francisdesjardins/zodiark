@@ -29,17 +29,19 @@ public interface PublisherService extends Service {
     @Override
     public void on(Object r, EventBusListener l);
 
-    public PublisherEndpoint init(Envelope e, AtmosphereResource resource);
+    public PublisherEndpoint createPublishereSession(Envelope e, AtmosphereResource resource);
 
     public PublisherEndpoint config(Envelope e);
 
     public void error(Envelope e, PublisherEndpoint p);
 
-    public void createShow(Envelope e);
+    public void createStreamingSession(Envelope e);
 
-    public void startShow(Envelope e);
+    public void startStreamingSession(Envelope e);
 
     public void response(Envelope e, PublisherEndpoint p, Message m);
+
+    public void terminateStreamingSession(PublisherEndpoint p, AtmosphereResource r);
 
 }
 

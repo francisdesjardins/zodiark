@@ -46,29 +46,38 @@ public class PublisherServiceImpl implements PublisherService {
     public void on(Envelope e, AtmosphereResource r, EventBusListener l) {
         switch (e.getMessage().getPath()) {
             case Paths.LOAD_CONFIG:
-            case Paths.CREATE_SESSION:
-                init(e, r);
+            case Paths.CREATE_USER_SESSION:
+                createPublishereSession(e, r);
                 break;
-            case Paths.PUBLISHER_REQUEST_SHOW:
-                createShow(e);
-            case Paths.WOWZA_PUBLISHER_RESPONSE_OK:
-                startShow(e);
+            case Paths.CREATE_STREAMING_SESSION:
+                createStreamingSession(e);
+            case Paths.WOWZA_STREAMING_SESSION_OK:
+                startStreamingSession(e);
                 break;
-            case Paths.WOWZA_PUBLISHER_RESPONSE_ERROR:
+            case Paths.WOWZA_STREAMING_SESSION_ERROR:
                 String uuid = e.getMessage().getUUID();
                 PublisherEndpoint p = endpoints.get(uuid);
                 error(e, p);
+                break;
+            case Paths.TERMINATE_STREAMING_SESSSION:
+                uuid = e.getMessage().getUUID();
+                p = endpoints.get(uuid);
+                terminateStreamingSession(p, r);
                 break;
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
         }
     }
 
-    public void createShow(final Envelope e) {
+    public void terminateStreamingSession(PublisherEndpoint p, AtmosphereResource r) {
+        // TODO:
+    }
+
+    public void createStreamingSession(final Envelope e) {
         String uuid = e.getMessage().getUUID();
         PublisherEndpoint p = retrieve(uuid);
 
-        eventBus.fire("/wowza/connect", p, new EventBusListener<PublisherEndpoint>() {
+        eventBus.fire(Paths.WOWZA_CONNECT, p, new EventBusListener<PublisherEndpoint>() {
             @Override
             public void completed(PublisherEndpoint p) {
                 // TODO: Proper Message
@@ -84,10 +93,10 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Override
-    public void startShow(final Envelope e) {
+    public void startStreamingSession(final Envelope e) {
         String uuid = e.getMessage().getUUID();
         PublisherEndpoint p = retrieve(uuid);
-        eventBus.fire("/livesession/create", p, new EventBusListener<PublisherEndpoint>() {
+        eventBus.fire(Paths.START_STREAMINGSESSION, p, new EventBusListener<PublisherEndpoint>() {
             @Override
             public void completed(PublisherEndpoint p) {
                 Message m = new Message();
@@ -125,13 +134,13 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Override
-    public PublisherEndpoint init(final Envelope e, AtmosphereResource resource) {
+    public PublisherEndpoint createPublishereSession(final Envelope e, AtmosphereResource resource) {
         String uuid = e.getUuid();
         PublisherEndpoint p = endpoints.get(uuid);
         if (p == null) {
             p = new PublisherEndpoint(uuid, e.getMessage(), resource);
             endpoints.put(uuid, p);
-            eventBus.fire("/db/init", p, new EventBusListener<PublisherEndpoint>() {
+            eventBus.fire(Paths.DB_INIT, p, new EventBusListener<PublisherEndpoint>() {
                 @Override
                 public void completed(PublisherEndpoint p) {
                     lookupConfig(e, p);
@@ -165,7 +174,7 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     private void lookupConfig(final Envelope e, PublisherEndpoint p) {
-        eventBus.fire("/db/config", p, new EventBusListener<PublisherEndpoint>() {
+        eventBus.fire(Paths.DB_CONFIG , p, new EventBusListener<PublisherEndpoint>() {
             @Override
             public void completed(PublisherEndpoint p) {
                 lookupConfig(e, p);

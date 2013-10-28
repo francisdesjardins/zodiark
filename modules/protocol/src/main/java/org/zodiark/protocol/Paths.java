@@ -20,14 +20,23 @@ package org.zodiark.protocol;
  */
 public interface Paths {
 
-    String CREATE_SESSION = "/REACT/EXECUTION/CREATE_SESSION";
+    String CREATE_USER_SESSION = "/REACT/EXECUTION/CREATE_USER_SESSION";
 
     String LOAD_CONFIG = "/REACT/EXECUTION/LOADCONFIG";
 
-    String PUBLISHER_REQUEST_SHOW = "/REACT/EXECUTION/CREATESHOW";
+    String CREATE_STREAMING_SESSION = "/REACT/EXECUTION/CREATESHOW";
 
-    String WOWZA_PUBLISHER_RESPONSE_OK = "/REACT/OK";
+    String WOWZA_STREAMING_SESSION_OK = "/REACT/OK";
 
-    String WOWZA_PUBLISHER_RESPONSE_ERROR = "/REACT/ERROR";
+    String WOWZA_STREAMING_SESSION_ERROR = "/REACT/ERROR";
 
+    String START_STREAMINGSESSION = "/streamingsession/start";
+
+    String WOWZA_CONNECT = "/wowza/connect";
+
+    String DB_CONFIG = "/db/config";
+
+    String DB_INIT = "/db/init";
+
+    String TERMINATE_STREAMING_SESSSION = "/publishere/disconnect";
 }

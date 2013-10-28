@@ -16,6 +16,7 @@
 package org.zodiark.service.wowza;
 
 import java.util.List;
+import java.util.Queue;
 
 /**
  * A Service for managing the lifecycle of {@link WowzaEndpoint}
@@ -27,7 +28,7 @@ public interface WowzaEndpointService {
      *
      * @return a list of connected endpoint
      */
-    public List<WowzaEndpoint> endpoints();
+    public Queue<WowzaEndpoint> endpoints();
 
     /**
      * Register a connected
@@ -35,7 +36,7 @@ public interface WowzaEndpointService {
      * @param endpoint {@link WowzaEndpoint}
      * @return this
      */
-    public WowzaEndpointService connected(WowzaEndpoint endpoint);
+    public WowzaEndpointService bind(WowzaEndpoint endpoint);
 
     /**
      * Unregister a {@link WowzaEndpoint}
@@ -43,7 +44,12 @@ public interface WowzaEndpointService {
      * @param endpoint {@link WowzaEndpoint}
      * @return this
      */
-    public WowzaEndpointService disconnected(WowzaEndpoint endpoint);
+    public WowzaEndpointService unbind(WowzaEndpoint endpoint);
 
+    /**
+     * Retrieve a {@link WowzaEndpoint}
+     * @param wowzaName
+     * @return a {@link WowzaEndpoint}
+     */
     public WowzaEndpoint lookup(String wowzaName);
 }

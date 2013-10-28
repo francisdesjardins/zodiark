@@ -20,10 +20,22 @@ import org.zodiark.service.subscriber.SubscriberEndpoint;
 
 import java.util.List;
 
-public interface PublisherSession {
+public interface StreamingSession {
+
+    public enum TYPE { PUBLIC, PRIVATE, PROTECTED, SHARED_PRIVATE, VIEW}
+
+    public StreamingSession susbcriber(SubscriberEndpoint s);
 
     public PublisherEndpoint publisher();
 
+    public StreamingSession publisher(PublisherEndpoint p);
+
     public List<SubscriberEndpoint> susbcribers();
+
+    public TYPE type();
+
+    public void terminate();
+
+    public StreamingSession initAndAct();
 
 }

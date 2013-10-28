@@ -51,7 +51,7 @@ public class WowzaService implements Service {
         if (PublisherEndpoint.class.isAssignableFrom(message.getClass())) {
             PublisherEndpoint p = PublisherEndpoint.class.cast(message);
             WowzaEndpoint w = wowzaService.lookup(p.wowzaServer());
-            w.isConnected(p, l);
+            w.isReady(p, l);
         }
     }
 

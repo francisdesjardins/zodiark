@@ -46,11 +46,16 @@ public class WowzaEndpoint implements Endpoint {
         return TYPE.WOOZA;
     }
 
+    @Override
+    public void terminate() {
+
+    }
+
     public List<Endpoint> supportedEndpoints() {
         return supportedEndpoints;
     }
 
-    public void isConnected(PublisherEndpoint p, EventBusListener l) {
+    public void isReady(PublisherEndpoint p, EventBusListener l) {
 
         // TODO: Send a message to wowza.
         //resource.write();

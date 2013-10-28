@@ -24,4 +24,6 @@ public interface Endpoint {
 
     TYPE type();
 
+    public void terminate();
+
 }

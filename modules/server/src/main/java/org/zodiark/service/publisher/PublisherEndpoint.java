@@ -51,6 +51,10 @@ public class PublisherEndpoint implements Endpoint {
         return TYPE.PUBLISHER;
     }
 
+    @Override
+    public void terminate() {
+    }
+
     public Message message() {
         return message;
     }

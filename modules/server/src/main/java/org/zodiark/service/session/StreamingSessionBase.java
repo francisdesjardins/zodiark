@@ -21,13 +21,15 @@ import org.zodiark.service.subscriber.SubscriberEndpoint;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class PublisherSessionImpl implements PublisherSession {
+public abstract class StreamingSessionBase implements StreamingSession {
 
-    private final PublisherEndpoint endpoint;
+    private PublisherEndpoint endpoint;
     private final ConcurrentLinkedQueue<SubscriberEndpoint> subscribers = new ConcurrentLinkedQueue<>();
 
-    public PublisherSessionImpl(PublisherEndpoint endpoint) {
-        this.endpoint = endpoint;
+    @Override
+    public StreamingSession publisher(PublisherEndpoint p) {
+        endpoint = p;
+        return this;
     }
 
     @Override
@@ -39,4 +41,25 @@ public class PublisherSessionImpl implements PublisherSession {
     public List<SubscriberEndpoint> susbcribers() {
         return susbcribers();
     }
+
+    @Override
+    public StreamingSession susbcriber(SubscriberEndpoint s) {
+        subscribers.add(s);
+        return this;
+    }
+
+    @Override
+    public void terminate() {
+        endpoint.terminate();
+        for (SubscriberEndpoint s : subscribers) {
+            s.terminate();
+        }
+    }
+
+    @Override
+    public StreamingSession initAndAct() {
+
+        return this;
+    }
+
 }

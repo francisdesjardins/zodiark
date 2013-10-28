@@ -35,7 +35,7 @@ public class ProtocolTest {
             "    \"from\": \"SERVER\",\n" +
             "    \"protocol\": \"zodiark/1.0\",\n" +
             "    \"message\": {\n" +
-            "        \"path\": \"/REACT/EXECUTION/CREATE_SESSION\",\n" +
+            "        \"path\": \"/REACT/EXECUTION/CREATE_USER_SESSION\",\n" +
             "        \"data\": \"\\\"{\\\"foo\\\": \\\"bar \\\"}\\\"\"\n" +
             "    }\n" +
             "}";
@@ -48,7 +48,7 @@ public class ProtocolTest {
             "    \"from\": \"SERVER\",\n" +
             "    \"protocol\": \"zodiark/1.0\",\n" +
             "    \"message\": {\n" +
-            "        \"path\": \"/REACT/EXECUTION/CREATE_SESSION\",\n" +
+            "        \"path\": \"/REACT/EXECUTION/CREATE_USER_SESSION\",\n" +
             "        \"data\": \"\\\"{\\\"foo\\\": \\\"bar \\\"}\\\"\"\n" +
             "    }\n" +
             "}";
@@ -61,7 +61,7 @@ public class ProtocolTest {
             "    \"from\": \"SERVER\",\n" +
             "    \"protocol\": \"zodiark/1.0\",\n" +
             "    \"message\": {\n" +
-            "        \"path\": \"/REACT/EXECUTION/CREATE_SESSION\",\n" +
+            "        \"path\": \"/REACT/EXECUTION/CREATE_USER_SESSION\",\n" +
             "        \"data\": \"\\\"{\\\"foo\\\": \\\"bar \\\"}\\\"\"\n" +
             "    }\n" +
             "}";
@@ -74,7 +74,7 @@ public class ProtocolTest {
             "    \"from\": \"UYTIU\",\n" +
             "    \"protocol\": \"zodiark/1.0\",\n" +
             "    \"message\": {\n" +
-            "        \"path\": \"/REACT/EXECUTION/CREATE_SESSION\",\n" +
+            "        \"path\": \"/REACT/EXECUTION/CREATE_USER_SESSION\",\n" +
             "        \"data\": \"\\\"{\\\"foo\\\": \\\"bar \\\"}\\\"\"\n" +
             "    }\n" +
             "}";

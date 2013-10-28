@@ -21,6 +21,8 @@ import org.atmosphere.cpr.AtmosphereObjectFactory;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.service.util.LoopbackRESTService;
 import org.zodiark.service.util.RESTService;
+import org.zodiark.service.wowza.WowzaEndpointService;
+import org.zodiark.service.wowza.WowzaEndpointServiceImpl;
 
 import java.lang.reflect.Field;
 
@@ -29,9 +31,10 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory{
     private final EventBus evenBus = EventBusFactory.getDefault().eventBus();
     private final ObjectMapper mapper = new ObjectMapper();
     private RESTService restService = new LoopbackRESTService();
+    private final WowzaEndpointService wowzaService = new WowzaEndpointServiceImpl();
 
     @Override
-    public <T> T newClassInstance(AtmosphereFramework atmosphereFramework, Class<T> tClass) throws InstantiationException, IllegalAccessException {
+    public <T> T newClassInstance(final AtmosphereFramework framework, Class<T> tClass) throws InstantiationException, IllegalAccessException {
 
         T instance = tClass.newInstance();
 
@@ -44,6 +47,19 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory{
                     field.set(instance, evenBus);
                 } else if (field.getType().isAssignableFrom(RESTService.class)) {
                     field.set(instance, restService);
+                } else if (field.getType().isAssignableFrom(WowzaEndpointService.class)) {
+                    field.set(instance, wowzaService);
+                } else if (field.getType().isAssignableFrom(Context.class)) {
+                    field.set(instance, new Context() {
+                            @Override
+                            public <T> T newInstance(Class<T> t) {
+                                try {
+                                    return newClassInstance(framework, t);
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
                 }
             }
         }

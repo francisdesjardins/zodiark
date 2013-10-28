@@ -22,4 +22,9 @@ public class SubscriberEndpoint implements Endpoint {
     public Endpoint.TYPE type() {
         return TYPE.SUBSCRIBER;
     }
+
+    @Override
+    public void terminate() {
+
+    }
 }
