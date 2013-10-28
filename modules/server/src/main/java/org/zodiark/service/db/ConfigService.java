@@ -35,11 +35,11 @@ public class ConfigService implements DBService {
     public RESTService restService;
 
     @Override
-    public void on(Envelope e, AtmosphereResource r, EventBusListener l) {
+    public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
     }
 
     @Override
-    public void on(Object message, EventBusListener l) {
+    public void serve(String event, Object message, EventBusListener l) {
         if (PublisherEndpoint.class.isAssignableFrom(message.getClass())) {
             PublisherEndpoint p = PublisherEndpoint.class.cast(message);
             PublisherConfig config = restService.get("/config/" + p.uuid(), PublisherConfig.class);

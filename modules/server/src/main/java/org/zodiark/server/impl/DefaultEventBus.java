@@ -63,7 +63,7 @@ public class DefaultEventBus implements EventBus {
         }
 
         if (s != null) {
-            s.on(e, o, l);
+            s.serve(e, o, l);
         }
         return this;
     }
@@ -76,7 +76,7 @@ public class DefaultEventBus implements EventBus {
     @Override
     public EventBus fire(String message, Object o) {
         Service s = services.get(message);
-        s.on(o, l);
+        s.serve(message, o, l);
         return this;
     }
 

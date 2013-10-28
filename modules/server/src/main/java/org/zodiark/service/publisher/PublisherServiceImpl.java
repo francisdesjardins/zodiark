@@ -47,7 +47,7 @@ public class PublisherServiceImpl implements PublisherService {
     Context context;
 
     @Override
-    public void on(Envelope e, AtmosphereResource r, EventBusListener l) {
+    public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
         switch (e.getMessage().getPath()) {
             case Paths.LOAD_CONFIG:
             case Paths.CREATE_USER_SESSION:
@@ -134,7 +134,7 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Override
-    public void on(Object r, EventBusListener l) {
+    public void serve(String event, Object r, EventBusListener l) {
     }
 
     @Override

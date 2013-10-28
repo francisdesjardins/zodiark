@@ -26,7 +26,7 @@ import org.zodiark.service.publisher.PublisherEndpoint;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-@On("/streaming")
+@On("/streaming/{action}")
 public class StreamingSessionServiceImpl implements StreamingSessionService {
 
     @Inject
@@ -35,11 +35,11 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
     private ConcurrentHashMap<String, StreamingSession> sessions = new ConcurrentHashMap<>();
 
     @Override
-    public void on(Envelope e, AtmosphereResource r, EventBusListener l) {
+    public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
     }
 
     @Override
-    public void on(Object message, EventBusListener l) {
+    public void serve(String event, Object message, EventBusListener l) {
         if (PublisherEndpoint.class.isAssignableFrom(message.getClass())) {
             PublisherEndpoint p = PublisherEndpoint.class.cast(message);
 

@@ -23,10 +23,10 @@ import org.zodiark.service.Service;
 public interface DBService extends Service {
 
     @Override
-    public void on(Envelope e, AtmosphereResource r, EventBusListener l) ;
+    public void serve(Envelope e, AtmosphereResource r, EventBusListener l) ;
 
     @Override
-    public void on(Object r, EventBusListener l);
+    public void serve(String event, Object r, EventBusListener l);
 
 }
 

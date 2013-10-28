@@ -29,7 +29,7 @@ import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.publisher.PublisherEndpoint;
 
-@On("/wowza")
+@On("/wowza/{action}")
 public class WowzaServiceImpl implements WowzaService {
     private final Logger logger = LoggerFactory.getLogger(WowzaServiceImpl.class);
 
@@ -47,7 +47,7 @@ public class WowzaServiceImpl implements WowzaService {
 
 
     @Override
-    public void on(Envelope e, AtmosphereResource r, EventBusListener l) {
+    public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
         String uuid = e.getUuid();
         WowzaEndpoint endpoint = wowzaManager.lookup(uuid);
         Message m = e.getMessage();
@@ -59,7 +59,7 @@ public class WowzaServiceImpl implements WowzaService {
 
     // Will be called when the Publisher is ready to start a streaming show
     @Override
-    public void on(Object message, EventBusListener l) {
+    public void serve(String event, Object message, EventBusListener l) {
         if (PublisherEndpoint.class.isAssignableFrom(message.getClass())) {
             PublisherEndpoint p = PublisherEndpoint.class.cast(message);
             WowzaEndpoint w = wowzaManager.lookup(p.wowzaServerUUID());
