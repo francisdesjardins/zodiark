@@ -45,7 +45,6 @@ public class WowzaServiceImpl implements WowzaService {
     @Inject
     public ObjectMapper mapper;
 
-
     @Override
     public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
         String uuid = e.getUuid();
@@ -71,6 +70,7 @@ public class WowzaServiceImpl implements WowzaService {
     public void connected(Envelope e, AtmosphereResource r) {
 
         String uuid = e.getUuid();
+        // Message contains the geo-localisation of the client.
         Message m = e.getMessage();
 
         wowzaManager.bind(context.newInstance(WowzaEndpoint.class).uuid(uuid).message(m).resource(r));

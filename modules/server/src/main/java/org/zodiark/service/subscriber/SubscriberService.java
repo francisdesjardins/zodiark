@@ -15,30 +15,14 @@
  */
 package org.zodiark.service.subscriber;
 
-import org.zodiark.server.Endpoint;
+import org.atmosphere.cpr.AtmosphereResource;
+import org.zodiark.protocol.Envelope;
+import org.zodiark.service.Service;
 
-public class SubscriberEndpoint implements Endpoint {
+public interface SubscriberService extends Service {
 
-    private String uuid;
+    public SubscriberEndpoint createPublisherSession(Envelope e, AtmosphereResource resource);
 
+    public SubscriberEndpoint config(Envelope e);
 
-    public SubscriberEndpoint uuid(String uuid) {
-        this.uuid = uuid;
-        return this;
-    }
-
-    @Override
-    public Endpoint.TYPE type() {
-        return TYPE.SUBSCRIBER;
-    }
-
-    @Override
-    public void terminate() {
-
-    }
-
-    @Override
-    public String uuid() {
-        return uuid;
-    }
 }
