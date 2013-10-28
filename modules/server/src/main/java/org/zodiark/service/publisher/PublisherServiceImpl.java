@@ -165,11 +165,7 @@ public class PublisherServiceImpl implements PublisherService {
         AtmosphereResource r = p.resource();
         // TODO: Define error.
         Envelope error = Envelope.newServerReply(e, new Message());
-        try {
-            r.write(mapper.writeValueAsString(error));
-        } catch (JsonProcessingException e1) {
-            logger.error("", e1);
-        }
+        eventBus.fire(error, r);
     }
 
     @Override

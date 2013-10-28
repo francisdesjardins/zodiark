@@ -41,7 +41,7 @@ public class EventBusAnnotationProcessor implements Processor {
 
         On s = annotatedClass.getAnnotation(On.class);
         try {
-            logger.info("Registering @EventBusListener {}", annotatedClass.getName());
+            logger.info("Registering @On annotation {}", annotatedClass.getName());
             eventBus.on(s.value(), (Service) framework.newClassInstance(annotatedClass));
         } catch (Exception e) {
             logger.error("Unable to register {}", annotatedClass, e);

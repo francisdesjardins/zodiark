@@ -22,7 +22,7 @@ public enum LeftPathValue {
     private String value;
 
     LeftPathValue(String value) {
-        this.value = value;
+        this.value = value.startsWith("/") ? value : "/" + value;
     }
 
     public static LeftPathValue deserialize(String v) {
@@ -37,7 +37,7 @@ public enum LeftPathValue {
             case "react":
                 return REACT;
             default:
-                return CUSTOM.value(v);
+                return CUSTOM.value(v.startsWith("/") ? v : "/" + v);
         }
     }
 

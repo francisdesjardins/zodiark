@@ -60,6 +60,6 @@ public class Path {
     }
 
     public String right(){
-        return right();
+        return right;
     }
 }

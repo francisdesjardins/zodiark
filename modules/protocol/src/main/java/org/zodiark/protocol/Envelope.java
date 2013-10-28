@@ -37,7 +37,7 @@ public class Envelope {
         this.uuid = b.uuid;
     }
 
-    protected Envelope(){
+    protected Envelope() {
     }
 
     public String getPath() {
@@ -181,14 +181,16 @@ public class Envelope {
 
     private final static String replyValue(String path) {
         Path p = new Path(path);
-        String left = p.left();
+        String left = p.left().startsWith("/") ? p.left() : "/" + p.left();
         switch (left) {
-            case "response":
-                return LeftPathValue.REQUEST.name() + "/" + p.right();
-            case "message":
-                return LeftPathValue.MESSAGE.name()+ "/" + p.right();
-            case "react":
-                return LeftPathValue.OK.name()+ "/" + p.right();
+            case "/request":
+                return LeftPathValue.RESPONSE.name() + p.right();
+            case "/response":
+                return LeftPathValue.REQUEST.name() + p.right();
+            case "/message":
+                return LeftPathValue.MESSAGE.name() + p.right();
+            case "/react":
+                return LeftPathValue.OK.name() + p.right();
             default:
                 return path;
         }

@@ -91,7 +91,7 @@ public class ZodiarkClientTest {
         assertNotNull(answer.get());
         assertEquals(TEST, answer.get().getMessage().getData());
         assertEquals(1, answer.get().getTraceId());
-        assertEquals("/request/action", answer.get().getPath());
+        assertEquals("/response/action", answer.get().getPath());
 
     }
 
@@ -121,6 +121,54 @@ public class ZodiarkClientTest {
         assertNotNull(answer.get());
         assertEquals(TEST, answer.get().getMessage().getData());
         assertEquals(3, answer.get().getTraceId());
-        assertEquals("/request/action", answer.get().getPath());
+        assertEquals("/response/action", answer.get().getPath());
+    }
+
+    @Test
+    public void errorTest() throws IOException, InterruptedException {
+        server.service(EchoService.class);
+
+        final AtomicReference<Envelope> answer = new AtomicReference<>();
+        final ZodiarkClient c = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
+        final CountDownLatch latch = new CountDownLatch(1);
+        c.handler(new OnEnvelopHandler() {
+            @Override
+            public boolean onEnvelop(Envelope e) throws IOException {
+                c.handler(new OnEnvelopHandler() {
+                    @Override
+                    public boolean onEnvelop(Envelope e) throws IOException {
+                        answer.set(e);
+                        latch.countDown();
+                        return false;
+                    }
+                }).send(Envelope.newClientReply(e, e.getMessage()));
+                return true;
+            }
+        }).open().send(Envelope.newClientToServerRequest(new Message(new Path("/zzz/toot"), TEST)));
+
+        latch.await(5, TimeUnit.SECONDS);
+        assertNotNull(answer.get());
+        assertEquals("/error", answer.get().getMessage().getPath());
+    }
+
+    @Test
+    public void connectTest() throws IOException, InterruptedException {
+        server.service(EchoService.class);
+
+        final AtomicReference<Envelope> answer = new AtomicReference<>();
+        final ZodiarkClient c = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
+        final CountDownLatch latch = new CountDownLatch(1);
+        c.handler(new OnEnvelopHandler() {
+            @Override
+            public boolean onEnvelop(Envelope e) throws IOException {
+                answer.set(e);
+                latch.countDown();
+                return false;
+            }
+        }).open().send(Envelope.newClientToServerRequest(new Message(new Path("/wowza", "/connect"), TEST)));
+
+        latch.await(60, TimeUnit.SECONDS);
+        assertNotNull(answer.get());
+        assertEquals("/wowza/connect/ok", answer.get().getMessage().getPath());
     }
 }

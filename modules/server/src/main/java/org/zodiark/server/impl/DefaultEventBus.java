@@ -21,6 +21,7 @@ import org.atmosphere.util.EndpointMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
+import org.zodiark.protocol.Message;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.service.Service;
@@ -31,9 +32,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * Synchronous EventBus implementation.
  */
 public class DefaultEventBus implements EventBus {
+    private final Logger logger = LoggerFactory.getLogger(DefaultEventBus.class);
 
     private final EndpointMapper<Service> mapper = new DefaultEndpointMapper<>();
-    private final static Logger logger = LoggerFactory.getLogger(DefaultEventBus.class);
     private final ConcurrentHashMap<String, Service> services = new ConcurrentHashMap<>();
     private final EventBusListener l = new EventBusListener() {
         @Override
@@ -53,24 +54,22 @@ public class DefaultEventBus implements EventBus {
     }
 
     @Override
-    public EventBus fire(Envelope e, AtmosphereResource o, EventBusListener l) {
+    public EventBus fire(Envelope e, AtmosphereResource r, EventBusListener l) {
         Service s = mapper.map(e.getMessage().getPath(), services); //services.get(e.getMessage().getPath().toString());
 
-        if (AtmosphereResource.class.isAssignableFrom(o.getClass())) {
-            AtmosphereResource r = AtmosphereResource.class.cast(o);
-            logger.debug("Dispatching Envelop {} to {}", e, r.uuid());
+        logger.debug("Dispatching Envelop {} to {}", e, r.uuid());
 
-            if (e.getUuid().isEmpty()) {
-                e.setUuid(r.uuid());
-            }
-
+        if (e.getUuid().isEmpty()) {
+            e.setUuid(r.uuid());
         }
 
         if (s != null) {
-            s.serve(e, o, l);
+            s.serve(e, r, l);
         } else {
-            // error();
-            logger.debug(("Unmapped Service {}"), e);
+            Message m = new Message();
+            m.setPath("/error");
+            Envelope error = Envelope.newServerReply(e, m);
+            fire(error, r);
         }
         return this;
     }

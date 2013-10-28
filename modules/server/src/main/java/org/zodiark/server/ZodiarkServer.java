@@ -21,6 +21,7 @@ import org.atmosphere.nettosphere.Nettosphere;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.annotation.On;
+import org.zodiark.server.impl.EventBusAnnotationProcessor;
 import org.zodiark.service.Service;
 
 import java.io.BufferedReader;
@@ -36,17 +37,16 @@ public class ZodiarkServer {
     private final Config.Builder builder = new Config.Builder();
     private Nettosphere server;
     private final List<String> packages = new ArrayList<String>();
+    private URI uri;
 
     public ZodiarkServer() {
         builder.resource(EnvelopeDigester.class)
-                .initParam(ApplicationConfig.CUSTOM_ANNOTATION_PACKAGE, On.class.getPackage().getName())
+                .initParam(ApplicationConfig.CUSTOM_ANNOTATION_PACKAGE, EventBusAnnotationProcessor.class.getPackage().getName())
                 .initParam(ApplicationConfig.OBJECT_FACTORY, ZodiarkObjectFactory.class.getName());
     }
 
     public ZodiarkServer listen(URI uri) {
-        builder.port(uri.getPort()).host(uri.getHost()).build();
-        server = new Nettosphere.Builder().config(builder.build()).build();
-
+        this.uri = uri;
         return this;
     }
 
@@ -57,19 +57,22 @@ public class ZodiarkServer {
 
     public ZodiarkServer on() {
         if (packages.isEmpty()) {
-            packages.add(On.class.getName());
+            packages.add(Service.class.getPackage().getName());
         }
         builder.initParam(ApplicationConfig.ANNOTATION_PACKAGE, toList());
 
-        if (server == null) {
-            listen(URI.create("http://127.0.0.1:8080"));
+        if (uri == null) {
+            uri = URI.create("http://127.0.0.1:8080");
         }
+
+        builder.port(uri.getPort()).host(uri.getHost()).build();
+        server = new Nettosphere.Builder().config(builder.build()).build();
         server.start();
         return this;
     }
 
     public ZodiarkServer service(Class<? extends Service> annotatedClass) {
-        if (!server.isStarted()) {
+        if (server == null || !server.isStarted()) {
             packages.add(annotatedClass.getName());
         } else {
             On s = annotatedClass.getAnnotation(On.class);

@@ -49,7 +49,6 @@ public class WowzaServiceImpl implements WowzaService {
     public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
         String uuid = e.getUuid();
         WowzaEndpoint endpoint = wowzaManager.lookup(uuid);
-        Message m = e.getMessage();
         if (endpoint == null) {
             connected(e, r);
         }
@@ -76,7 +75,8 @@ public class WowzaServiceImpl implements WowzaService {
         wowzaManager.bind(context.newInstance(WowzaEndpoint.class).uuid(uuid).message(m).resource(r));
         Message responseMessage = new Message();
         // TODO: m.setPath
-        m.setData("OK");
+        responseMessage.setPath("/wowza/connect/ok");
+        responseMessage.setData("");
         response(e, r, responseMessage);
     }
 
