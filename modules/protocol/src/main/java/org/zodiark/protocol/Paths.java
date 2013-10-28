@@ -30,7 +30,7 @@ public interface Paths {
 
     String WOWZA_STREAMING_SESSION_ERROR = "/REACT/ERROR";
 
-    String START_STREAMINGSESSION = "/streamingsession/start";
+    String START_STREAMINGSESSION = "/streaming/start";
 
     String WOWZA_CONNECT = "/wowza/connect";
 
@@ -38,5 +38,5 @@ public interface Paths {
 
     String DB_INIT = "/db/init";
 
-    String TERMINATE_STREAMING_SESSSION = "/publishere/disconnect";
+    String TERMINATE_STREAMING_SESSSION = "/publisher/disconnect";
 }
