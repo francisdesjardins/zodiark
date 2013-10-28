@@ -13,12 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.wowza;
+package org.zodiark.service.session;
 
-import org.zodiark.server.annotation.On;
+import org.zodiark.server.EventBusListener;
 import org.zodiark.service.Service;
+import org.zodiark.service.publisher.PublisherEndpoint;
 
-@On("/register/{endpoint}/")
-public interface WowzaService extends Service {
+/**
+ * @author Jeanfrancois Arcand
+ */
+public interface StreamingSessionService extends Service {
 
+    void terminate(PublisherEndpoint p, EventBusListener l);
+
+    void initiate(PublisherEndpoint p, EventBusListener l);
 }

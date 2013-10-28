@@ -13,12 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.wowza;
+package org.zodiark.service.session;
 
-import org.zodiark.server.annotation.On;
-import org.zodiark.service.Service;
+public class PublicStreamingSession extends StreamingSessionBase {
 
-@On("/register/{endpoint}/")
-public interface WowzaService extends Service {
-
+    @Override
+    public TYPE type() {
+        return TYPE.PUBLIC;
+    }
 }

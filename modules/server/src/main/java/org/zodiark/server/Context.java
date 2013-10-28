@@ -13,12 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.wowza;
+package org.zodiark.server;
 
-import org.zodiark.server.annotation.On;
-import org.zodiark.service.Service;
+public interface Context {
 
-@On("/register/{endpoint}/")
-public interface WowzaService extends Service {
-
+    <T> T newInstance(Class<T> t);
 }
