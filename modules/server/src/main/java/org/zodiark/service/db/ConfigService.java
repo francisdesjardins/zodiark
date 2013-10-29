@@ -39,7 +39,8 @@ public class ConfigService implements DBService {
         if (PublisherEndpoint.class.isAssignableFrom(message.getClass())) {
             PublisherEndpoint p = PublisherEndpoint.class.cast(message);
             PublisherConfig config = restService.get("/config/" + p.uuid(), PublisherConfig.class);
-            l.completed(config);
+            p.config(config);
+            l.completed(p);
         }
     }
 }

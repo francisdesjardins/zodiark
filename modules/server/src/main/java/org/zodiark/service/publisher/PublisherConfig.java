@@ -15,14 +15,20 @@
  */
 package org.zodiark.service.publisher;
 
+import org.zodiark.service.db.DBResult;
 import org.zodiark.service.session.StreamingSession;
 
-public class PublisherConfig {
+public class PublisherConfig implements DBResult {
 
-    private final StreamingSession.TYPE streamingSessionType;
+    private StreamingSession.TYPE streamingSessionType;
 
-    public PublisherConfig(StreamingSession.TYPE streamingSessionType) {
+    public PublisherConfig(){
+        sessionType(StreamingSession.TYPE.PRIVATE);
+    }
+
+    public PublisherConfig sessionType(StreamingSession.TYPE streamingSessionType) {
         this.streamingSessionType = streamingSessionType;
+        return this;
     }
 
     public StreamingSession.TYPE sessionType() {

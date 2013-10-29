@@ -33,7 +33,7 @@ public interface PublisherService extends Service {
 
     public PublisherEndpoint config(Envelope e);
 
-    public void error(Envelope e, PublisherEndpoint p);
+    public void error(Envelope e, PublisherEndpoint p, Message message);
 
     public void createStreamingSession(Envelope e);
 

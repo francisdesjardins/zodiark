@@ -76,14 +76,18 @@ public class DefaultEventBus implements EventBus {
 
     @Override
     public EventBus fire(String e, Object r, EventBusListener l) {
-        return fire(e, r, l);
+        Service s = mapper.map(e, services); //services.get(message);
+        if (s != null) {
+            s.serve(e, r, l);
+        } else {
+            throw new IllegalStateException("No Service for " + e);
+        }
+        return this;
     }
 
     @Override
     public EventBus fire(String message, Object o) {
-        Service s = mapper.map(message, services); //services.get(message);
-        s.serve(message, o, l);
-        return this;
+        return fire(message, o, l);
     }
 
     @Override

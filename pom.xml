@@ -76,6 +76,16 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.zodiark</groupId>
+                <artifactId>zodiark-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.zodiark</groupId>
+                <artifactId>zodiark-wowza</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
                 <version>${logback.version}</version>
@@ -100,9 +110,9 @@
     <modules>
         <module>modules/protocol</module>
         <module>modules/server</module>
+        <module>modules/wowza</module>
         <module>modules/publisher</module>
         <module>modules/subscriber</module>
-        <module>modules/wowza</module>
     </modules>
 
     <build>

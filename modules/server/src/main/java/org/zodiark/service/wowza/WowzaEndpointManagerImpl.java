@@ -42,7 +42,7 @@ public class WowzaEndpointManagerImpl implements WowzaEndpointManager {
     @Override
     public WowzaEndpoint lookup(String wowzaName) {
         for (WowzaEndpoint e : endpoints) {
-            if (e.uri().equalsIgnoreCase(wowzaName)) {
+            if (e.uuid().equalsIgnoreCase(wowzaName)) {
                 return e;
             }
         }

@@ -13,26 +13,37 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.util;
+package org.zodiark.publisher;
 
-public class LoopbackRESTService implements RESTService {
-    @Override
-    public <T> T get(String uri, Class<T> c) {
-        return null;
+public class UserPassword {
+
+    private String username;
+    private String password;
+
+
+    public UserPassword(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
-    @Override
-    public <T> T put(String uri, Object o, Class<T> result) {
-        return null;
+    public UserPassword() {
     }
 
-    @Override
-    public <T> T post(String uri, Object o, Class<T> result) {
-        return null;
+    public String getUsername() {
+        return username;
     }
 
-    @Override
-    public <T> T delete(String uri, Object o, Class<T> result) {
-        return null;
+    public void setUsername(String username) {
+        this.username = username;
     }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+
 }

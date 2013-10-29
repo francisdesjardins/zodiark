@@ -19,7 +19,7 @@ public class Message {
 
     private String path;
     private String data;
-    private String uuid;
+    private String uuid = "-1";
 
     public Message(){
     }

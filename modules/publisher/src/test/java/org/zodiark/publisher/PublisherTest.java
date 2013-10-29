@@ -15,19 +15,34 @@
  */
 package org.zodiark.publisher;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.zodiark.protocol.ActorValue;
+import org.zodiark.protocol.Envelope;
+import org.zodiark.protocol.From;
+import org.zodiark.protocol.Message;
+import org.zodiark.protocol.Path;
+import org.zodiark.protocol.Paths;
 import org.zodiark.server.ZodiarkServer;
+import org.zodiark.service.publisher.PublisherResults;
+import org.zodiark.service.wowza.WowzaUUID;
+import org.zodiark.wowza.OnEnvelopHandler;
+import org.zodiark.wowza.ZodiarkClient;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.URI;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNotNull;
 
 public class PublisherTest {
 
-    public final static String TEST = "This is a test";
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public final static int findFreePort()  {
         ServerSocket socket = null;
@@ -51,26 +66,125 @@ public class PublisherTest {
     }
 
     private ZodiarkServer server;
-    private int port = findFreePort();;
+    private int port = 8080;
 
-    @Test
-    public void startZodiark() throws IOException {
-        server = new ZodiarkServer().listen(URI.create("http://127.0.0.1:" + port))
-                .service(EchoService.class)
-                .serve("./modules/publisher/src/test/resources")
-                .serve("./modules/publisher/src/main/webapp/javascript").on();
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-//        String a = "";
-//        while (!(a.equals("quit"))) {
-//            a = br.readLine();
-//        }
-//        System.exit(-1);
+    @BeforeClass
+    public void startZodiark() {
+        server = new ZodiarkServer().listen(URI.create("http://127.0.0.1:" + port)).on();
     }
 
     @AfterClass
     public void stopZodiark() {
         if (server != null) server.off();
     }
+
+    @Test
+    public void createSessionTest() throws IOException, InterruptedException {
+        final AtomicReference<PublisherResults> answer = new AtomicReference<>();
+        final ZodiarkClient publisherClient = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        publisherClient.handler(new OnEnvelopHandler() {
+            @Override
+            public boolean onEnvelop(Envelope e) throws IOException {
+                answer.set(mapper.readValue(e.getMessage().getData(), PublisherResults.class));
+                latch.countDown();
+                return true;
+            }
+        }).open();
+
+        Envelope createSessionMessage = Envelope.newClientToServerRequest(
+                new Message(new Path(Paths.CREATE_USER_SESSION), mapper.writeValueAsString(new UserPassword("foo", "bar"))));
+        createSessionMessage.setFrom(new From(ActorValue.PUBLISHER));
+        publisherClient.send(createSessionMessage);
+        latch.await();
+        assertEquals("OK", answer.get().getResults());
+    }
+
+    @Test
+    public void startStreamingSession() throws IOException, InterruptedException {
+
+        final ZodiarkClient wowzaClient = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
+        final CountDownLatch connected = new CountDownLatch(1);
+        final AtomicReference<String> uuid = new AtomicReference<>();
+
+        wowzaClient.handler(new OnEnvelopHandler() {
+            @Override
+            public boolean onEnvelop(Envelope e) throws IOException {
+
+                Message m = e.getMessage();
+                switch(m.getPath()) {
+                    case Paths.WOWZA_CONNECT:
+                        // Connected. Listen
+                        uuid.set(e.getUuid());
+                        break;
+                    case Paths.SERVER_VALIDATE_PUBLISHER_OK:
+                        Envelope publisherOk = Envelope.newClientToServerRequest(
+                                new Message(new Path(Paths.START_STREAMING_SESSION), e.getMessage().getData()));
+                        wowzaClient.send(publisherOk);
+                        break;
+                    default:
+                        // ERROR
+                }
+
+                connected.countDown();
+                return false;
+            }
+        }).open();
+
+        Envelope wowzaConnect = Envelope.newClientToServerRequest(
+                new Message(new Path(Paths.WOWZA_CONNECT), mapper.writeValueAsString(new UserPassword("wowza", "bar"))));
+        wowzaClient.send(wowzaConnect);
+        connected.await();
+
+        final AtomicReference<PublisherResults> answer = new AtomicReference<>();
+        final ZodiarkClient publisherClient = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        publisherClient.handler(new OnEnvelopHandler() {
+            @Override
+            public boolean onEnvelop(Envelope e) throws IOException {
+                answer.set(mapper.readValue(e.getMessage().getData(), PublisherResults.class));
+                latch.countDown();
+                return true;
+            }
+        }).open();
+
+        Envelope createSessionMessage = Envelope.newClientToServerRequest(
+                new Message(new Path(Paths.CREATE_USER_SESSION), mapper.writeValueAsString(new UserPassword("publisherex", "bar"))));
+        createSessionMessage.setFrom(new From(ActorValue.PUBLISHER));
+        publisherClient.send(createSessionMessage);
+        latch.await();
+        assertEquals("OK", answer.get().getResults());
+        answer.set(null);
+
+        final CountDownLatch tlatch = new CountDownLatch(1);
+        publisherClient.handler(new OnEnvelopHandler() {
+            @Override
+            public boolean onEnvelop(Envelope e) throws IOException {
+                answer.set(mapper.readValue(e.getMessage().getData(), PublisherResults.class));
+                tlatch.countDown();
+                return true;
+            }
+        });
+
+        Envelope startStreamingSession = Envelope.newClientToServerRequest(
+                new Message(new Path(Paths.VALIDATE_STREAMING_SESSION), mapper.writeValueAsString(new WowzaUUID(uuid.get()))));
+        createSessionMessage.setFrom(new From(ActorValue.PUBLISHER));
+        publisherClient.send(startStreamingSession);
+
+        tlatch.await();
+
+        assertEquals("OK", answer.get().getResults());
+
+    }
+
+
+
+
+
+
+
+
 
 }

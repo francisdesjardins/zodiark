@@ -91,7 +91,7 @@ public class ZodiarkClientTest {
         assertNotNull(answer.get());
         assertEquals(TEST, answer.get().getMessage().getData());
         assertEquals(1, answer.get().getTraceId());
-        assertEquals("/response/action", answer.get().getPath());
+        assertEquals("/action", answer.get().getPath());
 
     }
 
@@ -121,7 +121,7 @@ public class ZodiarkClientTest {
         assertNotNull(answer.get());
         assertEquals(TEST, answer.get().getMessage().getData());
         assertEquals(3, answer.get().getTraceId());
-        assertEquals("/response/action", answer.get().getPath());
+        assertEquals("/action", answer.get().getPath());
     }
 
     @Test
@@ -169,6 +169,6 @@ public class ZodiarkClientTest {
 
         latch.await(60, TimeUnit.SECONDS);
         assertNotNull(answer.get());
-        assertEquals("/wowza/connect/ok", answer.get().getMessage().getPath());
+        assertEquals("/wowza/connect", answer.get().getMessage().getPath());
     }
 }

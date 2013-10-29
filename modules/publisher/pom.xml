@@ -21,14 +21,18 @@
             <classifier>jdk15</classifier>
         </dependency>
         <dependency>
-            <groupId>org.atmosphere</groupId>
-            <artifactId>nettosphere</artifactId>
+            <groupId>org.zodiark</groupId>
+            <artifactId>zodiark-server</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.zodiark</groupId>
-            <artifactId>zodiark-server</artifactId>
-            <version>${project.version}</version>
+            <artifactId>zodiark-wowza</artifactId>
             <scope>test</scope>
         </dependency>
 

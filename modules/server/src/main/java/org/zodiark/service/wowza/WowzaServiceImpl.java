@@ -22,14 +22,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
+import org.zodiark.protocol.Paths;
 import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.publisher.PublisherEndpoint;
+import org.zodiark.service.publisher.PublishereUUID;
 
-@On("/wowza/{action}")
+import java.io.IOException;
+
+@On("/wowza")
 public class WowzaServiceImpl implements WowzaService {
     private final Logger logger = LoggerFactory.getLogger(WowzaServiceImpl.class);
 
@@ -52,7 +56,6 @@ public class WowzaServiceImpl implements WowzaService {
         if (endpoint == null) {
             connected(e, r);
         }
-
     }
 
     // Will be called when the Publisher is ready to start a streaming show
@@ -61,7 +64,11 @@ public class WowzaServiceImpl implements WowzaService {
         if (PublisherEndpoint.class.isAssignableFrom(message.getClass())) {
             PublisherEndpoint p = PublisherEndpoint.class.cast(message);
             WowzaEndpoint w = wowzaManager.lookup(p.wowzaServerUUID());
-            w.isReady(p, l);
+            if (w != null) {
+                w.isPublisherConnected(p, l);
+            } else {
+                l.failed(p);
+            }
         }
     }
 
@@ -74,9 +81,12 @@ public class WowzaServiceImpl implements WowzaService {
 
         wowzaManager.bind(context.newInstance(WowzaEndpoint.class).uuid(uuid).message(m).resource(r));
         Message responseMessage = new Message();
-        // TODO: m.setPath
-        responseMessage.setPath("/wowza/connect/ok");
-        responseMessage.setData("");
+        responseMessage.setPath(Paths.WOWZA_CONNECT);
+        try {
+            responseMessage.setData(mapper.writeValueAsString(new WowzaResults("OK")));
+        } catch (JsonProcessingException e1) {
+            ;
+        }
         response(e, r, responseMessage);
     }
 

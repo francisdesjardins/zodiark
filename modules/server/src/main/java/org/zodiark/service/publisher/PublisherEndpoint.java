@@ -27,11 +27,7 @@ public class PublisherEndpoint implements Endpoint {
     private AtmosphereResource resource;
     private String wowzaServer;
 
-    public PublisherEndpoint(String uuid, Message message, AtmosphereResource resource) {
-        this.uuid = uuid;
-        this.message = message;
-        this.resource = resource;
-    }
+    public PublisherEndpoint(){}
 
     public String uuid() {
         return uuid;

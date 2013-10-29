@@ -30,6 +30,9 @@ public class InitService implements DBService {
     @Inject
     public RESTService restService;
 
+    @Inject
+    public AuthConfig authConfig;
+
     @Override
     public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
     }
@@ -38,8 +41,13 @@ public class InitService implements DBService {
     public void serve(String event, Object message, EventBusListener l) {
         if (PublisherEndpoint.class.isAssignableFrom(message.getClass())) {
             PublisherEndpoint p = PublisherEndpoint.class.cast(message);
-            PublisherConfig config = restService.post("/init/" + p.uuid(), p.message(), PublisherConfig.class);
-            l.completed(config);
+            AuthConfig config = restService.post("/init/" + p.uuid(), p.message(), AuthConfig.class);
+
+            if (config.isAuthenticated()) {
+                l.completed(p);
+            } else {
+                l.failed(p);
+            }
         }
     }
 }

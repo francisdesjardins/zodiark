@@ -26,19 +26,8 @@ public enum LeftPathValue {
     }
 
     public static LeftPathValue deserialize(String v) {
-        String value = v.length() > 1 ? v.split("/")[1].toLowerCase() : v.toLowerCase();
-        switch (value) {
-            case "request":
-                return REQUEST;
-            case "response":
-                return RESPONSE;
-            case "message":
-                return MESSAGE;
-            case "react":
-                return REACT;
-            default:
-                return CUSTOM.value(v.startsWith("/") ? v : "/" + v);
-        }
+        String value = v.length() > 1 ? v.split("/")[1] : v;
+        return CUSTOM.value("/" + value);
     }
 
     final String value() {

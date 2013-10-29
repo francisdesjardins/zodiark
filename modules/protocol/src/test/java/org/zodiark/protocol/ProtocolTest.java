@@ -85,7 +85,7 @@ public class ProtocolTest {
         Envelope e = mapper.readValue(testEnvelope, Envelope.class);
 
         assertNotNull(e);
-        assertEquals(e.getPath().toString(), "/REQUEST/ACTION".toLowerCase());
+        assertEquals(e.getPath().toString(), "/request/Action");
         assertEquals(e.getTraceId(), 0);
         assertEquals(e.getUuid(), "234-456-w2dsce3-29sj3");
 

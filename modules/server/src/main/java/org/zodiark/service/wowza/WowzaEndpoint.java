@@ -15,11 +15,19 @@
  */
 package org.zodiark.service.wowza;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cpr.AtmosphereResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
+import org.zodiark.protocol.Paths;
 import org.zodiark.server.Endpoint;
 import org.zodiark.server.EventBusListener;
+import org.zodiark.server.annotation.Inject;
 import org.zodiark.service.publisher.PublisherEndpoint;
+import org.zodiark.service.publisher.PublishereUUID;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,16 +37,18 @@ import java.util.List;
  */
 public class WowzaEndpoint implements Endpoint {
 
+    private final Logger logger = LoggerFactory.getLogger(WowzaEndpoint.class);
+
+    @Inject
+    public ObjectMapper mapper;
+
+
     private String uuid;
-    private String uri;
     private final List<Endpoint> supportedEndpoints = new LinkedList<Endpoint>();
     private AtmosphereResource resource;
     private Message message;
 
-    public WowzaEndpoint(){}
-
-    public String uri() {
-        return uri;
+    public WowzaEndpoint() {
     }
 
     @Override
@@ -53,17 +63,26 @@ public class WowzaEndpoint implements Endpoint {
 
     @Override
     public String uuid() {
-        return null;
+        return uuid;
     }
 
     public List<Endpoint> supportedEndpoints() {
         return supportedEndpoints;
     }
 
-    public void isReady(PublisherEndpoint p, EventBusListener l) {
+    public void isPublisherConnected(PublisherEndpoint p, EventBusListener l) {
+        Message m = new Message();
+        m.setPath(Paths.SERVER_VALIDATE_PUBLISHER_OK);
+        try {
+            m.setData(mapper.writeValueAsString(new PublishereUUID(p.uuid())));
 
-        // TODO: Send a message to wowza.
-        //resource.write();
+            Envelope e = Envelope.newServerRequest(Paths.REQUEST_ACTION, uuid, m);
+            resource.write(mapper.writeValueAsString(e));
+        } catch (Exception e) {
+            logger.error("", e);
+            l.failed(p);
+        }
+
     }
 
     public WowzaEndpoint uuid(String uuid) {

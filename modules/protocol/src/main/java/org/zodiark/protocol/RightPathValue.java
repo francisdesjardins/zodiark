@@ -28,26 +28,14 @@ public enum RightPathValue {
     public static RightPathValue deserialize(String v) {
         String[] s = v.split("/");
         if (s.length > 2) {
-            String value = s[2].toLowerCase();
-            switch (value) {
-                case "action":
-                    return ACTION;
-                case "command":
-                    return COMMAND;
-                case "execution":
-                    return EXECUTION;
-                case "systems":
-                    return SYSTEMS;
-                default:
-                    return CUSTOM.value(value);
-            }
+            return CUSTOM.value(v.substring(v.indexOf("/", 2)));
         } else {
             return CUSTOM.value("");
         }
     }
 
     final String value() {
-        return this.value.toLowerCase();
+        return this.value;
     }
 
     final RightPathValue value(String value) {

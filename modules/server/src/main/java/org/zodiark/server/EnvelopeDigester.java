@@ -19,11 +19,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cache.UUIDBroadcasterCache;
 import org.atmosphere.client.TrackMessageSizeInterceptor;
 import org.atmosphere.config.service.AtmosphereHandlerService;
+import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.AtmosphereResourceEvent;
 import org.atmosphere.cpr.AtmosphereResponse;
+import org.atmosphere.handler.AtmosphereHandlerAdapter;
 import org.atmosphere.handler.OnMessage;
 import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
 import org.atmosphere.interceptor.BroadcastOnPostAtmosphereInterceptor;
 import org.atmosphere.interceptor.HeartbeatInterceptor;
+import org.atmosphere.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
@@ -35,11 +39,10 @@ import java.io.IOException;
         path = "/",
         broadcasterCache = UUIDBroadcasterCache.class,
         interceptors = {AtmosphereResourceLifecycleInterceptor.class,
-                BroadcastOnPostAtmosphereInterceptor.class,
                 HeartbeatInterceptor.class,
                 TrackMessageSizeInterceptor.class}
 )
-public class EnvelopeDigester extends OnMessage<String> {
+public class EnvelopeDigester extends AtmosphereHandlerAdapter {
 
     private final ObjectMapper mapper = new ObjectMapper();
     private Logger logger = LoggerFactory.getLogger(EnvelopeDigester.class);
@@ -47,16 +50,23 @@ public class EnvelopeDigester extends OnMessage<String> {
     @Inject
     public EventBus eventBus;
 
-    @Override
-    public void onMessage(AtmosphereResponse response, String message) throws IOException {
-        try {
-            logger.debug("{}", message);
-            Envelope e = mapper.readValue(message, Envelope.class);
-            eventBus.fire(e, response.resource());
-        } catch (Exception ex) {
-            logger.error("", ex);
-            response.resource().close();
+    public void onRequest(AtmosphereResource r) throws IOException {
+        String message = IOUtils.readEntirely(r).toString();
+        if (!message.isEmpty()) {
+            try {
+                logger.debug("{}", message);
+                Envelope e = mapper.readValue(message, Envelope.class);
+                eventBus.fire(e, r);
+            } catch (Exception ex) {
+                logger.error("", ex);
+                r.close();
+            }
         }
+    }
+
+    @Override
+    public void onStateChange(AtmosphereResourceEvent event) throws IOException {
+        logger.trace("onRequest {}", event.getResource().uuid());
     }
 
 }
