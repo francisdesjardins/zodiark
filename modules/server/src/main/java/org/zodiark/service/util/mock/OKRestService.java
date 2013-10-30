@@ -15,11 +15,15 @@
  */
 package org.zodiark.service.util.mock;
 
-import org.zodiark.service.db.AuthConfig;
-import org.zodiark.service.publisher.PublisherConfig;
+import org.zodiark.server.Context;
+import org.zodiark.server.annotation.Inject;
 import org.zodiark.service.util.RESTService;
 
 public class OKRestService implements RESTService {
+
+    @Inject
+    public Context context;
+
     @Override
     public <T> T get(String uri, Class<T> c) {
         return post(uri, "", c);
@@ -33,13 +37,7 @@ public class OKRestService implements RESTService {
     @Override
     public <T> T post(String uri, Object o, Class<T> result) {
         try {
-            if (result.isAssignableFrom(AuthConfig.class)) {
-                return (T) OKAuthConfig.class.newInstance();
-            } else if (result.isAssignableFrom(PublisherConfig.class)) {
-                return (T) PublisherConfig.class.newInstance();
-            } else {
-                throw new UnsupportedOperationException(result.getName());
-            }
+            return context.newInstance(result);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

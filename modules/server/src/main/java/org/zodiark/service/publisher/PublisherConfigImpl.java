@@ -15,13 +15,21 @@
  */
 package org.zodiark.service.publisher;
 
-import org.zodiark.service.db.DBResult;
 import org.zodiark.service.session.StreamingSession;
 
-public interface PublisherConfig extends DBResult {
+public class PublisherConfigImpl implements PublisherConfig {
+    private StreamingSession.TYPE streamingSessionType;
 
+    public PublisherConfigImpl(){
+        sessionType(StreamingSession.TYPE.PRIVATE);
+    }
 
-    StreamingSession.TYPE  sessionType();
+    public PublisherConfig sessionType(StreamingSession.TYPE streamingSessionType) {
+        this.streamingSessionType = streamingSessionType;
+        return this;
+    }
 
-    PublisherConfig sessionType(StreamingSession.TYPE streamingSessionType);
+    public StreamingSession.TYPE sessionType() {
+        return streamingSessionType;
+    }
 }

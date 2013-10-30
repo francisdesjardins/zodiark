@@ -20,6 +20,8 @@ import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereObjectFactory;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.service.db.AuthConfig;
+import org.zodiark.service.publisher.PublisherConfig;
+import org.zodiark.service.publisher.PublisherConfigImpl;
 import org.zodiark.service.util.mock.OKRestService;
 import org.zodiark.service.util.mock.OKAuthConfig;
 import org.zodiark.service.util.RESTService;
@@ -28,16 +30,23 @@ import org.zodiark.service.wowza.WowzaEndpointManagerImpl;
 
 import java.lang.reflect.Field;
 
-public class ZodiarkObjectFactory implements AtmosphereObjectFactory{
+public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
 
     private final EventBus evenBus = EventBusFactory.getDefault().eventBus();
     private final ObjectMapper mapper = new ObjectMapper();
-    private RESTService restService = new OKRestService();
     private final WowzaEndpointManager wowzaService = new WowzaEndpointManagerImpl();
-    private final AuthConfig authConfig = new OKAuthConfig();
+    private final Class<? extends AuthConfig> authConfig = OKAuthConfig.class;
+    private final Class<? extends PublisherConfig> publisherConfig = PublisherConfigImpl.class;
+    private final Class<? extends RESTService> restService = OKRestService.class;
 
     @Override
     public <T> T newClassInstance(final AtmosphereFramework framework, Class<T> tClass) throws InstantiationException, IllegalAccessException {
+
+        if (tClass.isAssignableFrom(AuthConfig.class)) {
+            return (T) newClassInstance(framework, authConfig);
+        } else if (tClass.isAssignableFrom(PublisherConfig.class)) {
+            return (T) newClassInstance(framework, publisherConfig);
+        }
 
         T instance = tClass.newInstance();
 
@@ -49,22 +58,24 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory{
                 } else if (field.getType().isAssignableFrom(EventBus.class)) {
                     field.set(instance, evenBus);
                 } else if (field.getType().isAssignableFrom(RESTService.class)) {
-                    field.set(instance, restService);
+                    field.set(instance, newClassInstance(framework, restService));
                 } else if (field.getType().isAssignableFrom(WowzaEndpointManager.class)) {
                     field.set(instance, wowzaService);
                 } else if (field.getType().isAssignableFrom(Context.class)) {
                     field.set(instance, new Context() {
-                            @Override
-                            public <T> T newInstance(Class<T> t) {
-                                try {
-                                    return newClassInstance(framework, t);
-                                } catch (Exception e) {
-                                    throw new RuntimeException(e);
-                                }
+                        @Override
+                        public <T> T newInstance(Class<T> t) {
+                            try {
+                                return newClassInstance(framework, t);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
                             }
-                        });
+                        }
+                    });
                 } else if (field.getType().isAssignableFrom(AuthConfig.class)) {
-                    field.set(instance, authConfig);
+                    field.set(instance, newClassInstance(framework, authConfig));
+                } else if (field.getType().isAssignableFrom(PublisherConfig.class)) {
+                    field.set(instance, newClassInstance(framework, publisherConfig));
                 }
             }
         }
