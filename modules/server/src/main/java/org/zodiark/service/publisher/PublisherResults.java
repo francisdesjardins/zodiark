@@ -5,6 +5,7 @@ import org.zodiark.service.Results;
 public class PublisherResults implements Results {
 
     private String results;
+    private String uuid;
 
     public PublisherResults() {}
 
@@ -18,5 +19,13 @@ public class PublisherResults implements Results {
 
     public String getResults() {
         return results;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 }

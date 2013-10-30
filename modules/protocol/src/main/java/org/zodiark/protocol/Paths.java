@@ -28,7 +28,9 @@ public interface Paths {
 
     String VALIDATE_STREAMING_SESSION = "/publisher/validateStreamingSession";
 
-    String WOWZA_STREAMING_SESSION_ERROR = "/REACT/ERROR";
+    String WOWZA_ERROR_STREAMING_SESSION = "/publisher/errorStreamingSession";
+
+    String ERROR_STREAMING_SESSION = "/error/errorStreamingSession";
 
     String START_STREAMINGSESSION = "/streaming/start";
 

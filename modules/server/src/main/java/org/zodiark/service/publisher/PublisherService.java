@@ -43,5 +43,7 @@ public interface PublisherService extends Service {
 
     public void terminateStreamingSession(PublisherEndpoint p, AtmosphereResource r);
 
+    public void errorStreamingSession(Envelope e);
+
 }
 

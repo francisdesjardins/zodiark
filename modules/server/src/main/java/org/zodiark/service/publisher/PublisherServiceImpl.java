@@ -61,27 +61,36 @@ public class PublisherServiceImpl implements PublisherService {
             case Paths.START_STREAMING_SESSION:
                 startStreamingSession(e);
                 break;
-            case Paths.WOWZA_STREAMING_SESSION_ERROR:
-                String uuid = e.getMessage().getUUID();
-                PublisherEndpoint p = endpoints.get(uuid);
-
-                Message m = new Message();
-                m.setPath(Paths.CREATE_USER_SESSION);
-                try {
-                    m.setData(mapper.writeValueAsString(new PublisherResults("OK")));
-                } catch (JsonProcessingException e1) {
-                        //
-                }
-                error(e, p, m);
+            case Paths.WOWZA_ERROR_STREAMING_SESSION:
+                errorStreamingSession(e);
                 break;
             case Paths.TERMINATE_STREAMING_SESSSION:
-                uuid = e.getMessage().getUUID();
-                p = endpoints.get(uuid);
+                String uuid = e.getMessage().getUUID();
+                PublisherEndpoint p = endpoints.get(uuid);
                 terminateStreamingSession(p, r);
                 break;
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
         }
+    }
+
+    public void errorStreamingSession(Envelope e) {
+        try {
+            PublisherResults result = mapper.readValue(e.getMessage().getData(), PublisherResults.class);
+            PublisherEndpoint p = endpoints.get(result.getUuid());
+
+            Message m = new Message();
+            m.setPath(Paths.ERROR_STREAMING_SESSION);
+            try {
+                m.setData(mapper.writeValueAsString(new PublisherResults("ERROR")));
+            } catch (JsonProcessingException e1) {
+                    //
+            }
+            error(e, p, m);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
     }
 
     public void terminateStreamingSession(PublisherEndpoint p, AtmosphereResource r) {
@@ -202,7 +211,6 @@ public class PublisherServiceImpl implements PublisherService {
 
     public void error(Envelope e, PublisherEndpoint p, Message m) {
         AtmosphereResource r = p.resource();
-        // TODO: Define error.
         Envelope error = Envelope.newServerReply(e, m);
         eventBus.fire(error, r);
     }
