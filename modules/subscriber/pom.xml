@@ -28,7 +28,16 @@
         <dependency>
             <groupId>org.zodiark</groupId>
             <artifactId>zodiark-server</artifactId>
-            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.zodiark</groupId>
+            <artifactId>zodiark-wowza</artifactId>
             <scope>test</scope>
         </dependency>
 

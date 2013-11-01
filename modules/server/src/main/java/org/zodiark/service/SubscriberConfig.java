@@ -13,22 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.session;
+package org.zodiark.service;
 
-import org.zodiark.server.EventBusListener;
-import org.zodiark.service.Service;
-import org.zodiark.service.publisher.PublisherEndpoint;
-import org.zodiark.service.subscriber.SubscriberEndpoint;
+import org.zodiark.service.db.DBResult;
+import org.zodiark.service.session.StreamingSession;
 
-/**
- * @author Jeanfrancois Arcand
- */
-public interface StreamingSessionService extends Service {
+public interface SubscriberConfig extends DBResult {
 
-    void terminate(PublisherEndpoint p, EventBusListener l);
+    StreamingSession.TYPE sessionType();
 
-    void initiate(PublisherEndpoint p, EventBusListener l);
-
-    void join(SubscriberEndpoint s, EventBusListener l);
-
+    SubscriberConfig sessionType(StreamingSession.TYPE streamingSessionType);
 }

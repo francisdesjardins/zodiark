@@ -15,71 +15,11 @@
  */
 package org.zodiark.service.publisher;
 
-import org.atmosphere.cpr.AtmosphereResource;
-import org.zodiark.protocol.Message;
-import org.zodiark.server.Endpoint;
+import org.zodiark.service.EndpointAdapter;
 
-public class PublisherEndpoint implements Endpoint {
+public class PublisherEndpoint extends EndpointAdapter<PublisherEndpoint> {
 
-    private String uuid;
-    private PublisherConfig config;
-    private Message message;
-    private AtmosphereResource resource;
-    private String wowzaServer;
-
-    public PublisherEndpoint(){}
-
-    public String uuid() {
-        return uuid;
-    }
-
-    public PublisherEndpoint config(PublisherConfig config) {
-        this.config = config;
-        return this;
-    }
-
-    public PublisherConfig config() {
-        return config;
-    }
-
-    public PublisherEndpoint message(Message message) {
-        this.message = message;
-        return this;
-    }
-
-    public PublisherEndpoint uuid(String uuid) {
-        this.uuid = uuid;
-        return this;
-    }
-
-    @Override
-    public TYPE type() {
-        return TYPE.PUBLISHER;
-    }
-
-    @Override
-    public void terminate() {
-    }
-
-    public Message message() {
-        return message;
-    }
-
-    public AtmosphereResource resource() {
-        return resource;
-    }
-
-    public String wowzaServerUUID() {
-        return wowzaServer;
-    }
-
-    public PublisherEndpoint wowzaServerUUID(String wowzaServer) {
-        this.wowzaServer = wowzaServer;
-        return this;
-    }
-
-    public PublisherEndpoint resource(AtmosphereResource resource) {
-        this.resource = resource;
-        return this;
+    public PublisherEndpoint() {
+        super();
     }
 }

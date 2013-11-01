@@ -15,7 +15,6 @@
  */
 package org.zodiark.service.wowza;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.slf4j.Logger;
@@ -23,11 +22,10 @@ import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.protocol.Paths;
-import org.zodiark.server.Endpoint;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
-import org.zodiark.service.publisher.PublisherEndpoint;
-import org.zodiark.service.publisher.PublishereUUID;
+import org.zodiark.service.Endpoint;
+import org.zodiark.service.UUID;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -70,11 +68,11 @@ public class WowzaEndpoint implements Endpoint {
         return supportedEndpoints;
     }
 
-    public void isPublisherConnected(PublisherEndpoint p, EventBusListener l) {
+    public void isEndpointConnected(Endpoint p, EventBusListener l) {
         Message m = new Message();
-        m.setPath(Paths.SERVER_VALIDATE_PUBLISHER_OK);
+        m.setPath(Paths.SERVER_VALIDATE_OK);
         try {
-            m.setData(mapper.writeValueAsString(new PublishereUUID(p.uuid())));
+            m.setData(mapper.writeValueAsString(new UUID(p.uuid())));
 
             Envelope e = Envelope.newServerRequest(Paths.REQUEST_ACTION, uuid, m);
             resource.write(mapper.writeValueAsString(e));

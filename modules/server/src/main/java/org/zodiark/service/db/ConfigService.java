@@ -20,8 +20,8 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
-import org.zodiark.service.publisher.PublisherConfig;
-import org.zodiark.service.publisher.PublisherEndpoint;
+import org.zodiark.service.EndpointAdapter;
+import org.zodiark.service.PublisherConfig;
 import org.zodiark.service.util.RESTService;
 
 @On("/db/config")
@@ -36,8 +36,8 @@ public class ConfigService implements DBService {
 
     @Override
     public void serve(String event, Object message, EventBusListener l) {
-        if (PublisherEndpoint.class.isAssignableFrom(message.getClass())) {
-            PublisherEndpoint p = PublisherEndpoint.class.cast(message);
+        if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
+            EndpointAdapter p = EndpointAdapter.class.cast(message);
             PublisherConfig config = restService.get("/config/" + p.uuid(), PublisherConfig.class);
             p.config(config);
             l.completed(p);

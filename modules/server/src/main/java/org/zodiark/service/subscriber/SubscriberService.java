@@ -15,14 +15,8 @@
  */
 package org.zodiark.service.subscriber;
 
-import org.atmosphere.cpr.AtmosphereResource;
-import org.zodiark.protocol.Envelope;
 import org.zodiark.service.Service;
 
 public interface SubscriberService extends Service {
-
-    public SubscriberEndpoint createPublisherSession(Envelope e, AtmosphereResource resource);
-
-    public SubscriberEndpoint config(Envelope e);
 
 }

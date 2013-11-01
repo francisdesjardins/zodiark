@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ActorValue {
 
-    SUBCRIBER("/subscriber"), PUBLISHER("/publisher"), STREAM_SERVER("/stream_server"), SERVER("/server"), MONITOR("/monitor"), CLIENT("client");
+    SUBSCRIBER("/subscriber"), PUBLISHER("/publisher"), STREAM_SERVER("/stream_server"), SERVER("/server"), MONITOR("/monitor"), CLIENT("client");
 
     private final String value;
 
@@ -34,7 +34,7 @@ public enum ActorValue {
         String value = v.toLowerCase();
         switch (value) {
             case "subscriber":
-                return SUBCRIBER;
+                return SUBSCRIBER;
             case "publisher":
                 return PUBLISHER;
             case "stream_server":

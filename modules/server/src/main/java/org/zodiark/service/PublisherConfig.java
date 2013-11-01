@@ -13,13 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.publisher;
+package org.zodiark.service;
 
 import org.zodiark.service.db.DBResult;
 import org.zodiark.service.session.StreamingSession;
 
 public interface PublisherConfig extends DBResult {
-
 
     StreamingSession.TYPE  sessionType();
 

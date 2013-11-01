@@ -15,6 +15,7 @@
  */
 package org.zodiark.service.session;
 
+import org.zodiark.server.EventBusListener;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 
@@ -23,17 +24,18 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public abstract class StreamingSessionBase implements StreamingSession {
 
+
     private PublisherEndpoint endpoint;
     private final ConcurrentLinkedQueue<SubscriberEndpoint> subscribers = new ConcurrentLinkedQueue<>();
 
     @Override
-    public StreamingSession publisher(PublisherEndpoint p) {
+    public StreamingSession owner(PublisherEndpoint p) {
         endpoint = p;
         return this;
     }
 
     @Override
-    public PublisherEndpoint publisher() {
+    public PublisherEndpoint owner() {
         return endpoint;
     }
 
@@ -43,8 +45,13 @@ public abstract class StreamingSessionBase implements StreamingSession {
     }
 
     @Override
-    public StreamingSession susbcriber(SubscriberEndpoint s) {
-        subscribers.add(s);
+    public StreamingSession validateAndJoin(SubscriberEndpoint s, EventBusListener<SubscriberEndpoint> e) {
+        if (!validateSession(s)) {
+            e.failed(s);
+        } else {
+            subscribers.add(s);
+            e.completed(s);
+        }
         return this;
     }
 
@@ -56,9 +63,15 @@ public abstract class StreamingSessionBase implements StreamingSession {
         }
     }
 
+    private boolean validateSession(SubscriberEndpoint s) {
+        // TODO: Validate the Publisher.
+        // Can it be added to the session ?
+        return true;
+    }
+
     @Override
     public StreamingSession initAndAct() {
-
+        // TODO: DB CALL
         return this;
     }
 

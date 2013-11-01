@@ -45,13 +45,4 @@ public interface EventBus {
      */
     EventBus off(String eventName);
 
-
-    /**
-     * Return the {@link Service} associated with the clazz
-     *
-     * @param clazz
-     * @return
-     */
-    Service service(Class<? extends Service> clazz);
-
 }

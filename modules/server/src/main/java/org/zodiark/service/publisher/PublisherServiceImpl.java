@@ -28,13 +28,15 @@ import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
+import org.zodiark.service.UUID;
+import org.zodiark.service.Session;
 import org.zodiark.service.wowza.WowzaUUID;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 @On("/publisher")
-public class PublisherServiceImpl implements PublisherService {
+public class PublisherServiceImpl implements PublisherService, Session<PublisherEndpoint> {
 
     private final ConcurrentHashMap<String, PublisherEndpoint> endpoints = new ConcurrentHashMap<>();
     private final Logger logger = LoggerFactory.getLogger(PublisherServiceImpl.class);
@@ -52,11 +54,11 @@ public class PublisherServiceImpl implements PublisherService {
     public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
         switch (e.getMessage().getPath()) {
             case Paths.LOAD_CONFIG:
-            case Paths.CREATE_USER_SESSION:
-                createPublisherSession(e, r);
+            case Paths.CREATE_PUBLISHER_SESSION:
+                createSession(e, r);
                 break;
-            case Paths.VALIDATE_STREAMING_SESSION:
-                createStreamingSession(e);
+            case Paths.VALIDATE_PUBLISHER_STREAMING_SESSION:
+                createOrJoinStreamingSession(e);
                 break;
             case Paths.START_STREAMING_SESSION:
                 startStreamingSession(e);
@@ -88,23 +90,24 @@ public class PublisherServiceImpl implements PublisherService {
             }
             error(e, p, m);
         } catch (IOException e1) {
-            e1.printStackTrace();
+            logger.warn("{}", e1);
         }
-
     }
 
+    @Override
     public void terminateStreamingSession(PublisherEndpoint p, AtmosphereResource r) {
         // TODO:
     }
 
-    public void createStreamingSession(final Envelope e) {
+    @Override
+    public void createOrJoinStreamingSession(final Envelope e) {
         String uuid = e.getUuid();
         PublisherEndpoint p = retrieve(uuid);
 
         try {
             p.wowzaServerUUID(mapper.readValue(e.getMessage().getData(), WowzaUUID.class).getUuid());
         } catch (IOException e1) {
-            e1.printStackTrace();
+            logger.warn("{}", e1);
         }
 
         eventBus.fire(Paths.WOWZA_CONNECT, p, new EventBusListener<PublisherEndpoint>() {
@@ -124,18 +127,19 @@ public class PublisherServiceImpl implements PublisherService {
 
     @Override
     public void startStreamingSession(final Envelope e) {
-        PublishereUUID uuid = null;
+        UUID uuid = null;
         try {
-            uuid = mapper.readValue(e.getMessage().getData(), PublishereUUID.class);
+            uuid = mapper.readValue(e.getMessage().getData(), UUID.class);
         } catch (IOException e1) {
-            e1.printStackTrace();
+            logger.warn("{}", e1);
         }
+
         PublisherEndpoint p = retrieve(uuid.getUuid());
-        eventBus.fire(Paths.START_STREAMINGSESSION, p, new EventBusListener<PublisherEndpoint>() {
+        eventBus.fire(Paths.BEGIN_STREAMING_SESSION, p, new EventBusListener<PublisherEndpoint>() {
             @Override
             public void completed(PublisherEndpoint p) {
                 Message m = new Message();
-                m.setPath(Paths.START_STREAMINGSESSION);
+                m.setPath(Paths.BEGIN_STREAMING_SESSION);
                 try {
                     m.setData(mapper.writeValueAsString(new PublisherResults("OK")));
                 } catch (JsonProcessingException e1) {
@@ -146,7 +150,7 @@ public class PublisherServiceImpl implements PublisherService {
 
             @Override
             public void failed(PublisherEndpoint p) {
-                error(e, p, constructMessage(Paths.START_STREAMINGSESSION, "error"));
+                error(e, p, constructMessage(Paths.BEGIN_STREAMING_SESSION, "error"));
             }
         });
     }
@@ -157,7 +161,7 @@ public class PublisherServiceImpl implements PublisherService {
         try {
             m.setData(mapper.writeValueAsString(new PublisherResults(status)));
         } catch (JsonProcessingException e1) {
-                //
+            logger.warn("{}", e1);
         }
         return m;
     }
@@ -186,7 +190,7 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Override
-    public PublisherEndpoint createPublisherSession(final Envelope e, AtmosphereResource resource) {
+    public PublisherEndpoint createSession(final Envelope e, AtmosphereResource resource) {
         String uuid = e.getUuid();
         PublisherEndpoint p = endpoints.get(uuid);
         if (p == null) {
@@ -202,13 +206,14 @@ public class PublisherServiceImpl implements PublisherService {
 
                 @Override
                 public void failed(PublisherEndpoint p) {
-                    error(e, p, constructMessage(Paths.VALIDATE_STREAMING_SESSION, "error"));
+                    error(e, p, constructMessage(Paths.VALIDATE_PUBLISHER_STREAMING_SESSION, "error"));
                 }
             });
         }
         return p;
     }
 
+    @Override
     public void error(Envelope e, PublisherEndpoint p, Message m) {
         AtmosphereResource r = p.resource();
         Envelope error = Envelope.newServerReply(e, m);
@@ -226,13 +231,17 @@ public class PublisherServiceImpl implements PublisherService {
         eventBus.fire(Paths.DB_CONFIG , p, new EventBusListener<PublisherEndpoint>() {
             @Override
             public void completed(PublisherEndpoint p) {
-                response(e, p, constructMessage(Paths.CREATE_USER_SESSION, "OK"));
+                response(e, p, constructMessage(Paths.CREATE_PUBLISHER_SESSION, "OK"));
             }
 
             @Override
             public void failed(PublisherEndpoint p) {
-                error(e, p, constructMessage(Paths.VALIDATE_STREAMING_SESSION, "error"));
+                error(e, p, constructMessage(Paths.VALIDATE_PUBLISHER_STREAMING_SESSION, "error"));
             }
         });
+    }
+
+    public ConcurrentHashMap<String, PublisherEndpoint>endpoints() {
+        return endpoints;
     }
 }

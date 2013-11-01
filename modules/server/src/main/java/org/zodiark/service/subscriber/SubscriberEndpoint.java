@@ -15,30 +15,23 @@
  */
 package org.zodiark.service.subscriber;
 
-import org.zodiark.server.Endpoint;
+import org.zodiark.service.EndpointAdapter;
+import org.zodiark.service.publisher.PublisherEndpoint;
 
-public class SubscriberEndpoint implements Endpoint {
+public class SubscriberEndpoint extends EndpointAdapter<SubscriberEndpoint> {
 
-    private String uuid;
+    private PublisherEndpoint publisherEndpoint;
 
+    public SubscriberEndpoint() {
+        super();
+    }
 
-    public SubscriberEndpoint uuid(String uuid) {
-        this.uuid = uuid;
+    public SubscriberEndpoint publisherUUID(PublisherEndpoint publisherEndpoint) {
+        this.publisherEndpoint = publisherEndpoint;
         return this;
     }
 
-    @Override
-    public Endpoint.TYPE type() {
-        return TYPE.SUBSCRIBER;
-    }
-
-    @Override
-    public void terminate() {
-
-    }
-
-    @Override
-    public String uuid() {
-        return uuid;
+    public PublisherEndpoint publisherEndpoint() {
+        return publisherEndpoint;
     }
 }

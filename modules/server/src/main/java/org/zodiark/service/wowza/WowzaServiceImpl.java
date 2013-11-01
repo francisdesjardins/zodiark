@@ -28,10 +28,7 @@ import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
-import org.zodiark.service.publisher.PublisherEndpoint;
-import org.zodiark.service.publisher.PublishereUUID;
-
-import java.io.IOException;
+import org.zodiark.service.EndpointAdapter;
 
 @On("/wowza")
 public class WowzaServiceImpl implements WowzaService {
@@ -61,11 +58,11 @@ public class WowzaServiceImpl implements WowzaService {
     // Will be called when the Publisher is ready to start a streaming show
     @Override
     public void serve(String event, Object message, EventBusListener l) {
-        if (PublisherEndpoint.class.isAssignableFrom(message.getClass())) {
-            PublisherEndpoint p = PublisherEndpoint.class.cast(message);
+        if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
+            EndpointAdapter p = EndpointAdapter.class.cast(message);
             WowzaEndpoint w = wowzaManager.lookup(p.wowzaServerUUID());
             if (w != null) {
-                w.isPublisherConnected(p, l);
+                w.isEndpointConnected(p, l);
             } else {
                 l.failed(p);
             }

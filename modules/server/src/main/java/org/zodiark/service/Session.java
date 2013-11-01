@@ -13,20 +13,27 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.publisher;
+package org.zodiark.service;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
-import org.zodiark.server.EventBusListener;
-import org.zodiark.service.Service;
+import org.zodiark.protocol.Message;
 
-public interface PublisherService extends Service {
+public interface Session<T extends Endpoint> {
 
-    @Override
-    public void serve(Envelope e, AtmosphereResource r, EventBusListener l) ;
+    public T createSession(Envelope e, AtmosphereResource resource);
 
-    @Override
-    public void serve(String event, Object r, EventBusListener l);
+    public T config(Envelope e);
 
+    public void error(Envelope e, T p, Message message);
+
+    public void createOrJoinStreamingSession(Envelope e);
+
+    public void startStreamingSession(Envelope e);
+
+    public void response(Envelope e, T p, Message m);
+
+    public void terminateStreamingSession(T p, AtmosphereResource r);
+
+    public void errorStreamingSession(Envelope e);
 }
-

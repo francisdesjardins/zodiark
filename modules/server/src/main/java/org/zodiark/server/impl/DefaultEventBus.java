@@ -26,6 +26,7 @@ import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.service.Service;
 
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -102,8 +103,13 @@ public class DefaultEventBus implements EventBus {
         return null;
     }
 
-    @Override
     public Service service(Class<? extends Service> clazz) {
+        Collection<Service> i = services.values();
+        for (Service s : i) {
+            if (s.getClass().equals(clazz)) {
+                return s;
+            }
+        }
         return null;
     }
 }

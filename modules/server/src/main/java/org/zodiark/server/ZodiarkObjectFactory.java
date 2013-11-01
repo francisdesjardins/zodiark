@@ -19,12 +19,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereObjectFactory;
 import org.zodiark.server.annotation.Inject;
-import org.zodiark.service.db.AuthConfig;
-import org.zodiark.service.publisher.PublisherConfig;
+import org.zodiark.service.AuthConfig;
+import org.zodiark.service.PublisherConfig;
 import org.zodiark.service.publisher.PublisherConfigImpl;
-import org.zodiark.service.util.mock.OKRestService;
-import org.zodiark.service.util.mock.OKAuthConfig;
 import org.zodiark.service.util.RESTService;
+import org.zodiark.service.util.mock.OKAuthConfig;
+import org.zodiark.service.util.mock.OKRestService;
 import org.zodiark.service.wowza.WowzaEndpointManager;
 import org.zodiark.service.wowza.WowzaEndpointManagerImpl;
 
@@ -63,6 +63,7 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
                     field.set(instance, wowzaService);
                 } else if (field.getType().isAssignableFrom(Context.class)) {
                     field.set(instance, new Context() {
+
                         @Override
                         public <T> T newInstance(Class<T> t) {
                             try {

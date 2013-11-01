@@ -15,6 +15,7 @@
  */
 package org.zodiark.service.session;
 
+import org.zodiark.server.EventBusListener;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 
@@ -24,11 +25,11 @@ public interface StreamingSession {
 
     public enum TYPE { PUBLIC, PRIVATE, PROTECTED, SHARED_PRIVATE, VIEW}
 
-    public StreamingSession susbcriber(SubscriberEndpoint s);
+    public StreamingSession validateAndJoin(SubscriberEndpoint s, EventBusListener<SubscriberEndpoint> e);
 
-    public PublisherEndpoint publisher();
+    public PublisherEndpoint owner();
 
-    public StreamingSession publisher(PublisherEndpoint p);
+    public StreamingSession owner(PublisherEndpoint p);
 
     public List<SubscriberEndpoint> susbcribers();
 

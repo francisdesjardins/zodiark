@@ -1,12 +1,12 @@
-package org.zodiark.service.publisher;
+package org.zodiark.service;
 
-public class PublishereUUID {
+public class UUID {
 
     private String uuid;
 
-    public PublishereUUID(){}
+    public UUID(){}
 
-    public PublishereUUID(String uuid) {
+    public UUID(String uuid) {
         this.uuid = uuid;
     }
 

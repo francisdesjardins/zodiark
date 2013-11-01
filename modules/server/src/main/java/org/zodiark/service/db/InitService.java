@@ -20,8 +20,8 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
-import org.zodiark.service.publisher.PublisherConfig;
-import org.zodiark.service.publisher.PublisherEndpoint;
+import org.zodiark.service.AuthConfig;
+import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.util.RESTService;
 
 @On("/db/init")
@@ -39,8 +39,8 @@ public class InitService implements DBService {
 
     @Override
     public void serve(String event, Object message, EventBusListener l) {
-        if (PublisherEndpoint.class.isAssignableFrom(message.getClass())) {
-            PublisherEndpoint p = PublisherEndpoint.class.cast(message);
+        if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
+            EndpointAdapter p = EndpointAdapter.class.cast(message);
             AuthConfig config = restService.post("/init/" + p.uuid(), p.message(), AuthConfig.class);
 
             if (config.isAuthenticated()) {

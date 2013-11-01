@@ -21,12 +21,13 @@ import org.zodiark.server.Context;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
-import org.zodiark.service.publisher.PublisherConfig;
+import org.zodiark.service.PublisherConfig;
 import org.zodiark.service.publisher.PublisherEndpoint;
+import org.zodiark.service.subscriber.SubscriberEndpoint;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-@On("/streaming/{action}")
+@On("/streaming")
 public class StreamingSessionServiceImpl implements StreamingSessionService {
 
     @Inject
@@ -49,14 +50,19 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
             } else {
                 initiate(p, l);
             }
+        } else if (SubscriberEndpoint.class.isAssignableFrom(message.getClass())) {
+            SubscriberEndpoint s = SubscriberEndpoint.class.cast(message);
+            join(s, l);
         }
     }
 
+    @Override
     public void terminate(PublisherEndpoint p, EventBusListener l) {
         StreamingSession s = sessions.remove(p.uuid());
         s.terminate();
     }
 
+    @Override
     public void initiate(PublisherEndpoint p, EventBusListener l) {
         StreamingSession s = sessionType(p);
         sessions.put(p.uuid(), s);
@@ -64,6 +70,18 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
         s.initAndAct();
 
         l.completed(p);
+    }
+
+    @Override
+    public void join(SubscriberEndpoint s, EventBusListener l) {
+        boolean hasStreamingSession = hasStreamingSession(s.publisherEndpoint());
+        if (!hasStreamingSession) {
+            l.failed(s);
+        } else {
+            StreamingSession streamingSession = sessions.get(s.publisherEndpoint().uuid());
+            streamingSession.validateAndJoin(s, l);
+        }
+
     }
 
     private boolean hasStreamingSession(PublisherEndpoint p) {

@@ -22,17 +22,25 @@ public interface Paths {
 
     String START_STREAMING_SESSION = "/publisher/startStreamingSession";
 
-    String CREATE_USER_SESSION = "/publisher/createUserSession";
+    String JOIN_STREAMING_SESSION = "/subscriber/joinStreamingSession";
+
+    String CREATE_PUBLISHER_SESSION = "/publisher/createUserSession";
+
+    String CREATE_SUBSCRIBER_SESSION = "/subscriber/createUserSession";
 
     String LOAD_CONFIG = "/REACT/EXECUTION/LOADCONFIG";
 
-    String VALIDATE_STREAMING_SESSION = "/publisher/validateStreamingSession";
+    String VALIDATE_PUBLISHER_STREAMING_SESSION = "/publisher/validateStreamingSession";
+
+    String VALIDATE_SUBSCRIBER_STREAMING_SESSION = "/subscriber/validateStreamingSession";
 
     String WOWZA_ERROR_STREAMING_SESSION = "/publisher/errorStreamingSession";
 
+    String WOWZA_ERROR_SUBSCRIBER_STREAMING_SESSION = "/subscriber/errorStreamingSession";
+
     String ERROR_STREAMING_SESSION = "/error/errorStreamingSession";
 
-    String START_STREAMINGSESSION = "/streaming/start";
+    String BEGIN_STREAMING_SESSION = "/streaming/begin";
 
     String WOWZA_CONNECT = "/wowza/connect";
 
@@ -42,7 +50,10 @@ public interface Paths {
 
     String TERMINATE_STREAMING_SESSSION = "/publisher/disconnect";
 
-    String SERVER_VALIDATE_PUBLISHER_OK = "/wowza/validate";
+    String TERMINATE_SUBSCRIBER_STREAMING_SESSSION = "/subscriber/disconnect";
+
+    String SERVER_VALIDATE_OK = "/wowza/validate";
 
     String REQUEST_ACTION = "/request/action";
+
 }
