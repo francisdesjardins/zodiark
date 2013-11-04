@@ -50,12 +50,12 @@ public class DefaultEventBus implements EventBus {
     };
 
     @Override
-    public EventBus fire(Envelope e, AtmosphereResource o) {
-        return fire(e, o, l);
+    public EventBus dispatch(Envelope e, AtmosphereResource o) {
+        return dispatch(e, o, l);
     }
 
     @Override
-    public EventBus fire(Envelope e, AtmosphereResource r, EventBusListener l) {
+    public EventBus dispatch(Envelope e, AtmosphereResource r, EventBusListener l) {
         Service s = mapper.map(e.getMessage().getPath(), services);
 
         logger.debug("Dispatching Envelop {} to Service {}", e, s);
@@ -71,13 +71,13 @@ public class DefaultEventBus implements EventBus {
             Message m = new Message();
             m.setPath("/error");
             Envelope error = Envelope.newServerReply(e, m);
-            fire(error, r);
+            dispatch(error, r);
         }
         return this;
     }
 
     @Override
-    public EventBus fire(String e, Object r, EventBusListener l) {
+    public EventBus dispatch(String e, Object r, EventBusListener l) {
         Service s = mapper.map(e, services);
 
         logger.debug("Dispatching Message {} to {}", e, s);
@@ -91,8 +91,8 @@ public class DefaultEventBus implements EventBus {
     }
 
     @Override
-    public EventBus fire(String message, Object o) {
-        return fire(message, o, l);
+    public EventBus dispatch(String message, Object o) {
+        return dispatch(message, o, l);
     }
 
     @Override

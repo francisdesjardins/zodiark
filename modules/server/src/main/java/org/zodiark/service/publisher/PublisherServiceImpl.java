@@ -120,7 +120,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         }
 
         // TODO: Callback is not called at the moment as the dispatching to Wowza is asynchronous
-        eventBus.fire(Paths.WOWZA_CONNECT, p, new EventBusListener<PublisherEndpoint>() {
+        eventBus.dispatch(Paths.WOWZA_CONNECT, p, new EventBusListener<PublisherEndpoint>() {
             @Override
             public void completed(PublisherEndpoint p) {
                 // TODO: Proper Message
@@ -145,7 +145,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         }
 
         PublisherEndpoint p = retrieve(uuid.getUuid());
-        eventBus.fire(Paths.BEGIN_STREAMING_SESSION, p, new EventBusListener<PublisherEndpoint>() {
+        eventBus.dispatch(Paths.BEGIN_STREAMING_SESSION, p, new EventBusListener<PublisherEndpoint>() {
             @Override
             public void completed(PublisherEndpoint p) {
                 Message m = new Message();
@@ -153,7 +153,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                 try {
                     m.setData(mapper.writeValueAsString(new PublisherResults("OK")));
                 } catch (JsonProcessingException e1) {
-                        //
+                    //
                 }
                 response(e, p, m);
             }
@@ -213,7 +213,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             p.uuid(uuid).message(e.getMessage()).resource(resource);
 
             endpoints.put(uuid, p);
-            eventBus.fire(Paths.DB_INIT, p, new EventBusListener<PublisherEndpoint>() {
+            eventBus.dispatch(Paths.DB_INIT, p, new EventBusListener<PublisherEndpoint>() {
                 @Override
                 public void completed(PublisherEndpoint p) {
                     lookupConfig(e, p);
@@ -232,7 +232,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     public void error(Envelope e, PublisherEndpoint p, Message m) {
         AtmosphereResource r = p.resource();
         Envelope error = Envelope.newServerReply(e, m);
-        eventBus.fire(error, r);
+        eventBus.dispatch(error, r);
     }
 
     @Override
@@ -243,7 +243,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     }
 
     private void lookupConfig(final Envelope e, PublisherEndpoint p) {
-        eventBus.fire(Paths.DB_CONFIG , p, new EventBusListener<PublisherEndpoint>() {
+        eventBus.dispatch(Paths.DB_CONFIG, p, new EventBusListener<PublisherEndpoint>() {
             @Override
             public void completed(PublisherEndpoint p) {
                 response(e, p, constructMessage(Paths.CREATE_PUBLISHER_SESSION, "OK"));

@@ -113,13 +113,13 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             final SubscriberEndpoint s = retrieve(uuid);
             final StreamingRequest request = mapper.readValue(e.getMessage().getData(), requestClass.getClass());
 
-            eventBus.fire(Paths.RETRIEVE_PUBLISHER, request.getPublisherUUID(), new EventBusListener<PublisherEndpoint>() {
+            eventBus.dispatch(Paths.RETRIEVE_PUBLISHER, request.getPublisherUUID(), new EventBusListener<PublisherEndpoint>() {
                 @Override
                 public void completed(PublisherEndpoint p) {
                     s.wowzaServerUUID(request.getWowzaUUID()).publisherEndpoint(p);
 
                     // TODO: Callback is not called at the moment as the dispatching to Wowza is asynchronous
-                    eventBus.fire(Paths.WOWZA_CONNECT, s, new EventBusListener<SubscriberEndpoint>() {
+                    eventBus.dispatch(Paths.WOWZA_CONNECT, s, new EventBusListener<SubscriberEndpoint>() {
                         @Override
                         public void completed(SubscriberEndpoint s) {
                             // TODO: Proper Message
@@ -155,7 +155,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         }
 
         SubscriberEndpoint p = retrieve(uuid.getUuid());
-        eventBus.fire(Paths.BEGIN_STREAMING_SESSION, p, new EventBusListener<SubscriberEndpoint>() {
+        eventBus.dispatch(Paths.BEGIN_STREAMING_SESSION, p, new EventBusListener<SubscriberEndpoint>() {
             @Override
             public void completed(SubscriberEndpoint p) {
                 Message m = new Message();
@@ -163,7 +163,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
                 try {
                     m.setData(mapper.writeValueAsString(new PublisherResults("OK")));
                 } catch (JsonProcessingException e1) {
-                        //
+                    //
                 }
                 response(e, p, m);
             }
@@ -218,7 +218,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             s.uuid(uuid).message(e.getMessage()).resource(resource);
 
             endpoints.put(uuid, s);
-            eventBus.fire(Paths.DB_INIT, s, new EventBusListener<SubscriberEndpoint>() {
+            eventBus.dispatch(Paths.DB_INIT, s, new EventBusListener<SubscriberEndpoint>() {
                 @Override
                 public void completed(SubscriberEndpoint p) {
                     lookupConfig(e, p);
@@ -237,7 +237,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     public void error(Envelope e, SubscriberEndpoint p, Message m) {
         AtmosphereResource r = p.resource();
         Envelope error = Envelope.newServerReply(e, m);
-        eventBus.fire(error, r);
+        eventBus.dispatch(error, r);
     }
 
     @Override
@@ -248,7 +248,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     private void lookupConfig(final Envelope e, SubscriberEndpoint p) {
-        eventBus.fire(Paths.DB_CONFIG , p, new EventBusListener<SubscriberEndpoint>() {
+        eventBus.dispatch(Paths.DB_CONFIG, p, new EventBusListener<SubscriberEndpoint>() {
             @Override
             public void completed(SubscriberEndpoint p) {
                 response(e, p, constructMessage(Paths.CREATE_SUBSCRIBER_SESSION, "OK"));

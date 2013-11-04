@@ -53,7 +53,7 @@ public class EnvelopeDigester extends AtmosphereHandlerAdapter {
             try {
                 logger.debug("\n\n{}\n\n", message);
                 Envelope e = mapper.readValue(message, Envelope.class);
-                eventBus.fire(e, r);
+                eventBus.dispatch(e, r);
             } catch (Exception ex) {
                 logger.error("", ex);
                 r.close();
