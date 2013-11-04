@@ -16,6 +16,8 @@
 package org.zodiark.service.db;
 
 import org.atmosphere.cpr.AtmosphereResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
@@ -27,11 +29,10 @@ import org.zodiark.service.util.RESTService;
 @On("/db/init")
 public class InitService implements DBService {
 
-    @Inject
-    public RESTService restService;
+    private final Logger logger = LoggerFactory.getLogger(InitService.class);
 
     @Inject
-    public AuthConfig authConfig;
+    public RESTService restService;
 
     @Override
     public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
@@ -39,6 +40,7 @@ public class InitService implements DBService {
 
     @Override
     public void serve(String event, Object message, EventBusListener l) {
+        logger.trace("Servicing {}", event);
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             EndpointAdapter p = EndpointAdapter.class.cast(message);
             AuthConfig config = restService.post("/init/" + p.uuid(), p.message(), AuthConfig.class);

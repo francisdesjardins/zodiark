@@ -73,6 +73,7 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
         logger.trace("Starting streaming session {}", p);
         StreamingSession s = sessionType(p);
         sessions.put(p.uuid(), s);
+        s.owner(p);
 
         s.initAndAct();
 

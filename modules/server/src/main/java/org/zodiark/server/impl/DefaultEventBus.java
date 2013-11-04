@@ -56,9 +56,9 @@ public class DefaultEventBus implements EventBus {
 
     @Override
     public EventBus fire(Envelope e, AtmosphereResource r, EventBusListener l) {
-        Service s = mapper.map(e.getMessage().getPath(), services); //services.get(e.getMessage().getPath().toString());
+        Service s = mapper.map(e.getMessage().getPath(), services);
 
-        //logger.debug("Dispatching Envelop {} to {}", e, r.uuid());
+        logger.debug("Dispatching Envelop {} to Service {}", e, s);
 
         if (e.getUuid().isEmpty()) {
             e.setUuid(r.uuid());
@@ -67,6 +67,7 @@ public class DefaultEventBus implements EventBus {
         if (s != null) {
             s.serve(e, r, l);
         } else {
+            logger.error("No Service available for {}", e);
             Message m = new Message();
             m.setPath("/error");
             Envelope error = Envelope.newServerReply(e, m);
@@ -77,11 +78,14 @@ public class DefaultEventBus implements EventBus {
 
     @Override
     public EventBus fire(String e, Object r, EventBusListener l) {
-        Service s = mapper.map(e, services); //services.get(message);
+        Service s = mapper.map(e, services);
+
+        logger.debug("Dispatching Message {} to {}", e, s);
+
         if (s != null) {
             s.serve(e, r, l);
         } else {
-            throw new IllegalStateException("No Service for " + e);
+            logger.error("No Service available for {}", e);
         }
         return this;
     }

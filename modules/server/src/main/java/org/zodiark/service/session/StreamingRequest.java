@@ -13,25 +13,11 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.subscriber;
+package org.zodiark.service.session;
 
-import org.zodiark.service.EndpointAdapter;
-import org.zodiark.service.publisher.PublisherEndpoint;
+public interface StreamingRequest {
 
-public class SubscriberEndpoint extends EndpointAdapter<SubscriberEndpoint> {
+    public String getPublisherUUID();
 
-    private PublisherEndpoint publisherEndpoint;
-
-    public SubscriberEndpoint() {
-        super();
-    }
-
-    public SubscriberEndpoint publisherEndpoint(PublisherEndpoint publisherEndpoint) {
-        this.publisherEndpoint = publisherEndpoint;
-        return this;
-    }
-
-    public PublisherEndpoint publisherEndpoint() {
-        return publisherEndpoint;
-    }
+    public String getWowzaUUID();
 }

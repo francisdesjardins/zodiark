@@ -56,4 +56,5 @@ public interface Paths {
 
     String REQUEST_ACTION = "/request/action";
 
+    String RETRIEVE_PUBLISHER = "/publisher/retrieve";
 }

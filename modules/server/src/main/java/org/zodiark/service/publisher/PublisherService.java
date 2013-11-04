@@ -28,5 +28,6 @@ public interface PublisherService extends Service {
     @Override
     public void serve(String event, Object r, EventBusListener l);
 
+    public void retrievePublisher(Object s, EventBusListener l);
 }
 

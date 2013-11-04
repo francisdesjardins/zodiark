@@ -18,11 +18,15 @@ package org.zodiark.server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereObjectFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.service.AuthConfig;
 import org.zodiark.service.PublisherConfig;
 import org.zodiark.service.publisher.PublisherConfigImpl;
+import org.zodiark.service.session.StreamingRequest;
 import org.zodiark.service.util.RESTService;
+import org.zodiark.service.util.StreamingRequestImpl;
 import org.zodiark.service.util.mock.OKAuthConfig;
 import org.zodiark.service.util.mock.OKRestService;
 import org.zodiark.service.wowza.WowzaEndpointManager;
@@ -31,6 +35,7 @@ import org.zodiark.service.wowza.WowzaEndpointManagerImpl;
 import java.lang.reflect.Field;
 
 public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
+    private final Logger logger = LoggerFactory.getLogger(ZodiarkObjectFactory.class);
 
     private final EventBus evenBus = EventBusFactory.getDefault().eventBus();
     private final ObjectMapper mapper = new ObjectMapper();
@@ -38,9 +43,12 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
     private final Class<? extends AuthConfig> authConfig = OKAuthConfig.class;
     private final Class<? extends PublisherConfig> publisherConfig = PublisherConfigImpl.class;
     private final Class<? extends RESTService> restService = OKRestService.class;
+    private final StreamingRequest streamingRequest = new StreamingRequestImpl();
 
     @Override
     public <T> T newClassInstance(final AtmosphereFramework framework, Class<T> tClass) throws InstantiationException, IllegalAccessException {
+
+        logger.debug("About to create {}", tClass.getName());
 
         if (tClass.isAssignableFrom(AuthConfig.class)) {
             return (T) newClassInstance(framework, authConfig);
@@ -77,6 +85,8 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
                     field.set(instance, newClassInstance(framework, authConfig));
                 } else if (field.getType().isAssignableFrom(PublisherConfig.class)) {
                     field.set(instance, newClassInstance(framework, publisherConfig));
+                } else if (field.getType().isAssignableFrom(StreamingRequest.class)) {
+                    field.set(instance, streamingRequest);
                 }
             }
         }

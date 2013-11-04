@@ -28,13 +28,11 @@ import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
-import org.zodiark.server.impl.DefaultEventBus;
 import org.zodiark.service.Session;
 import org.zodiark.service.UUID;
+import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.publisher.PublisherResults;
-import org.zodiark.service.publisher.PublisherService;
-import org.zodiark.service.publisher.PublisherServiceImpl;
-import org.zodiark.service.wowza.WowzaUUID;
+import org.zodiark.service.session.StreamingRequest;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,8 +52,12 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     @Inject
     public ObjectMapper mapper;
 
+    @Inject
+    public StreamingRequest requestClass;
+
     @Override
     public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
+        logger.trace("Handling Subscriber Envelop {} to Service {}", e, r.uuid());
         switch (e.getMessage().getPath()) {
             case Paths.LOAD_CONFIG:
             case Paths.CREATE_SUBSCRIBER_SESSION:
@@ -107,35 +109,40 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     @Override
     public void createOrJoinStreamingSession(final Envelope e) {
         String uuid = e.getUuid();
-
-        // TODO: Publisher
-        // The message will contains the UUID of the Publisher.
-        SubscriberEndpoint s = retrieve(uuid);
-        // Hack for testing
-        if (true) {
-            PublisherServiceImpl p = (PublisherServiceImpl)((DefaultEventBus)eventBus).service(PublisherService.class);
-            s.publisherUUID(p.endpoints().values().iterator().next());
-        }
-
         try {
-            s.wowzaServerUUID(mapper.readValue(e.getMessage().getData(), WowzaUUID.class).getUuid());
+            final SubscriberEndpoint s = retrieve(uuid);
+            final StreamingRequest request = mapper.readValue(e.getMessage().getData(), requestClass.getClass());
+
+            eventBus.fire(Paths.RETRIEVE_PUBLISHER, request.getPublisherUUID(), new EventBusListener<PublisherEndpoint>() {
+                @Override
+                public void completed(PublisherEndpoint p) {
+                    s.wowzaServerUUID(request.getWowzaUUID()).publisherEndpoint(p);
+
+                    // TODO: Callback is not called at the moment as the dispatching to Wowza is asynchronous
+                    eventBus.fire(Paths.WOWZA_CONNECT, s, new EventBusListener<SubscriberEndpoint>() {
+                        @Override
+                        public void completed(SubscriberEndpoint s) {
+                            // TODO: Proper Message
+                            Message m = new Message();
+                            response(e, s, m);
+                        }
+
+                        @Override
+                        public void failed(SubscriberEndpoint s) {
+                            error(e, s, constructMessage(Paths.WOWZA_CONNECT, "error"));
+                        }
+                    });
+                }
+
+                @Override
+                public void failed(PublisherEndpoint p) {
+                    error(e, s, constructMessage(Paths.VALIDATE_SUBSCRIBER_STREAMING_SESSION, "error"));
+                }
+            });
         } catch (IOException e1) {
             logger.warn("{}", e1);
         }
 
-        eventBus.fire(Paths.WOWZA_CONNECT, s, new EventBusListener<SubscriberEndpoint>() {
-            @Override
-            public void completed(SubscriberEndpoint s) {
-                // TODO: Proper Message
-                Message m = new Message();
-                response(e, s, m);
-            }
-
-            @Override
-            public void failed(SubscriberEndpoint s) {
-                error(e, s, constructMessage(Paths.WOWZA_CONNECT, "error"));
-            }
-        });
     }
 
     @Override

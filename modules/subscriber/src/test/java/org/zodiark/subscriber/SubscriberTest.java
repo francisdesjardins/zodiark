@@ -27,7 +27,9 @@ import org.zodiark.protocol.Path;
 import org.zodiark.protocol.Paths;
 import org.zodiark.server.ZodiarkServer;
 import org.zodiark.service.publisher.PublisherResults;
+import org.zodiark.service.session.StreamingRequest;
 import org.zodiark.service.subscriber.SubscriberResults;
+import org.zodiark.service.util.StreamingRequestImpl;
 import org.zodiark.service.wowza.WowzaUUID;
 import org.zodiark.wowza.OnEnvelopHandler;
 import org.zodiark.wowza.ZodiarkClient;
@@ -146,11 +148,12 @@ public class SubscriberTest {
         final AtomicReference<PublisherResults> answer = new AtomicReference<>();
         final ZodiarkClient publisherClient = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
         final CountDownLatch latch = new CountDownLatch(1);
-
+        final AtomicReference<String> publisherUUID = new AtomicReference<>();
         publisherClient.handler(new OnEnvelopHandler() {
             @Override
             public boolean onEnvelop(Envelope e) throws IOException {
                 answer.set(mapper.readValue(e.getMessage().getData(), PublisherResults.class));
+                publisherUUID.set(e.getUuid());
                 latch.countDown();
                 return true;
             }
@@ -217,14 +220,16 @@ public class SubscriberTest {
             }
         });
 
+        StreamingRequest request = new StreamingRequestImpl(publisherUUID.get(), uuid.get());
+
         startStreamingSession = Envelope.newClientToServerRequest(
-                new Message(new Path(Paths.VALIDATE_SUBSCRIBER_STREAMING_SESSION), mapper.writeValueAsString(new WowzaUUID(uuid.get()))));
+                new Message(new Path(Paths.VALIDATE_SUBSCRIBER_STREAMING_SESSION), mapper.writeValueAsString(request)));
         createSessionMessage.setFrom(new From(ActorValue.SUBSCRIBER));
         subscriberClient.send(startStreamingSession);
 
         elatch.await();
 
-        assertEquals("OK", answer.get().getResults());
+        assertEquals("OK", sanswer.get().getResults());
 
     }
 

@@ -52,6 +52,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 
     @Override
     public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
+        logger.trace("Handling Publisher Envelop {} to Service {}", e, r.uuid());
         switch (e.getMessage().getPath()) {
             case Paths.LOAD_CONFIG:
             case Paths.CREATE_PUBLISHER_SESSION:
@@ -73,6 +74,14 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                 break;
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
+        }
+    }
+
+    public void retrievePublisher(Object s, EventBusListener l) {
+        if (String.class.isAssignableFrom(s.getClass())) {
+            l.completed(endpoints.get(s.toString()));
+        } else {
+            l.failed(new Exception("No publisher associated"));
         }
     }
 
@@ -110,6 +119,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             logger.warn("{}", e1);
         }
 
+        // TODO: Callback is not called at the moment as the dispatching to Wowza is asynchronous
         eventBus.fire(Paths.WOWZA_CONNECT, p, new EventBusListener<PublisherEndpoint>() {
             @Override
             public void completed(PublisherEndpoint p) {
@@ -187,6 +197,11 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 
     @Override
     public void serve(String event, Object r, EventBusListener l) {
+        switch(event) {
+        case Paths.RETRIEVE_PUBLISHER:
+            retrievePublisher(r, l);
+            break;
+        }
     }
 
     @Override
