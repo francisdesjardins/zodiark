@@ -85,6 +85,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         }
     }
 
+    @Override
     public void errorStreamingSession(Envelope e) {
         try {
             PublisherResults result = mapper.readValue(e.getMessage().getData(), PublisherResults.class);
@@ -95,7 +96,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             try {
                 m.setData(mapper.writeValueAsString(new PublisherResults("ERROR")));
             } catch (JsonProcessingException e1) {
-                    //
+                //
             }
             error(e, p, m);
         } catch (IOException e1) {
@@ -197,10 +198,10 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 
     @Override
     public void serve(String event, Object r, EventBusListener l) {
-        switch(event) {
-        case Paths.RETRIEVE_PUBLISHER:
-            retrievePublisher(r, l);
-            break;
+        switch (event) {
+            case Paths.RETRIEVE_PUBLISHER:
+                retrievePublisher(r, l);
+                break;
         }
     }
 
@@ -256,7 +257,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         });
     }
 
-    public ConcurrentHashMap<String, PublisherEndpoint>endpoints() {
+    public ConcurrentHashMap<String, PublisherEndpoint> endpoints() {
         return endpoints;
     }
 }

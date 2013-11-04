@@ -30,6 +30,7 @@ import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.Session;
 import org.zodiark.service.UUID;
+import org.zodiark.service.action.Action;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.publisher.PublisherResults;
 import org.zodiark.service.session.StreamingRequest;
@@ -77,11 +78,49 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
                 SubscriberEndpoint p = endpoints.get(uuid);
                 terminateStreamingSession(p, r);
                 break;
+            case Paths.SUBSCRIBER_ACTION:
+                validateAndExecuteAction(e, r, l);
+                break;
+            case Paths.PUBLISHER_ACTION_ACCEPT_OK:
+                acceptAction(e);
+                break;
+            case Paths.PUBLISHER_ACTION_ACCEPT_REFUSED:
+                refuseAction(e);
+                break;
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
         }
     }
 
+    @Override
+    public void validateAndExecuteAction(final Envelope e, AtmosphereResource r, EventBusListener l) {
+        Message m = e.getMessage();
+        final SubscriberEndpoint s = endpoints.get(e.getUuid());
+        try {
+            Action a = mapper.readValue(m.getData(), Action.class);
+            eventBus.dispatch(Paths.ACTION_VALIDATE, a, new EventBusListener<Action>() {
+                @Override
+                public void completed(Action action) {
+                    logger.trace("Action {} succeeded. Sending request to publisher {}", action, s);
+
+                    // No need to have a listener here since the response will be dispatched to EnvelopeDigester
+                    action.setPath(Paths.PUBLISHER_ACTION_ACCEPT);
+                    requestForAction(e, s.publisherEndpoint(), action);
+                }
+
+                @Override
+                public void failed(Action action) {
+                    error(e, s, constructMessage(Paths.ACTION_VALIDATE, "error"));
+                }
+            });
+
+
+        } catch (IOException e1) {
+            logger.warn("{}", e1);
+        }
+    }
+
+    @Override
     public void errorStreamingSession(Envelope e) {
         try {
             SubscriberResults result = mapper.readValue(e.getMessage().getData(), SubscriberResults.class);
@@ -92,13 +131,12 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             try {
                 m.setData(mapper.writeValueAsString(new PublisherResults("ERROR")));
             } catch (JsonProcessingException e1) {
-                    //
+                //
             }
             error(e, p, m);
         } catch (IOException e1) {
-           logger.warn("{}", e1);
+            logger.warn("{}", e1);
         }
-
     }
 
     @Override
@@ -119,17 +157,14 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
                     s.wowzaServerUUID(request.getWowzaUUID()).publisherEndpoint(p);
 
                     // TODO: Callback is not called at the moment as the dispatching to Wowza is asynchronous
+                    // TODO: Unit test
                     eventBus.dispatch(Paths.WOWZA_CONNECT, s, new EventBusListener<SubscriberEndpoint>() {
                         @Override
                         public void completed(SubscriberEndpoint s) {
-                            // TODO: Proper Message
-                            Message m = new Message();
-                            response(e, s, m);
                         }
 
                         @Override
                         public void failed(SubscriberEndpoint s) {
-                            error(e, s, constructMessage(Paths.WOWZA_CONNECT, "error"));
                         }
                     });
                 }
@@ -175,15 +210,26 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         });
     }
 
-    Message constructMessage(String path, String status) {
-        Message m = new Message();
-        m.setPath(path);
+    @Override
+    public void requestForAction(Envelope e, PublisherEndpoint p, Action action) {
+        Message m = constructMessage(action);
+        AtmosphereResource r = p.resource();
+        Envelope newResponse = Envelope.newServerReply(e, m);
         try {
-            m.setData(mapper.writeValueAsString(new PublisherResults(status)));
+            r.write(mapper.writeValueAsString(newResponse));
         } catch (JsonProcessingException e1) {
-            logger.warn("{}", e1);
+            logger.debug("Unable to write {} {}", p, m);
         }
-        return m;
+    }
+
+    @Override
+    public void acceptAction(Envelope e) {
+        // TODO
+    }
+
+    @Override
+    public void refuseAction(Envelope e) {
+        // TODO
     }
 
     @Override
@@ -260,4 +306,27 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             }
         });
     }
+
+    Message constructMessage(Action action) {
+        Message m = new Message();
+        m.setPath(action.getPath());
+        try {
+            m.setData(mapper.writeValueAsString(action));
+        } catch (JsonProcessingException e1) {
+            logger.warn("{}", e1);
+        }
+        return m;
+    }
+
+    Message constructMessage(String path, String status) {
+        Message m = new Message();
+        m.setPath(path);
+        try {
+            m.setData(mapper.writeValueAsString(new PublisherResults(status)));
+        } catch (JsonProcessingException e1) {
+            logger.warn("{}", e1);
+        }
+        return m;
+    }
+
 }

@@ -57,4 +57,16 @@ public interface Paths {
     String REQUEST_ACTION = "/request/action";
 
     String RETRIEVE_PUBLISHER = "/publisher/retrieve";
+
+    String SUBSCRIBER_ACTION = "/subscriber/action";
+
+    String ACTION_VALIDATE = "/action/validate";
+
+    String PUBLISHER_ACTION_ACCEPT = "/action/accept";
+
+    String PUBLISHER_ACTION_ACCEPT_OK = "/publisher/actionAccepted";
+
+    String PUBLISHER_ACTION_ACCEPT_REFUSED = "/publisher/actionRefused";
+
+
 }

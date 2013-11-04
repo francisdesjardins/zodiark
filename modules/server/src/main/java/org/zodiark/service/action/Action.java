@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 High-Level Technologies
+ * Copyright 2013 Jeanfrancois Arcand
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,22 +13,24 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.protocol;
+package org.zodiark.service.action;
 
-import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.zodiark.service.subscriber.SubscriberEndpoint;
 
-public class Message {
+public class Action {
 
     private String path;
     private String data;
-    private String uuid = UUID.randomUUID().toString();
+    @JsonIgnore
+    private SubscriberEndpoint endpoint;
 
-    public Message(){
+    public Action(){
     }
 
-    public Message(Path path, String message) {
-        this.path = path.toString();
-        this.data = message;
+    public Action(String path, String data) {
+        this.path = path;
+        this.data = data;
     }
 
     public String getPath() {
@@ -47,19 +49,12 @@ public class Message {
         this.data = data;
     }
 
-    public String getUUID() {
-        return uuid;
+    public Action endpoint(SubscriberEndpoint endpoint) {
+        this.endpoint = endpoint;
+        return this;
     }
 
-    public void setUUID(String uuid) {
-        this.uuid = uuid;
-    }
-
-    @Override
-    public String toString() {
-        return "{" +
-                "path:'" + path + '\'' +
-                ", data:'" + data + '\'' +
-                '}';
+    public SubscriberEndpoint endpoint() {
+        return endpoint;
     }
 }

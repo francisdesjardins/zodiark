@@ -13,22 +13,25 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.publisher;
+package org.zodiark.service.action;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.service.Service;
+import org.zodiark.service.subscriber.SubscriberEndpoint;
 
-public interface PublisherService extends Service {
+/**
+ * @author Jeanfrancois Arcand
+ */
+public interface ActionService extends Service {
 
     @Override
-    public void serve(Envelope e, AtmosphereResource r, EventBusListener l) ;
+    public void serve(Envelope e, AtmosphereResource r, EventBusListener l);
 
     @Override
     public void serve(String event, Object r, EventBusListener l);
 
-    public void retrievePublisher(Object s, EventBusListener l);
 
+    public boolean validate(SubscriberEndpoint s);
 }
-
