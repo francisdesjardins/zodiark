@@ -13,12 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.session;
+package org.zodiark.service.session.impl;
 
-public class SharedPrivateStreamingSession extends StreamingSessionBase {
+import org.zodiark.service.session.StreamingSessionBase;
+
+public class PublicStreamingSession extends StreamingSessionBase {
 
     @Override
     public TYPE type() {
-        return TYPE.SHARED_PRIVATE;
+        return TYPE.PUBLIC;
     }
 }
