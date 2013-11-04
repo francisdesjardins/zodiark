@@ -15,6 +15,8 @@
  */
 package org.zodiark.service.session;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
@@ -24,7 +26,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public abstract class StreamingSessionBase implements StreamingSession {
 
-
+    private final Logger logger = LoggerFactory.getLogger(StreamingSessionBase.class);
     private PublisherEndpoint endpoint;
     private final ConcurrentLinkedQueue<SubscriberEndpoint> subscribers = new ConcurrentLinkedQueue<>();
 
@@ -49,6 +51,7 @@ public abstract class StreamingSessionBase implements StreamingSession {
         if (!validateSession(s)) {
             e.failed(s);
         } else {
+            logger.debug("Subscriber {} joined Publisher {}", s, endpoint);
             subscribers.add(s);
             e.completed(s);
         }

@@ -220,7 +220,7 @@ public class SubscriberTest {
         startStreamingSession = Envelope.newClientToServerRequest(
                 new Message(new Path(Paths.VALIDATE_SUBSCRIBER_STREAMING_SESSION), mapper.writeValueAsString(new WowzaUUID(uuid.get()))));
         createSessionMessage.setFrom(new From(ActorValue.SUBSCRIBER));
-        publisherClient.send(startStreamingSession);
+        subscriberClient.send(startStreamingSession);
 
         elatch.await();
 

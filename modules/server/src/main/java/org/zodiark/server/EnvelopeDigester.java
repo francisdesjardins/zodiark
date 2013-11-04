@@ -21,11 +21,8 @@ import org.atmosphere.client.TrackMessageSizeInterceptor;
 import org.atmosphere.config.service.AtmosphereHandlerService;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceEvent;
-import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.handler.AtmosphereHandlerAdapter;
-import org.atmosphere.handler.OnMessage;
 import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
-import org.atmosphere.interceptor.BroadcastOnPostAtmosphereInterceptor;
 import org.atmosphere.interceptor.HeartbeatInterceptor;
 import org.atmosphere.util.IOUtils;
 import org.slf4j.Logger;
@@ -54,7 +51,7 @@ public class EnvelopeDigester extends AtmosphereHandlerAdapter {
         String message = IOUtils.readEntirely(r).toString();
         if (!message.isEmpty()) {
             try {
-                logger.debug("{}", message);
+                logger.debug("\n\n{}\n\n", message);
                 Envelope e = mapper.readValue(message, Envelope.class);
                 eventBus.fire(e, r);
             } catch (Exception ex) {

@@ -107,7 +107,6 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     @Override
     public void createOrJoinStreamingSession(final Envelope e) {
         String uuid = e.getUuid();
-        Message m = e.getMessage();
 
         // TODO: Publisher
         // The message will contains the UUID of the Publisher.

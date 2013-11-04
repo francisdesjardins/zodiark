@@ -16,6 +16,8 @@
 package org.zodiark.service.session;
 
 import org.atmosphere.cpr.AtmosphereResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.Context;
 import org.zodiark.server.EventBusListener;
@@ -30,6 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @On("/streaming")
 public class StreamingSessionServiceImpl implements StreamingSessionService {
 
+    private final Logger logger = LoggerFactory.getLogger(StreamingSessionServiceImpl.class);
+
     @Inject
     public Context context;
 
@@ -41,6 +45,7 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
 
     @Override
     public void serve(String event, Object message, EventBusListener l) {
+        logger.trace("Handling {}", event);
         if (PublisherEndpoint.class.isAssignableFrom(message.getClass())) {
             PublisherEndpoint p = PublisherEndpoint.class.cast(message);
 
@@ -58,12 +63,14 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
 
     @Override
     public void terminate(PublisherEndpoint p, EventBusListener l) {
+        logger.trace("Terminating streaming session {}", p);
         StreamingSession s = sessions.remove(p.uuid());
         s.terminate();
     }
 
     @Override
     public void initiate(PublisherEndpoint p, EventBusListener l) {
+        logger.trace("Starting streaming session {}", p);
         StreamingSession s = sessionType(p);
         sessions.put(p.uuid(), s);
 

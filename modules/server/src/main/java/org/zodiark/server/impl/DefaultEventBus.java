@@ -58,7 +58,7 @@ public class DefaultEventBus implements EventBus {
     public EventBus fire(Envelope e, AtmosphereResource r, EventBusListener l) {
         Service s = mapper.map(e.getMessage().getPath(), services); //services.get(e.getMessage().getPath().toString());
 
-        logger.debug("Dispatching Envelop {} to {}", e, r.uuid());
+        //logger.debug("Dispatching Envelop {} to {}", e, r.uuid());
 
         if (e.getUuid().isEmpty()) {
             e.setUuid(r.uuid());
@@ -106,7 +106,7 @@ public class DefaultEventBus implements EventBus {
     public Service service(Class<? extends Service> clazz) {
         Collection<Service> i = services.values();
         for (Service s : i) {
-            if (s.getClass().equals(clazz)) {
+            if (clazz.isAssignableFrom(s.getClass())) {
                 return s;
             }
         }
