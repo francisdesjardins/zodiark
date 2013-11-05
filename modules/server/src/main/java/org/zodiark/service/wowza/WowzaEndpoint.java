@@ -15,6 +15,7 @@
  */
 package org.zodiark.service.wowza;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.slf4j.Logger;
@@ -25,8 +26,11 @@ import org.zodiark.protocol.Paths;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.service.Endpoint;
+import org.zodiark.service.session.StreamingSession;
+import org.zodiark.service.subscriber.SubscriberEndpoint;
 import org.zodiark.service.util.UUID;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -95,5 +99,30 @@ public class WowzaEndpoint implements Endpoint {
     public WowzaEndpoint resource(AtmosphereResource r) {
         this.resource = r;
         return this;
+    }
+
+    public void obfuscate(StreamingSession session, EventBusListener l) {
+        String executorUuid = session.pendingAction().getSubscriberUUID();
+        List<String> uuids = new ArrayList<>();
+
+        for (SubscriberEndpoint s : session.susbcribers()) {
+            if (!s.uuid().equalsIgnoreCase(executorUuid)) {
+                uuids.add(s.uuid());
+            }
+        }
+
+        WowzaMessage w = new WowzaMessage(uuids);
+        Message m = new Message();
+        m.setPath(Paths.WOWZA_OBFUSCATE);
+        try {
+            m.setData(mapper.writeValueAsString(w));
+
+            Envelope e = Envelope.newServerRequest(Paths.REQUEST_ACTION, uuid, m);
+            resource.write(mapper.writeValueAsString(e));
+        } catch (JsonProcessingException e1) {
+            logger.error("", e1);
+            l.failed(session.pendingAction());
+        }
+
     }
 }

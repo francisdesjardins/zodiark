@@ -77,7 +77,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         }
     }
 
-    public void retrievePublisher(Object s, EventBusListener l) {
+    public void retrieveEndpoint(Object s, EventBusListener l) {
         if (String.class.isAssignableFrom(s.getClass())) {
             l.completed(endpoints.get(s.toString()));
         } else {
@@ -200,7 +200,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     public void serve(String event, Object r, EventBusListener l) {
         switch (event) {
             case Paths.RETRIEVE_PUBLISHER:
-                retrievePublisher(r, l);
+                retrieveEndpoint(r, l);
                 break;
         }
     }

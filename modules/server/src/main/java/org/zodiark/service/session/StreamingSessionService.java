@@ -17,6 +17,7 @@ package org.zodiark.service.session;
 
 import org.zodiark.server.EventBusListener;
 import org.zodiark.service.Service;
+import org.zodiark.service.action.Action;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 
@@ -30,5 +31,7 @@ public interface StreamingSessionService extends Service {
     void initiate(PublisherEndpoint p, EventBusListener l);
 
     void join(SubscriberEndpoint s, EventBusListener l);
+
+    void executeAction(final Action a, final EventBusListener l);
 
 }

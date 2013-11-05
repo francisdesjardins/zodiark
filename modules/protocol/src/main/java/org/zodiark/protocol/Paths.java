@@ -44,6 +44,8 @@ public interface Paths {
 
     String WOWZA_CONNECT = "/wowza/connect";
 
+    String WOWZA_OBFUSCATE = "/wowza/obfuscate";
+
     String DB_CONFIG = "/db/config";
 
     String DB_INIT = "/db/init";
@@ -60,6 +62,8 @@ public interface Paths {
 
     String RETRIEVE_PUBLISHER = "/publisher/retrieve";
 
+    String RETRIEVE_SUBSCRIBER = "/subscriber/retrieve";
+
     String SUBSCRIBER_ACTION = "/subscriber/action";
 
     String ACTION_VALIDATE = "/action/validate";
@@ -70,5 +74,8 @@ public interface Paths {
 
     String ACTION_ACCEPT_REFUSED = "/action/actionRefused";
 
+    String BEGIN_SUBSCRIBER_STREAMING_SESSION = "/streaming/join";
+
+    String STREAMING_EXECUTE_ACTION = "/streaming/executeAction";
 
 }

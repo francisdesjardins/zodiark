@@ -127,13 +127,39 @@ public class ActionServiceImpl implements ActionService {
     @Override
     public void actionAccepted(Envelope e) {
         try {
-            Action action = mapper.readValue(e.getMessage().getData(), Action.class);
+            final Action action = mapper.readValue(e.getMessage().getData(), Action.class);
+
+            eventBus.dispatch(Paths.RETRIEVE_SUBSCRIBER, action.getSubscriberUUID(), new EventBusListener<SubscriberEndpoint>(){
+                @Override
+                public void completed(SubscriberEndpoint s) {
+                    action.endpoint(s);
+                }
+
+                @Override
+                public void failed(SubscriberEndpoint s) {
+                    logger.error("No Endpoint");
+                }
+            });
+
             EventBusListener l = handshakingActions.remove(action.getSubscriberUUID());
             if (l == null) {
                 throw new IllegalStateException("Invalid state");
             }
 
+            // Send OK
             l.completed(action);
+
+            eventBus.dispatch(Paths.STREAMING_EXECUTE_ACTION, action, new EventBusListener<Action>() {
+                @Override
+                public void completed(Action action) {
+
+                }
+
+                @Override
+                public void failed(Action action) {
+
+                }
+            });
         } catch (IOException e1) {
             logger.error("", e1);
         }

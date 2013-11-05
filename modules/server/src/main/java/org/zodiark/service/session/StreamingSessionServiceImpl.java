@@ -19,10 +19,13 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
+import org.zodiark.protocol.Paths;
 import org.zodiark.server.Context;
+import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
+import org.zodiark.service.action.Action;
 import org.zodiark.service.config.PublisherConfig;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.session.impl.PrivateStreamingSession;
@@ -42,6 +45,9 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
     @Inject
     public Context context;
 
+    @Inject
+    public EventBus eventBus;
+
     private ConcurrentHashMap<String, StreamingSession> sessions = new ConcurrentHashMap<>();
 
     @Override
@@ -51,19 +57,54 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
     @Override
     public void serve(String event, Object message, EventBusListener l) {
         logger.trace("Handling {}", event);
-        if (PublisherEndpoint.class.isAssignableFrom(message.getClass())) {
-            PublisherEndpoint p = PublisherEndpoint.class.cast(message);
 
-            boolean hasStreamingSession = hasStreamingSession(p);
-            if (hasStreamingSession) {
-                terminate(p, l);
-            } else {
-                initiate(p, l);
-            }
-        } else if (SubscriberEndpoint.class.isAssignableFrom(message.getClass())) {
-            SubscriberEndpoint s = SubscriberEndpoint.class.cast(message);
-            join(s, l);
+        switch(event) {
+            case Paths.BEGIN_STREAMING_SESSION:
+                PublisherEndpoint p = PublisherEndpoint.class.cast(message);
+
+                boolean hasStreamingSession = hasStreamingSession(p);
+                if (hasStreamingSession) {
+                    terminate(p, l);
+                } else {
+                    initiate(p, l);
+                }
+                break;
+            case Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION:
+                join(SubscriberEndpoint.class.cast(message), l);
+                break;
+            case Paths.STREAMING_EXECUTE_ACTION:
+                Action a = Action.class.cast(message);
+                executeAction(a, l);
+                break;
+            default:
+                logger.error("Not Supported {}", event);
         }
+
+    }
+
+    public void executeAction(final Action a, final EventBusListener l) {
+
+        PublisherEndpoint p = a.endpoint().publisherEndpoint();
+        final StreamingSession session = sessions.get(p.uuid());
+        if (session == null) {
+            throw new IllegalStateException("No live session for " + p.uuid());
+        }
+
+        eventBus.dispatch(Paths.WOWZA_OBFUSCATE, a, new EventBusListener<StreamingSession>() {
+            @Override
+            public void completed(StreamingSession session) {
+                logger.trace("Wowza obfuscation executed {}", a);
+                session.executeAction(a);
+                // TODO: Do we need to call the subscriber
+                l.completed(a);
+            }
+
+            @Override
+            public void failed(StreamingSession action) {
+                l.failed(action);
+            }
+        });
+
     }
 
     @Override

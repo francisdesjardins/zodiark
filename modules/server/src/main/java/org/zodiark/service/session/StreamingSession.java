@@ -16,27 +16,33 @@
 package org.zodiark.service.session;
 
 import org.zodiark.server.EventBusListener;
+import org.zodiark.service.action.Action;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 
 import java.util.List;
 
 public interface StreamingSession {
+    enum TYPE { PUBLIC, PRIVATE, PROTECTED, SHARED_PRIVATE, VIEW}
 
-    public enum TYPE { PUBLIC, PRIVATE, PROTECTED, SHARED_PRIVATE, VIEW}
+    void executeAction(Action a);
 
-    public StreamingSession validateAndJoin(SubscriberEndpoint s, EventBusListener<SubscriberEndpoint> e);
+    Action pendingAction();
 
-    public PublisherEndpoint owner();
+    StreamingSession pendingAction(Action action);
 
-    public StreamingSession owner(PublisherEndpoint p);
+    StreamingSession validateAndJoin(SubscriberEndpoint s, EventBusListener<SubscriberEndpoint> e);
 
-    public List<SubscriberEndpoint> susbcribers();
+    PublisherEndpoint owner();
 
-    public TYPE type();
+    StreamingSession owner(PublisherEndpoint p);
 
-    public void terminate();
+    List<SubscriberEndpoint> susbcribers();
 
-    public StreamingSession initAndAct();
+    TYPE type();
+
+    void terminate();
+
+    StreamingSession initAndAct();
 
 }

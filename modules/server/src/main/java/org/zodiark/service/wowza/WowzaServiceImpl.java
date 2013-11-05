@@ -29,6 +29,7 @@ import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
+import org.zodiark.service.session.StreamingSession;
 
 @On("/wowza")
 public class WowzaServiceImpl implements WowzaService {
@@ -58,14 +59,30 @@ public class WowzaServiceImpl implements WowzaService {
     // Will be called when the Publisher is ready to start a streaming show
     @Override
     public void serve(String event, Object message, EventBusListener l) {
-        if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
-            EndpointAdapter p = EndpointAdapter.class.cast(message);
-            WowzaEndpoint w = wowzaManager.lookup(p.wowzaServerUUID());
-            if (w != null) {
-                w.isEndpointConnected(p, l);
-            } else {
-                l.failed(p);
-            }
+
+        switch (event) {
+            case Paths.WOWZA_OBFUSCATE:
+                StreamingSession session = StreamingSession.class.cast(message);
+                WowzaEndpoint w = wowzaManager.lookup(session.owner().wowzaServerUUID());
+                if (w != null) {
+                    w.obfuscate(session, l);
+                } else {
+                    l.failed(session);
+                }
+                break;
+            case Paths.WOWZA_CONNECT:
+                if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
+                    EndpointAdapter p = EndpointAdapter.class.cast(message);
+                    w = wowzaManager.lookup(p.wowzaServerUUID());
+                    if (w != null) {
+                        w.isEndpointConnected(p, l);
+                    } else {
+                        l.failed(p);
+                    }
+                }
+                break;
+            default:
+                logger.error("Unhandled event {}", event);
         }
     }
 

@@ -18,6 +18,7 @@ package org.zodiark.service.session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.EventBusListener;
+import org.zodiark.service.action.Action;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 
@@ -29,6 +30,7 @@ public abstract class StreamingSessionBase implements StreamingSession {
     private final Logger logger = LoggerFactory.getLogger(StreamingSessionBase.class);
     private PublisherEndpoint endpoint;
     private final ConcurrentLinkedQueue<SubscriberEndpoint> subscribers = new ConcurrentLinkedQueue<>();
+    private Action pendingAction;
 
     @Override
     public StreamingSession owner(PublisherEndpoint p) {
@@ -78,4 +80,17 @@ public abstract class StreamingSessionBase implements StreamingSession {
         return this;
     }
 
+    @Override
+    public void executeAction(Action action) {
+
+    }
+
+    public Action pendingAction() {
+        return pendingAction;
+    }
+
+    public StreamingSession pendingAction(Action action) {
+        this.pendingAction = action;
+        return this;
+    }
 }

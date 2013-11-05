@@ -161,6 +161,15 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     @Override
+    public void retrieveEndpoint(Object s, EventBusListener l) {
+        if (String.class.isAssignableFrom(s.getClass())) {
+            l.completed(endpoints.get(s.toString()));
+        } else {
+            l.failed(new Exception("No Sunscriber associated"));
+        }
+    }
+
+    @Override
     public void startStreamingSession(final Envelope e) {
         UUID uuid = null;
         try {
@@ -173,12 +182,12 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         eventBus.dispatch(Paths.BEGIN_STREAMING_SESSION, s, new EventBusListener<SubscriberEndpoint>() {
             @Override
             public void completed(SubscriberEndpoint s) {
-                response(e, s, constructMessage(Paths.BEGIN_STREAMING_SESSION, "OK"));
+                response(e, s, constructMessage(Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION, "OK"));
             }
 
             @Override
             public void failed(SubscriberEndpoint s) {
-                error(e, s, constructMessage(Paths.BEGIN_STREAMING_SESSION, "error"));
+                error(e, s, constructMessage(Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION, "error"));
             }
         });
     }
@@ -204,6 +213,11 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
 
     @Override
     public void serve(String event, Object r, EventBusListener l) {
+        switch (event) {
+            case Paths.RETRIEVE_SUBSCRIBER:
+                retrieveEndpoint(r, l);
+                break;
+        }
     }
 
     @Override
