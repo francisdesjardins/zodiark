@@ -190,9 +190,9 @@ public class Envelope {
                 .build();
     }
 
-    public final static Envelope newPublishereRequest(String path, String uuid, Message message) {
+    public final static Envelope newPublisherRequest(String uuid, Message message) {
         return new Envelope.Builder()
-                .path(new Path(path))
+                .path(new Path("/request/action"))
                 .to(new To(ActorValue.PUBLISHER.value()))
                 .from(new From(ActorValue.SERVER.value()))
                 .traceId(new TraceId())

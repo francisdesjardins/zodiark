@@ -48,6 +48,8 @@ public interface Paths {
 
     String DB_INIT = "/db/init";
 
+    String SUBSCRIBER_VALIDATE_STATE = "/db/validate";
+
     String TERMINATE_STREAMING_SESSSION = "/publisher/disconnect";
 
     String TERMINATE_SUBSCRIBER_STREAMING_SESSSION = "/subscriber/disconnect";
@@ -62,11 +64,11 @@ public interface Paths {
 
     String ACTION_VALIDATE = "/action/validate";
 
-    String PUBLISHER_ACTION_ACCEPT = "/action/accept";
+    String ACTION_ACCEPT = "/action/accept";
 
-    String PUBLISHER_ACTION_ACCEPT_OK = "/publisher/actionAccepted";
+    String ACTION_ACCEPT_OK = "/action/actionAccepted";
 
-    String PUBLISHER_ACTION_ACCEPT_REFUSED = "/publisher/actionRefused";
+    String ACTION_ACCEPT_REFUSED = "/action/actionRefused";
 
 
 }

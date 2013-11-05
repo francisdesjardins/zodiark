@@ -19,16 +19,9 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.service.Service;
-import org.zodiark.service.action.Action;
-import org.zodiark.service.publisher.PublisherEndpoint;
 
 public interface SubscriberService extends Service {
 
-    public void validateAndExecuteAction(Envelope e, AtmosphereResource r, EventBusListener l);
+    public void requestForAction(Envelope e, AtmosphereResource r, EventBusListener l);
 
-    public void requestForAction(Envelope e, PublisherEndpoint p, Action action);
-
-    public void acceptAction(Envelope e);
-
-    public void refuseAction(Envelope e);
 }

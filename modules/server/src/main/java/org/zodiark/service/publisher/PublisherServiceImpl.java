@@ -28,7 +28,7 @@ import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
-import org.zodiark.service.UUID;
+import org.zodiark.service.util.UUID;
 import org.zodiark.service.Session;
 import org.zodiark.service.wowza.WowzaUUID;
 

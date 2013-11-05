@@ -17,6 +17,7 @@ package org.zodiark.service;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Message;
+import org.zodiark.service.config.PublisherConfig;
 
 public class EndpointAdapter<T> implements Endpoint {
     protected String uuid;

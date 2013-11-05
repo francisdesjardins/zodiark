@@ -23,7 +23,7 @@ import org.zodiark.server.Context;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
-import org.zodiark.service.PublisherConfig;
+import org.zodiark.service.config.PublisherConfig;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.session.impl.PrivateStreamingSession;
 import org.zodiark.service.session.impl.ProtectedStreamingSession;

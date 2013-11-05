@@ -19,7 +19,7 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.service.Service;
-import org.zodiark.service.subscriber.SubscriberEndpoint;
+import org.zodiark.service.publisher.PublisherEndpoint;
 
 /**
  * @author Jeanfrancois Arcand
@@ -32,6 +32,11 @@ public interface ActionService extends Service {
     @Override
     public void serve(String event, Object r, EventBusListener l);
 
+    public void validateAction(Action action, EventBusListener l);
 
-    public boolean validate(SubscriberEndpoint s);
+    public void actionAccepted(Envelope e);
+
+    public void actionRefused(Envelope e);
+
+    public void requestForAction(PublisherEndpoint p, Action action);
 }

@@ -26,7 +26,7 @@ import org.zodiark.protocol.Message;
 import org.zodiark.protocol.Path;
 import org.zodiark.protocol.Paths;
 import org.zodiark.server.ZodiarkServer;
-import org.zodiark.service.UUID;
+import org.zodiark.service.util.UUID;
 import org.zodiark.service.publisher.PublisherResults;
 import org.zodiark.service.wowza.WowzaUUID;
 import org.zodiark.wowza.OnEnvelopHandler;

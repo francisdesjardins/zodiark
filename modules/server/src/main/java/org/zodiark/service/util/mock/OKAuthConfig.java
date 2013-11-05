@@ -1,6 +1,6 @@
 package org.zodiark.service.util.mock;
 
-import org.zodiark.service.AuthConfig;
+import org.zodiark.service.config.AuthConfig;
 
 public class OKAuthConfig implements AuthConfig {
     @Override

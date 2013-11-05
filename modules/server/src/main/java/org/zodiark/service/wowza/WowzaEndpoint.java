@@ -25,7 +25,7 @@ import org.zodiark.protocol.Paths;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.service.Endpoint;
-import org.zodiark.service.UUID;
+import org.zodiark.service.util.UUID;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -39,7 +39,6 @@ public class WowzaEndpoint implements Endpoint {
 
     @Inject
     public ObjectMapper mapper;
-
 
     private String uuid;
     private final List<Endpoint> supportedEndpoints = new LinkedList<Endpoint>();

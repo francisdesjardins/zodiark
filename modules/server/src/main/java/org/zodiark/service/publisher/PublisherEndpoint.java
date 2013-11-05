@@ -17,9 +17,23 @@ package org.zodiark.service.publisher;
 
 import org.zodiark.service.EndpointAdapter;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class PublisherEndpoint extends EndpointAdapter<PublisherEndpoint> {
+
+    private final AtomicBoolean actionInProgress = new AtomicBoolean();
 
     public PublisherEndpoint() {
         super();
+    }
+
+    // TODO: Should we allow this?
+    public boolean actionInProgress() {
+        return actionInProgress.get();
+    }
+
+    public PublisherEndpoint actionInProgress(boolean b) {
+        actionInProgress.set(b);
+        return this;
     }
 }

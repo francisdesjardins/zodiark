@@ -15,7 +15,7 @@
  */
 package org.zodiark.service.publisher;
 
-import org.zodiark.service.PublisherConfig;
+import org.zodiark.service.config.PublisherConfig;
 import org.zodiark.service.session.StreamingSession;
 
 public class PublisherConfigImpl implements PublisherConfig {

@@ -23,4 +23,6 @@ public interface SubscriberConfig extends DBResult {
     StreamingSession.TYPE sessionType();
 
     SubscriberConfig sessionType(StreamingSession.TYPE streamingSessionType);
+
+    boolean isStateValid();
 }

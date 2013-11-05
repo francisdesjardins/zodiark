@@ -15,18 +15,47 @@
  */
 package org.zodiark.service.action;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cpr.AtmosphereResource;
+import org.jboss.netty.util.internal.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
+import org.zodiark.protocol.Message;
 import org.zodiark.protocol.Paths;
+import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
+import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
+import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
+
+import java.io.IOException;
 
 @On("/action")
 public class ActionServiceImpl implements ActionService {
 
+    private final Logger logger = LoggerFactory.getLogger(ActionServiceImpl.class);
+    // TODO: Timer to clear action that were never accepted.
+    private final ConcurrentHashMap<String, EventBusListener> handshakingActions = new ConcurrentHashMap<>();
+
+    @Inject
+    public EventBus eventBus;
+
+    @Inject
+    public ObjectMapper mapper;
+
     @Override
     public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
+        switch (e.getMessage().getPath()) {
+            case Paths.ACTION_ACCEPT_OK:
+                actionAccepted(e);
+                break;
+            case Paths.ACTION_ACCEPT_REFUSED:
+                actionRefused(e);
+                break;
+        }
     }
 
     @Override
@@ -35,18 +64,94 @@ public class ActionServiceImpl implements ActionService {
             case Paths.ACTION_VALIDATE:
                 if (Action.class.isAssignableFrom(message.getClass())) {
                     Action action = Action.class.cast(message);
-                    if (validate(action.endpoint())) {
-                        l.completed(action);
-                    } else {
-                        l.failed(action);
-                    }
+                    validateAction(action, l);
                 }
+                break;
+
         }
     }
 
-    public boolean validate(SubscriberEndpoint s) {
-        // TODO: Validate The Subscriber State
-        return true;
+    @Override
+    public void validateAction(final Action action, final EventBusListener l) {
+        final SubscriberEndpoint s = action.endpoint();
+        final PublisherEndpoint p = s.publisherEndpoint();
+
+        if (p.actionInProgress()) {
+            l.failed(s);
+            return;
+        }
+
+        eventBus.dispatch(Paths.SUBSCRIBER_VALIDATE_STATE, s, new EventBusListener<SubscriberEndpoint>() {
+            @Override
+            public void completed(SubscriberEndpoint s) {
+                logger.trace("Action {} succeeded. Sending request to publisher {}", action, s);
+
+                // No need to have a listener here since the response will be dispatched to EnvelopeDigester
+                action.setPath(Paths.ACTION_ACCEPT);
+                handshakingActions.put(s.uuid(), l);
+                requestForAction(p, action);
+            }
+
+            @Override
+            public void failed(SubscriberEndpoint s) {
+                l.failed(s);
+            }
+        });
+    }
+
+    @Override
+    public void requestForAction(PublisherEndpoint p, Action action) {
+        Message m = constructMessage(action);
+        AtmosphereResource r = p.resource();
+        Envelope newResponse = Envelope.newPublisherRequest(p.uuid(), m);
+        try {
+            r.write(mapper.writeValueAsString(newResponse));
+        } catch (JsonProcessingException e1) {
+            logger.error("", e1);
+        }
+    }
+
+
+    Message constructMessage(Action action) {
+        Message m = new Message();
+        m.setPath(action.getPath());
+        try {
+            m.setData(mapper.writeValueAsString(action));
+        } catch (JsonProcessingException e1) {
+            logger.error("", e1);
+        }
+        return m;
+    }
+
+
+    @Override
+    public void actionAccepted(Envelope e) {
+        try {
+            Action action = mapper.readValue(e.getMessage().getData(), Action.class);
+            EventBusListener l = handshakingActions.remove(action.getSubscriberUUID());
+            if (l == null) {
+                throw new IllegalStateException("Invalid state");
+            }
+
+            l.completed(action);
+        } catch (IOException e1) {
+            logger.error("", e1);
+        }
+    }
+
+    @Override
+    public void actionRefused(Envelope e) {
+        try {
+            Action action = mapper.readValue(e.getMessage().getData(), Action.class);
+            EventBusListener l = handshakingActions.remove(action.getSubscriberUUID());
+            if (l == null) {
+                throw new IllegalStateException("Invalid state");
+            }
+
+            l.failed(action);
+        } catch (IOException e1) {
+            logger.error("", e1);
+        }
     }
 
 }

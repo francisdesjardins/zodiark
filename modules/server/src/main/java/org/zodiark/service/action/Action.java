@@ -22,6 +22,7 @@ public class Action {
 
     private String path;
     private String data;
+    private String subscriberUUID;
     @JsonIgnore
     private SubscriberEndpoint endpoint;
 
@@ -51,10 +52,19 @@ public class Action {
 
     public Action endpoint(SubscriberEndpoint endpoint) {
         this.endpoint = endpoint;
+        subscriberUUID = endpoint.uuid();
         return this;
     }
 
     public SubscriberEndpoint endpoint() {
         return endpoint;
+    }
+
+    public String getSubscriberUUID() {
+        return subscriberUUID;
+    }
+
+    public void setSubscriberUUID(String subscriberUUID) {
+        this.subscriberUUID = subscriberUUID;
     }
 }
