@@ -31,6 +31,7 @@ import org.zodiark.service.publisher.PublisherResults;
 import org.zodiark.service.session.StreamingRequest;
 import org.zodiark.service.subscriber.SubscriberResults;
 import org.zodiark.service.util.StreamingRequestImpl;
+import org.zodiark.service.wowza.WowzaMessage;
 import org.zodiark.service.wowza.WowzaUUID;
 import org.zodiark.wowza.OnEnvelopHandler;
 import org.zodiark.wowza.ZodiarkClient;
@@ -260,6 +261,11 @@ public class SubscriberTest {
                                 new Message(new Path(paths.get()), e.getMessage().getData()));
                         wowzaClient.send(publisherOk);
                         break;
+                    case Paths.WOWZA_OBFUSCATE:
+                        WowzaMessage wm = mapper.readValue(m.getData(), WowzaMessage.class);
+                        Envelope ok = Envelope.newClientToServerRequest(
+                                new Message(new Path(Paths.WOWZA_OBFUSCATE_OK), e.getMessage().getData()));
+                        wowzaClient.send(ok);
                     default:
                         // ERROR
                 }
@@ -304,15 +310,27 @@ public class SubscriberTest {
         publisherClient.handler(new OnEnvelopHandler() {
             @Override
             public boolean onEnvelop(Envelope e) throws IOException {
-                if (tlatch.getCount() != 0) {
-                    answer.set(mapper.readValue(e.getMessage().getData(), PublisherResults.class));
-                    tlatch.countDown();
-                } else {
-                    // Just for testing
-                    Action a = mapper.readValue(e.getMessage().getData(), Action.class);
-                    Envelope publisherOk = Envelope.newClientToServerRequest(
-                            new Message(new Path(Paths.ACTION_ACCEPT_OK), e.getMessage().getData()));
-                    publisherClient.send(publisherOk);
+
+                switch(e.getMessage().getPath()) {
+                    case Paths.BEGIN_STREAMING_SESSION:
+                        answer.set(mapper.readValue(e.getMessage().getData(), PublisherResults.class));
+                        tlatch.countDown();
+                        break;
+                    case Paths.ACTION_ACCEPT:
+                        Action a = mapper.readValue(e.getMessage().getData(), Action.class);
+                        Envelope publisherOk = Envelope.newClientToServerRequest(
+                                new Message(new Path(Paths.ACTION_ACCEPT_OK), e.getMessage().getData()));
+                        publisherClient.send(publisherOk);
+                        break;
+                    case Paths.ACTION_START:
+                        // Start action
+                        PublisherResults results = mapper.readValue(e.getMessage().getData(), PublisherResults.class);
+                        System.out.println("==> Start Action " + results.getResults());
+
+                        publisherOk = Envelope.newClientToServerRequest(
+                                new Message(new Path(Paths.ACTION_START_OK), e.getMessage().getData()));
+                        publisherClient.send(publisherOk);
+                        break;
                 }
                 return false;
             }
@@ -403,6 +421,9 @@ public class SubscriberTest {
         assertEquals(Paths.ACTION_VALIDATE, response.get().getMessage().getPath());
         assertEquals("{\"results\":\"OK\",\"uuid\":null}", response.get().getMessage().getData());
 
+        CountDownLatch actionStarted = new CountDownLatch(1);
+
+        //actionStarted.await();
     }
 
 }

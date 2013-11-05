@@ -20,7 +20,7 @@ import org.zodiark.service.action.Action;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 
-import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public interface StreamingSession {
     enum TYPE { PUBLIC, PRIVATE, PROTECTED, SHARED_PRIVATE, VIEW}
@@ -37,7 +37,7 @@ public interface StreamingSession {
 
     StreamingSession owner(PublisherEndpoint p);
 
-    List<SubscriberEndpoint> susbcribers();
+    ConcurrentLinkedQueue<SubscriberEndpoint> subscribers();
 
     TYPE type();
 

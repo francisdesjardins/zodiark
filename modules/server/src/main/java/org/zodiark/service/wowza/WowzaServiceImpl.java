@@ -29,7 +29,11 @@ import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
+import org.zodiark.service.publisher.PublisherEndpoint;
+import org.zodiark.service.publisher.PublisherResults;
 import org.zodiark.service.session.StreamingSession;
+
+import java.io.IOException;
 
 @On("/wowza")
 public class WowzaServiceImpl implements WowzaService {
@@ -48,11 +52,42 @@ public class WowzaServiceImpl implements WowzaService {
     public ObjectMapper mapper;
 
     @Override
-    public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
+    public void serve(Envelope e, AtmosphereResource r) {
         String uuid = e.getUuid();
-        WowzaEndpoint endpoint = wowzaManager.lookup(uuid);
-        if (endpoint == null) {
-            connected(e, r);
+        switch (e.getMessage().getPath()) {
+            case Paths.WOWZA_OBFUSCATE_OK:
+                logger.debug("Obfuscation executed");
+                try {
+                    final WowzaMessage w = mapper.readValue(e.getMessage().getData(), WowzaMessage.class);
+                    evenBus.dispatch(Paths.RETRIEVE_PUBLISHER, w.getPublisherUUID(), new EventBusListener<PublisherEndpoint>() {
+                        @Override
+                        public void completed(PublisherEndpoint p) {
+                            try {
+                                AtmosphereResource r = p.resource();
+                                Message m = new Message();
+                                m.setPath(Paths.ACTION_START);
+                                m.setData(mapper.writeValueAsString(new PublisherResults("OK")));
+                                Envelope newResponse = Envelope.newPublisherRequest(p.uuid(), m);
+                                r.write(mapper.writeValueAsString(newResponse));
+                            } catch (JsonProcessingException e) {
+                                logger.debug("Unable to write {}", e);
+                            }
+                        }
+
+                        @Override
+                        public void failed(PublisherEndpoint p) {
+                            logger.error("No Publisher found", w.getPublisherUUID());
+                        }
+                    });
+                } catch (IOException e1) {
+                    logger.error("{}", e1);
+                }
+                break;
+            case Paths.WOWZA_CONNECT:
+                WowzaEndpoint endpoint = wowzaManager.lookup(uuid);
+                if (endpoint == null) {
+                    connected(e, r);
+                }
         }
     }
 

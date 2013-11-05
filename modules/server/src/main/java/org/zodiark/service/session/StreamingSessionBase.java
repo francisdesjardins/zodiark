@@ -22,7 +22,6 @@ import org.zodiark.service.action.Action;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public abstract class StreamingSessionBase implements StreamingSession {
@@ -44,8 +43,8 @@ public abstract class StreamingSessionBase implements StreamingSession {
     }
 
     @Override
-    public List<SubscriberEndpoint> susbcribers() {
-        return susbcribers();
+    public ConcurrentLinkedQueue<SubscriberEndpoint> subscribers() {
+        return subscribers;
     }
 
     @Override

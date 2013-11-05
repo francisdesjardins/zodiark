@@ -35,7 +35,7 @@ public class ErrorHandlerService implements Service {
     public ObjectMapper mapper;
 
     @Override
-    public void serve(Envelope error, AtmosphereResource r, EventBusListener l) {
+    public void serve(Envelope error, AtmosphereResource r) {
         try {
             r.write(mapper.writeValueAsString(error));
         } catch (JsonProcessingException e1) {

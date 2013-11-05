@@ -51,7 +51,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     public Context context;
 
     @Override
-    public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
+    public void serve(Envelope e, AtmosphereResource r) {
         logger.trace("Handling Publisher Envelop {} to Service {}", e, r.uuid());
         switch (e.getMessage().getPath()) {
             case Paths.LOAD_CONFIG:

@@ -22,7 +22,7 @@ import org.zodiark.service.Service;
 
 public interface SubscriberService extends Service {
 
-    public void requestForAction(Envelope e, AtmosphereResource r, EventBusListener l);
+    public void requestForAction(Envelope e, AtmosphereResource r);
 
     public void retrieveEndpoint(Object s, EventBusListener l);
 

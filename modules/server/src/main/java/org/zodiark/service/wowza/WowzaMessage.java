@@ -22,8 +22,9 @@ public class WowzaMessage {
 
     public enum TYPE { OBFUSCATE, LIVE }
 
-    private TYPE type;
+    private TYPE type = TYPE.OBFUSCATE;
     private List<String> uuids;
+    private String publisherUUID;
 
     public WowzaMessage(){
         uuids = new ArrayList<>();
@@ -47,5 +48,13 @@ public class WowzaMessage {
 
     public void setUuids(List<String> uuids) {
         this.uuids = uuids;
+    }
+
+    public String getPublisherUUID() {
+        return publisherUUID;
+    }
+
+    public void setPublisherUUID(String publisherUUID) {
+        this.publisherUUID = publisherUUID;
     }
 }

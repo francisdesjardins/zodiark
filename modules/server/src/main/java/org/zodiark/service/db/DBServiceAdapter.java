@@ -22,7 +22,7 @@ import org.zodiark.server.EventBusListener;
 public class DBServiceAdapter implements DBService {
 
     @Override
-    public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {}
+    public void serve(Envelope e, AtmosphereResource r) {}
 
     @Override
     public void serve(String event, Object r, EventBusListener l) {}

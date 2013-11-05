@@ -65,7 +65,7 @@ public class DefaultEventBus implements EventBus {
         }
 
         if (s != null) {
-            s.serve(e, r, l);
+            s.serve(e, r);
         } else {
             logger.error("No Service available for {}", e);
             Message m = new Message();

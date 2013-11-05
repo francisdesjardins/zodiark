@@ -51,7 +51,7 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
     private ConcurrentHashMap<String, StreamingSession> sessions = new ConcurrentHashMap<>();
 
     @Override
-    public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
+    public void serve(Envelope e, AtmosphereResource r) {
     }
 
     @Override
@@ -89,8 +89,9 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
         if (session == null) {
             throw new IllegalStateException("No live session for " + p.uuid());
         }
+        session.pendingAction(a);
 
-        eventBus.dispatch(Paths.WOWZA_OBFUSCATE, a, new EventBusListener<StreamingSession>() {
+        eventBus.dispatch(Paths.WOWZA_OBFUSCATE, session, new EventBusListener<StreamingSession>() {
             @Override
             public void completed(StreamingSession session) {
                 logger.trace("Wowza obfuscation executed {}", a);

@@ -23,7 +23,7 @@ import org.zodiark.service.Service;
 public interface PublisherService extends Service {
 
     @Override
-    public void serve(Envelope e, AtmosphereResource r, EventBusListener l) ;
+    public void serve(Envelope e, AtmosphereResource r) ;
 
     @Override
     public void serve(String event, Object r, EventBusListener l);

@@ -56,7 +56,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     public StreamingRequest requestClass;
 
     @Override
-    public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
+    public void serve(Envelope e, AtmosphereResource r) {
         logger.trace("Handling Subscriber Envelop {} to Service {}", e, r.uuid());
         switch (e.getMessage().getPath()) {
             case Paths.LOAD_CONFIG:
@@ -78,7 +78,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
                 terminateStreamingSession(p, r);
                 break;
             case Paths.SUBSCRIBER_ACTION:
-                requestForAction(e, r, l);
+                requestForAction(e, r);
                 break;
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
@@ -86,7 +86,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     @Override
-    public void requestForAction(final Envelope e, AtmosphereResource r, EventBusListener l) {
+    public void requestForAction(final Envelope e, AtmosphereResource r) {
         Message m = e.getMessage();
         final SubscriberEndpoint s = endpoints.get(e.getUuid());
 
@@ -179,7 +179,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         }
 
         SubscriberEndpoint s = retrieve(uuid.getUuid());
-        eventBus.dispatch(Paths.BEGIN_STREAMING_SESSION, s, new EventBusListener<SubscriberEndpoint>() {
+        eventBus.dispatch(Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION, s, new EventBusListener<SubscriberEndpoint>() {
             @Override
             public void completed(SubscriberEndpoint s) {
                 response(e, s, constructMessage(Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION, "OK"));

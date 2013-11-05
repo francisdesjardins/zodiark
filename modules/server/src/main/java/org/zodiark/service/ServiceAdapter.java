@@ -21,7 +21,7 @@ import org.zodiark.server.EventBusListener;
 
 public class ServiceAdapter implements Service {
     @Override
-    public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
+    public void serve(Envelope e, AtmosphereResource r) {
     }
 
     @Override

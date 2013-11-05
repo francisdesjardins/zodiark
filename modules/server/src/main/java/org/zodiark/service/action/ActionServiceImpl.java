@@ -29,9 +29,11 @@ import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.publisher.PublisherEndpoint;
+import org.zodiark.service.publisher.PublisherResults;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 
 import java.io.IOException;
+import java.util.concurrent.ScheduledExecutorService;
 
 @On("/action")
 public class ActionServiceImpl implements ActionService {
@@ -46,8 +48,11 @@ public class ActionServiceImpl implements ActionService {
     @Inject
     public ObjectMapper mapper;
 
+    @Inject
+    public ScheduledExecutorService timer;
+
     @Override
-    public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
+    public void serve(Envelope e, AtmosphereResource r) {
         switch (e.getMessage().getPath()) {
             case Paths.ACTION_ACCEPT_OK:
                 actionAccepted(e);
@@ -55,7 +60,41 @@ public class ActionServiceImpl implements ActionService {
             case Paths.ACTION_ACCEPT_REFUSED:
                 actionRefused(e);
                 break;
+            case Paths.ACTION_START_OK:
+                actionStarted(e);
+                break;
         }
+    }
+
+    public void actionStarted(Envelope e) {
+        try {
+            final PublisherResults results = mapper.readValue(e.getMessage().getData(), PublisherResults.class);
+
+            eventBus.dispatch(Paths.RETRIEVE_PUBLISHER, results.getUuid(), new EventBusListener<PublisherEndpoint>() {
+                @Override
+                public void completed(final PublisherEndpoint p) {
+
+//                    timer.scheduleAtFixedRate(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            AtmosphereResource r = p.resource();
+//                        }
+//                    }, 1, 1, TimeUnit.SECONDS);
+                }
+
+                @Override
+                public void failed(PublisherEndpoint p) {
+                    logger.error("Unable to retrieve Publishere for {}", results.getUuid());
+                }
+            });
+
+
+
+
+        } catch (IOException e1) {
+            logger.error("", e1);
+        }
+
     }
 
     @Override

@@ -40,7 +40,7 @@ public interface Paths {
 
     String ERROR_STREAMING_SESSION = "/error/errorStreamingSession";
 
-    String BEGIN_STREAMING_SESSION = "/streaming/begin";
+    String BEGIN_STREAMING_SESSION = "/streaming/begin/publisher";
 
     String WOWZA_CONNECT = "/wowza/connect";
 
@@ -72,10 +72,15 @@ public interface Paths {
 
     String ACTION_ACCEPT_OK = "/action/actionAccepted";
 
+    String ACTION_START = "/action/start";
+
     String ACTION_ACCEPT_REFUSED = "/action/actionRefused";
 
     String BEGIN_SUBSCRIBER_STREAMING_SESSION = "/streaming/join";
 
     String STREAMING_EXECUTE_ACTION = "/streaming/executeAction";
 
+    String WOWZA_OBFUSCATE_OK = "/wowza/obfuscate/ok";
+
+    String ACTION_START_OK = "/action/start/ok";
 }

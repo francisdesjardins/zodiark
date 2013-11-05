@@ -21,7 +21,7 @@ import org.zodiark.server.EventBusListener;
 
 public interface Service {
 
-    void serve(Envelope e, AtmosphereResource r, EventBusListener l);
+    void serve(Envelope e, AtmosphereResource r);
 
     void serve(String event, Object r, EventBusListener l);
 

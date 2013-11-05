@@ -105,14 +105,16 @@ public class WowzaEndpoint implements Endpoint {
         String executorUuid = session.pendingAction().getSubscriberUUID();
         List<String> uuids = new ArrayList<>();
 
-        for (SubscriberEndpoint s : session.susbcribers()) {
+        for (SubscriberEndpoint s : session.subscribers()) {
             if (!s.uuid().equalsIgnoreCase(executorUuid)) {
                 uuids.add(s.uuid());
             }
         }
 
         WowzaMessage w = new WowzaMessage(uuids);
+        w.setPublisherUUID(session.owner().uuid());
         Message m = new Message();
+
         m.setPath(Paths.WOWZA_OBFUSCATE);
         try {
             m.setData(mapper.writeValueAsString(w));

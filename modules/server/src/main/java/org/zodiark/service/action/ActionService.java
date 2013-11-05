@@ -27,7 +27,7 @@ import org.zodiark.service.publisher.PublisherEndpoint;
 public interface ActionService extends Service {
 
     @Override
-    public void serve(Envelope e, AtmosphereResource r, EventBusListener l);
+    public void serve(Envelope e, AtmosphereResource r);
 
     @Override
     public void serve(String event, Object r, EventBusListener l);
@@ -39,4 +39,6 @@ public interface ActionService extends Service {
     public void actionRefused(Envelope e);
 
     public void requestForAction(PublisherEndpoint p, Action action);
+
+    public void actionStarted(Envelope e);
 }

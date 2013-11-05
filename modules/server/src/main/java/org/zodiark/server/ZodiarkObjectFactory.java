@@ -16,6 +16,7 @@
 package org.zodiark.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.atmosphere.cpr.AtmosphereConfig;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereObjectFactory;
 import org.slf4j.Logger;
@@ -35,6 +36,9 @@ import org.zodiark.service.wowza.WowzaEndpointManager;
 import org.zodiark.service.wowza.WowzaEndpointManagerImpl;
 
 import java.lang.reflect.Field;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
     private final Logger logger = LoggerFactory.getLogger(ZodiarkObjectFactory.class);
@@ -48,11 +52,22 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
 
     private final Class<? extends RESTService> restService = OKRestService.class;
     private final StreamingRequest streamingRequest = new StreamingRequestImpl();
+    private ScheduledExecutorService timer = Executors.newScheduledThreadPool(200);
+
+    private final AtomicBoolean added = new AtomicBoolean();
 
     @Override
     public <T> T newClassInstance(final AtmosphereFramework framework, Class<T> tClass) throws InstantiationException, IllegalAccessException {
 
         logger.debug("About to create {}", tClass.getName());
+        if (!added.getAndSet(true)) {
+            framework.getAtmosphereConfig().shutdownHook(new AtmosphereConfig.ShutdownHook() {
+                @Override
+                public void shutdown() {
+                    timer.shutdown();
+                }
+            });
+        }
 
         if (tClass.isAssignableFrom(AuthConfig.class)) {
             return (T) newClassInstance(framework, authConfig);
@@ -95,6 +110,8 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
                     field.set(instance, newClassInstance(framework, subscriberConfig));
                 } else if (field.getType().isAssignableFrom(StreamingRequest.class)) {
                     field.set(instance, streamingRequest);
+                } else if (field.getType().isAssignableFrom(ScheduledExecutorService.class)) {
+                    field.set(instance, timer);
                 }
             }
         }
