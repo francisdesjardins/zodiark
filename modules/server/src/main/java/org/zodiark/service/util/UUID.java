@@ -1,4 +1,4 @@
-package org.zodiark.service;
+package org.zodiark.service.util;
 
 public class UUID {
 

@@ -15,28 +15,22 @@
  */
 package org.zodiark.service.db;
 
-import org.atmosphere.cpr.AtmosphereResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
-import org.zodiark.service.PublisherConfig;
+import org.zodiark.service.config.PublisherConfig;
 import org.zodiark.service.util.RESTService;
 
 @On("/db/config")
-public class ConfigService implements DBService {
+public class ConfigService extends DBServiceAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(ConfigService.class);
 
     @Inject
     public RESTService restService;
-
-    @Override
-    public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {
-    }
 
     @Override
     public void serve(String event, Object message, EventBusListener l) {

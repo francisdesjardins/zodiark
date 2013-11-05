@@ -13,11 +13,19 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service;
+package org.zodiark.service.db;
 
-public interface Event {
+import org.atmosphere.cpr.AtmosphereResource;
+import org.zodiark.protocol.Envelope;
+import org.zodiark.server.EventBusListener;
 
-    String WOWZA_CONNECT = "/wowza/connect";
+public class DBServiceAdapter implements DBService {
 
+    @Override
+    public void serve(Envelope e, AtmosphereResource r, EventBusListener l) {}
+
+    @Override
+    public void serve(String event, Object r, EventBusListener l) {}
 
 }
+

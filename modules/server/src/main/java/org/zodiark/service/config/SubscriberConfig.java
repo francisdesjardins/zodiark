@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service;
+package org.zodiark.service.config;
 
 import org.zodiark.service.db.DBResult;
 import org.zodiark.service.session.StreamingSession;

@@ -1,4 +1,4 @@
-package org.zodiark.service;
+package org.zodiark.service.config;
 
 import org.zodiark.service.db.DBResult;
 

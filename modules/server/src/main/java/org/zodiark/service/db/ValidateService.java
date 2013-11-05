@@ -20,14 +20,13 @@ import org.slf4j.LoggerFactory;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
-import org.zodiark.service.config.AuthConfig;
 import org.zodiark.service.EndpointAdapter;
+import org.zodiark.service.config.SubscriberConfig;
 import org.zodiark.service.util.RESTService;
 
-@On("/db/init")
-public class InitService extends DBServiceAdapter {
-
-    private final Logger logger = LoggerFactory.getLogger(InitService.class);
+@On("/db/validate")
+public class ValidateService extends DBServiceAdapter {
+    private final Logger logger = LoggerFactory.getLogger(ValidateService.class);
 
     @Inject
     public RESTService restService;
@@ -37,9 +36,9 @@ public class InitService extends DBServiceAdapter {
         logger.trace("Servicing {}", event);
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             EndpointAdapter p = EndpointAdapter.class.cast(message);
-            AuthConfig config = restService.post("/init/" + p.uuid(), p.message(), AuthConfig.class);
+            SubscriberConfig config = restService.post("/validate/" + p.uuid(), p.message(), SubscriberConfig.class);
 
-            if (config.isAuthenticated()) {
+            if (config.isStateValid()) {
                 l.completed(p);
             } else {
                 l.failed(p);
