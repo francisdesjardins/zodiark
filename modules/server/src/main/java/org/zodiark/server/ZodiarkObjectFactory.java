@@ -23,8 +23,10 @@ import org.slf4j.LoggerFactory;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.service.config.AuthConfig;
 import org.zodiark.service.config.PublisherConfig;
+import org.zodiark.service.config.SubscriberConfig;
 import org.zodiark.service.publisher.PublisherConfigImpl;
 import org.zodiark.service.session.StreamingRequest;
+import org.zodiark.service.subscriber.SubscriberConfigImpl;
 import org.zodiark.service.util.RESTService;
 import org.zodiark.service.util.StreamingRequestImpl;
 import org.zodiark.service.util.mock.OKAuthConfig;
@@ -42,6 +44,8 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
     private final WowzaEndpointManager wowzaService = new WowzaEndpointManagerImpl();
     private final Class<? extends AuthConfig> authConfig = OKAuthConfig.class;
     private final Class<? extends PublisherConfig> publisherConfig = PublisherConfigImpl.class;
+    private final Class<? extends SubscriberConfig> subscriberConfig = SubscriberConfigImpl.class;
+
     private final Class<? extends RESTService> restService = OKRestService.class;
     private final StreamingRequest streamingRequest = new StreamingRequestImpl();
 
@@ -54,6 +58,8 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
             return (T) newClassInstance(framework, authConfig);
         } else if (tClass.isAssignableFrom(PublisherConfig.class)) {
             return (T) newClassInstance(framework, publisherConfig);
+        } else if (tClass.isAssignableFrom(SubscriberConfig.class)) {
+            return (T) newClassInstance(framework, subscriberConfig);
         }
 
         T instance = tClass.newInstance();
@@ -85,6 +91,8 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
                     field.set(instance, newClassInstance(framework, authConfig));
                 } else if (field.getType().isAssignableFrom(PublisherConfig.class)) {
                     field.set(instance, newClassInstance(framework, publisherConfig));
+                } else if (field.getType().isAssignableFrom(SubscriberConfig.class)) {
+                    field.set(instance, newClassInstance(framework, subscriberConfig));
                 } else if (field.getType().isAssignableFrom(StreamingRequest.class)) {
                     field.set(instance, streamingRequest);
                 }
