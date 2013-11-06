@@ -21,6 +21,8 @@ import org.atmosphere.client.TrackMessageSizeInterceptor;
 import org.atmosphere.config.service.AtmosphereHandlerService;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceEvent;
+import org.atmosphere.cpr.FrameworkConfig;
+import org.atmosphere.cpr.Serializer;
 import org.atmosphere.handler.AtmosphereHandlerAdapter;
 import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
 import org.atmosphere.interceptor.HeartbeatInterceptor;
@@ -28,9 +30,11 @@ import org.atmosphere.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
+import org.zodiark.protocol.Message;
 import org.zodiark.server.annotation.Inject;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 @AtmosphereHandlerService(
         path = "/",
@@ -51,14 +55,30 @@ public class EnvelopeDigester extends AtmosphereHandlerAdapter {
         String message = IOUtils.readEntirely(r).toString();
         if (!message.isEmpty()) {
             try {
-                Envelope e = mapper.readValue(message, Envelope.class);
+                final Envelope e = mapper.readValue(message, Envelope.class);
 
                 if (e.getUuid().isEmpty()) {
                     e.setUuid(r.uuid());
                 }
                 logger.debug("\n\n{}\n\n", message);
 
-                eventBus.dispatch(e, r);
+                // TODO: Dangerous
+                if (!e.getMessage().getPath().startsWith("/chat")) {
+                    eventBus.dispatch(e, r);
+                } else {
+                    r.setSerializer(new Serializer() {
+                        @Override
+                        public void write(OutputStream os, Object o) throws IOException {
+                            Message m = new Message();
+                            m.setPath(e.getMessage().getPath());
+                            m.setData(o.toString());
+                            byte[] message = mapper.writeValueAsBytes(Envelope.newServerToSubscriberResponse(m));
+                            os.write(message);
+                        }
+                    });
+                    r.getRequest().body(e.getMessage().getData()).attributes().put(FrameworkConfig.INJECTED_ATMOSPHERE_RESOURCE, r);
+                    r.getAtmosphereConfig().framework().doCometSupport(r.getRequest(), r.getResponse());
+                }
             } catch (Exception ex) {
                 logger.error("", ex);
                 Envelope e = Envelope.newError(r.uuid());

@@ -31,8 +31,8 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 @ManagedService(path = "/chat/{room: [a-zA-Z][a-zA-Z_0-9]*}")
-public class ChatService {
-    private final Logger logger = LoggerFactory.getLogger(ChatService.class);
+public class ChatRoom {
+    private final Logger logger = LoggerFactory.getLogger(ChatRoom.class);
 
     private final ConcurrentHashMap<String, String> users = new ConcurrentHashMap<String, String>();
     private String chatroomName;
