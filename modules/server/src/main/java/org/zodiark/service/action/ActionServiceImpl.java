@@ -124,6 +124,8 @@ public class ActionServiceImpl implements ActionService {
                                 subscriber.write(w);
                             } catch (JsonProcessingException e1) {
                                 logger.error("", e1);
+                            } finally {
+                                eventBus.dispatch(Paths.STREAMING_COMPLETE_ACTION, p);
                             }
                         }
                     }, p.action().time(), TimeUnit.SECONDS);

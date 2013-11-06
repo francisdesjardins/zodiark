@@ -108,7 +108,6 @@ public class SubscriberTest {
 
     @Test
     public void joinStreamingSession() throws IOException, InterruptedException {
-
         final ZodiarkClient wowzaClient = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
         final CountDownLatch connected = new CountDownLatch(1);
         final AtomicReference<String> uuid = new AtomicReference<>();
@@ -238,6 +237,7 @@ public class SubscriberTest {
 
     @Test
     public void sucessfulRequestForAction() throws IOException, InterruptedException {
+        final CountDownLatch completed = new CountDownLatch(1);
 
         final ZodiarkClient wowzaClient = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
         final CountDownLatch connected = new CountDownLatch(1);
@@ -266,6 +266,13 @@ public class SubscriberTest {
                         WowzaMessage wm = mapper.readValue(m.getData(), WowzaMessage.class);
                         Envelope ok = Envelope.newClientToServerRequest(
                                 new Message(new Path(Paths.WOWZA_OBFUSCATE_OK), e.getMessage().getData()));
+                        System.out.println("Obfuscating Subscribers");
+                        wowzaClient.send(ok);
+                    case Paths.WOWZA_DEOBFUSCATE:
+                        wm = mapper.readValue(m.getData(), WowzaMessage.class);
+                        System.out.println("De-obfuscating Subscribers");
+                        ok = Envelope.newClientToServerRequest(
+                                new Message(new Path(Paths.WOWZA_DEOBFUSCATE_OK), e.getMessage().getData()));
                         wowzaClient.send(ok);
                     default:
                         // ERROR
@@ -308,6 +315,8 @@ public class SubscriberTest {
         answer.set(null);
 
         final CountDownLatch tlatch = new CountDownLatch(1);
+        final AtomicReference<String> finalMessage = new AtomicReference<>();
+
         publisherClient.handler(new OnEnvelopHandler() {
             @Override
             public boolean onEnvelop(Envelope e) throws IOException {
@@ -340,6 +349,12 @@ public class SubscriberTest {
                         results = mapper.readValue(e.getMessage().getData(), PublisherResults.class);
                         System.out.println("Publisher Action completed");
                         break;
+                    case Paths.PUBLISHER_ABOUT_READY:
+                        results = mapper.readValue(e.getMessage().getData(), PublisherResults.class);
+
+                        finalMessage.set(results.getResults());
+                        completed.countDown();
+                       break;
                 }
                 return false;
             }
@@ -415,7 +430,6 @@ public class SubscriberTest {
         e.setFrom(new From(ActorValue.SUBSCRIBER));
         final CountDownLatch actionLatch = new CountDownLatch(1);
         final AtomicReference<Envelope> response = new AtomicReference<>();
-        final CountDownLatch actionCompleted = new CountDownLatch(1);
 
         subscriberClient.handler(new OnEnvelopHandler() {
             @Override
@@ -432,7 +446,6 @@ public class SubscriberTest {
                     case Paths.ACTION_COMPLETED:
                         SubscriberResults results = mapper.readValue(e.getMessage().getData(), SubscriberResults.class);
                         System.out.println("Action completed");
-                        actionCompleted.countDown();
                         break;
                 }
 
@@ -446,7 +459,9 @@ public class SubscriberTest {
         assertEquals(Paths.ACTION_VALIDATE, response.get().getMessage().getPath());
         assertEquals("{\"results\":\"OK\",\"uuid\":null}", response.get().getMessage().getData());
 
-        actionCompleted.await();
+        completed.await();
+
+        assertEquals("READY", finalMessage.get());
     }
 
 }

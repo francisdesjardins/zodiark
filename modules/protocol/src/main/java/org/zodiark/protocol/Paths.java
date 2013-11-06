@@ -46,6 +46,12 @@ public interface Paths {
 
     String WOWZA_OBFUSCATE = "/wowza/obfuscate";
 
+    String WOWZA_DEOBFUSCATE = "/wowza/deobfuscate";
+
+    String WOWZA_OBFUSCATE_OK = "/wowza/obfuscate/ok";
+
+    String WOWZA_DEOBFUSCATE_OK = "/wowza/deobfuscate/ok";
+
     String DB_CONFIG = "/db/config";
 
     String DB_INIT = "/db/init";
@@ -59,6 +65,8 @@ public interface Paths {
     String SERVER_VALIDATE_OK = "/wowza/validate";
 
     String REQUEST_ACTION = "/request/action";
+
+    String MESSAGE_ACTION = "/message/action";
 
     String RETRIEVE_PUBLISHER = "/publisher/retrieve";
 
@@ -80,11 +88,15 @@ public interface Paths {
 
     String STREAMING_EXECUTE_ACTION = "/streaming/executeAction";
 
-    String WOWZA_OBFUSCATE_OK = "/wowza/obfuscate/ok";
+    String STREAMING_COMPLETE_ACTION = "/streaming/completeAction";
 
     String ACTION_START_OK = "/action/start/ok";
 
     String ACTION_TIMER = "/action/timer";
 
     String ACTION_COMPLETED = "/action/completed";
+
+    String PUBLISHER_ACTION_COMPLETED = "/publisher/actionCompleted";
+
+    String PUBLISHER_ABOUT_READY = "/publisher/ready";
 }

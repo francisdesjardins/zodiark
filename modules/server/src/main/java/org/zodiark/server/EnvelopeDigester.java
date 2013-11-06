@@ -56,7 +56,8 @@ public class EnvelopeDigester extends AtmosphereHandlerAdapter {
                 eventBus.dispatch(e, r);
             } catch (Exception ex) {
                 logger.error("", ex);
-                r.close();
+                Envelope e = Envelope.newError(r.uuid());
+                r.write(mapper.writeValueAsString(e)).close();
             }
         }
     }

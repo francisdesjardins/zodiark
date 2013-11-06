@@ -30,5 +30,6 @@ public interface PublisherService extends Service {
 
     public void retrieveEndpoint(Object s, EventBusListener l);
 
+    public void resetEndpoint(Object message, EventBusListener l);
 }
 

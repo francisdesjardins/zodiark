@@ -80,9 +80,16 @@ public abstract class StreamingSessionBase implements StreamingSession {
     }
 
     @Override
-    public void executeAction(Action action) {
+    public StreamingSession executeAction(Action action) {
 
+        return this;
     }
+
+    public StreamingSession completeAction(Action completedAction) {
+
+        return this;
+    }
+
 
     public Action pendingAction() {
         return pendingAction;

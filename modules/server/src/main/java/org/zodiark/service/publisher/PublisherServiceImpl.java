@@ -77,6 +77,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         }
     }
 
+    @Override
     public void retrieveEndpoint(Object s, EventBusListener l) {
         if (String.class.isAssignableFrom(s.getClass())) {
             l.completed(endpoints.get(s.toString()));
@@ -149,14 +150,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         eventBus.dispatch(Paths.BEGIN_STREAMING_SESSION, p, new EventBusListener<PublisherEndpoint>() {
             @Override
             public void completed(PublisherEndpoint p) {
-                Message m = new Message();
-                m.setPath(Paths.BEGIN_STREAMING_SESSION);
-                try {
-                    m.setData(mapper.writeValueAsString(new PublisherResults("OK")));
-                } catch (JsonProcessingException e1) {
-                    //
-                }
-                response(e, p, m);
+                response(e, p, constructMessage(Paths.BEGIN_STREAMING_SESSION, "OK"));
             }
 
             @Override
@@ -197,11 +191,32 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     }
 
     @Override
-    public void serve(String event, Object r, EventBusListener l) {
+    public void serve(String event, Object message, EventBusListener l) {
         switch (event) {
             case Paths.RETRIEVE_PUBLISHER:
-                retrieveEndpoint(r, l);
+                retrieveEndpoint(message, l);
                 break;
+            case Paths.PUBLISHER_ABOUT_READY:
+                resetEndpoint(message, l);
+                break;
+
+        }
+    }
+
+    @Override
+    public void resetEndpoint(Object message, EventBusListener l) {
+        try {
+            PublisherEndpoint p = endpoints.get(message.toString());
+            AtmosphereResource r = p.resource();
+            Message m = new Message();
+            m.setPath(Paths.PUBLISHER_ABOUT_READY);
+            m.setData(mapper.writeValueAsString(new PublisherResults("READY")));
+
+            Envelope e = Envelope.newPublisherRequest(p.uuid(), m);
+            r.write(mapper.writeValueAsString(e));
+        } catch (JsonProcessingException e1) {
+            logger.debug("Unable to write {} {}", message);
+            l.failed(message);
         }
     }
 

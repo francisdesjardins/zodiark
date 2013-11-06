@@ -23,13 +23,16 @@ import org.zodiark.service.subscriber.SubscriberEndpoint;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public interface StreamingSession {
+
     enum TYPE { PUBLIC, PRIVATE, PROTECTED, SHARED_PRIVATE, VIEW}
 
-    void executeAction(Action a);
+    StreamingSession executeAction(Action a);
 
     Action pendingAction();
 
     StreamingSession pendingAction(Action action);
+
+    StreamingSession completeAction(Action completedAction);
 
     StreamingSession validateAndJoin(SubscriberEndpoint s, EventBusListener<SubscriberEndpoint> e);
 

@@ -76,12 +76,42 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
                 Action a = Action.class.cast(message);
                 executeAction(a, l);
                 break;
+            case Paths.STREAMING_COMPLETE_ACTION:
+                p = PublisherEndpoint.class.cast(message);
+                completeAction(p);
+                break;
             default:
                 logger.error("Not Supported {}", event);
         }
 
     }
 
+    @Override
+    public void completeAction(PublisherEndpoint p) {
+        p.actionInProgress(false);
+        final StreamingSession session = sessions.get(p.uuid());
+        if (session == null) {
+            throw new IllegalStateException("No live session for " + p.uuid());
+        }
+
+        final Action completedAction = session.pendingAction();
+        session.pendingAction(null);
+
+        eventBus.dispatch(Paths.WOWZA_DEOBFUSCATE, session, new EventBusListener<StreamingSession>() {
+            @Override
+            public void completed(StreamingSession session) {
+                logger.trace("Wowza de-obfuscation executed {}", completedAction);
+                session.completeAction(completedAction);
+            }
+
+            @Override
+            public void failed(StreamingSession action) {
+                logger.error("Error finishing Session {}", action);
+            }
+        });
+    }
+
+    @Override
     public void executeAction(final Action a, final EventBusListener l) {
 
         PublisherEndpoint p = a.subscriber().publisherEndpoint();

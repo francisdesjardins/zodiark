@@ -34,4 +34,6 @@ public interface StreamingSessionService extends Service {
 
     void executeAction(final Action a, final EventBusListener l);
 
+    void completeAction(PublisherEndpoint p);
+
 }

@@ -127,4 +127,31 @@ public class WowzaEndpoint implements Endpoint {
         }
 
     }
+
+    public void deobfuscate(StreamingSession session, EventBusListener l) {
+        String executorUuid = session.pendingAction().getSubscriberUUID();
+        List<String> uuids = new ArrayList<>();
+
+        for (SubscriberEndpoint s : session.subscribers()) {
+            if (!s.uuid().equalsIgnoreCase(executorUuid)) {
+                uuids.add(s.uuid());
+            }
+        }
+
+        WowzaMessage w = new WowzaMessage(uuids);
+        w.setPublisherUUID(session.publisher().uuid());
+        Message m = new Message();
+
+        m.setPath(Paths.WOWZA_DEOBFUSCATE);
+        try {
+            m.setData(mapper.writeValueAsString(w));
+
+            Envelope e = Envelope.newServerRequest(Paths.MESSAGE_ACTION, uuid, m);
+            resource.write(mapper.writeValueAsString(e));
+        } catch (JsonProcessingException e1) {
+            logger.error("", e1);
+            l.failed(session.pendingAction());
+        }
+
+    }
 }

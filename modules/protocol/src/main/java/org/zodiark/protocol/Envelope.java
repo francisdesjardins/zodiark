@@ -116,6 +116,7 @@ public class Envelope {
                 '}';
     }
 
+
     protected final static class Builder {
         private Path path = new Path(LeftPathValue.REQUEST, RightPathValue.ACTION);
         private TraceId traceId = new TraceId();
@@ -219,6 +220,16 @@ public class Envelope {
                 .from(new From(ActorValue.SUBSCRIBER.value()))
                 .traceId(new TraceId())
                 .message(message)
+                .uuid(uuid)
+                .build();
+    }
+
+    public final static Envelope newError(String uuid) {
+        return new Envelope.Builder()
+                .path(new Path("/error"))
+                .to(new To(ActorValue.SUBSCRIBER.value()))
+                .from(new From(ActorValue.SUBSCRIBER.value()))
+                .traceId(new TraceId())
                 .uuid(uuid)
                 .build();
     }

@@ -83,6 +83,14 @@ public class WowzaServiceImpl implements WowzaService {
                     logger.error("{}", e1);
                 }
                 break;
+            case Paths.WOWZA_DEOBFUSCATE_OK:
+                try {
+                    final WowzaMessage w = mapper.readValue(e.getMessage().getData(), WowzaMessage.class);
+                    evenBus.dispatch(Paths.PUBLISHER_ABOUT_READY, w.getPublisherUUID());
+                } catch (IOException e1) {
+                    logger.error("{}", e1);
+                }
+                break;
             case Paths.WOWZA_CONNECT:
                 WowzaEndpoint endpoint = wowzaManager.lookup(uuid);
                 if (endpoint == null) {
@@ -101,6 +109,15 @@ public class WowzaServiceImpl implements WowzaService {
                 WowzaEndpoint w = wowzaManager.lookup(session.publisher().wowzaServerUUID());
                 if (w != null) {
                     w.obfuscate(session, l);
+                } else {
+                    l.failed(session);
+                }
+                break;
+            case Paths.WOWZA_DEOBFUSCATE:
+                session = StreamingSession.class.cast(message);
+                w = wowzaManager.lookup(session.publisher().wowzaServerUUID());
+                if (w != null) {
+                    w.deobfuscate(session, l);
                 } else {
                     l.failed(session);
                 }
