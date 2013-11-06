@@ -31,6 +31,7 @@ import org.zodiark.service.publisher.PublisherResults;
 import org.zodiark.service.session.StreamingRequest;
 import org.zodiark.service.subscriber.SubscriberResults;
 import org.zodiark.service.util.StreamingRequestImpl;
+import org.zodiark.service.util.Time;
 import org.zodiark.service.wowza.WowzaMessage;
 import org.zodiark.service.wowza.WowzaUUID;
 import org.zodiark.wowza.OnEnvelopHandler;
@@ -331,6 +332,14 @@ public class SubscriberTest {
                                 new Message(new Path(Paths.ACTION_START_OK), e.getMessage().getData()));
                         publisherClient.send(publisherOk);
                         break;
+                    case Paths.ACTION_TIMER:
+                        Time t = mapper.readValue(e.getMessage().getData(), Time.class);
+                        System.out.println("Publisher ===>" + t);
+                        break;
+                    case Paths.ACTION_COMPLETED:
+                        results = mapper.readValue(e.getMessage().getData(), PublisherResults.class);
+                        System.out.println("Publisher Action completed");
+                        break;
                 }
                 return false;
             }
@@ -406,11 +415,27 @@ public class SubscriberTest {
         e.setFrom(new From(ActorValue.SUBSCRIBER));
         final CountDownLatch actionLatch = new CountDownLatch(1);
         final AtomicReference<Envelope> response = new AtomicReference<>();
+        final CountDownLatch actionCompleted = new CountDownLatch(1);
+
         subscriberClient.handler(new OnEnvelopHandler() {
             @Override
             public boolean onEnvelop(Envelope e) throws IOException {
-                response.set(e);
-                actionLatch.countDown();
+                switch (e.getMessage().getPath()) {
+                    case Paths.ACTION_VALIDATE:
+                        response.set(e);
+                        actionLatch.countDown();
+                        break;
+                    case Paths.ACTION_TIMER:
+                        Time t = mapper.readValue(e.getMessage().getData(), Time.class);
+                        System.out.println("Subscriber ===>" + t);
+                        break;
+                    case Paths.ACTION_COMPLETED:
+                        SubscriberResults results = mapper.readValue(e.getMessage().getData(), SubscriberResults.class);
+                        System.out.println("Action completed");
+                        actionCompleted.countDown();
+                        break;
+                }
+
                 return false;
             }
         });
@@ -421,9 +446,7 @@ public class SubscriberTest {
         assertEquals(Paths.ACTION_VALIDATE, response.get().getMessage().getPath());
         assertEquals("{\"results\":\"OK\",\"uuid\":null}", response.get().getMessage().getData());
 
-        CountDownLatch actionStarted = new CountDownLatch(1);
-
-        //actionStarted.await();
+        actionCompleted.await();
     }
 
 }

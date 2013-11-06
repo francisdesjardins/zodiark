@@ -16,12 +16,14 @@
 package org.zodiark.service.publisher;
 
 import org.zodiark.service.EndpointAdapter;
+import org.zodiark.service.action.Action;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PublisherEndpoint extends EndpointAdapter<PublisherEndpoint> {
 
     private final AtomicBoolean actionInProgress = new AtomicBoolean();
+    private Action action;
 
     public PublisherEndpoint() {
         super();
@@ -34,6 +36,15 @@ public class PublisherEndpoint extends EndpointAdapter<PublisherEndpoint> {
 
     public PublisherEndpoint actionInProgress(boolean b) {
         actionInProgress.set(b);
+        return this;
+    }
+
+    public Action action() {
+        return action;
+    }
+
+    public PublisherEndpoint action(Action action) {
+        this.action = action;
         return this;
     }
 }

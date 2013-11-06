@@ -25,6 +25,8 @@ public class Action {
     private String subscriberUUID;
     @JsonIgnore
     private SubscriberEndpoint endpoint;
+    @JsonIgnore
+    private int time = 5;
 
     public Action(){
     }
@@ -50,13 +52,13 @@ public class Action {
         this.data = data;
     }
 
-    public Action endpoint(SubscriberEndpoint endpoint) {
+    public Action subscriber(SubscriberEndpoint endpoint) {
         this.endpoint = endpoint;
         subscriberUUID = endpoint.uuid();
         return this;
     }
 
-    public SubscriberEndpoint endpoint() {
+    public SubscriberEndpoint subscriber() {
         return endpoint;
     }
 
@@ -66,5 +68,14 @@ public class Action {
 
     public void setSubscriberUUID(String subscriberUUID) {
         this.subscriberUUID = subscriberUUID;
+    }
+
+    public int time() {
+        return time;
+    }
+
+    public Action time(int time) {
+        this.time = time;
+        return this;
     }
 }

@@ -84,7 +84,7 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
 
     public void executeAction(final Action a, final EventBusListener l) {
 
-        PublisherEndpoint p = a.endpoint().publisherEndpoint();
+        PublisherEndpoint p = a.subscriber().publisherEndpoint();
         final StreamingSession session = sessions.get(p.uuid());
         if (session == null) {
             throw new IllegalStateException("No live session for " + p.uuid());
@@ -120,7 +120,7 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
         logger.trace("Starting streaming session {}", p);
         StreamingSession s = sessionType(p);
         sessions.put(p.uuid(), s);
-        s.owner(p);
+        s.publisher(p);
 
         s.initAndAct();
 

@@ -35,5 +35,13 @@ public class Time {
 
     public Time decrement() {
         time--;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return "Time{" +
+                "time=" + time +
+                '}';
     }
 }

@@ -31,9 +31,13 @@ import org.zodiark.server.annotation.On;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.publisher.PublisherResults;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
+import org.zodiark.service.subscriber.SubscriberResults;
 
 import java.io.IOException;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @On("/action")
 public class ActionServiceImpl implements ActionService {
@@ -69,17 +73,60 @@ public class ActionServiceImpl implements ActionService {
     public void actionStarted(Envelope e) {
         try {
             final PublisherResults results = mapper.readValue(e.getMessage().getData(), PublisherResults.class);
-
             eventBus.dispatch(Paths.RETRIEVE_PUBLISHER, results.getUuid(), new EventBusListener<PublisherEndpoint>() {
                 @Override
                 public void completed(final PublisherEndpoint p) {
 
-//                    timer.scheduleAtFixedRate(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            AtmosphereResource r = p.resource();
-//                        }
-//                    }, 1, 1, TimeUnit.SECONDS);
+                    final AtomicInteger time = new AtomicInteger(p.action().time());
+                    final AtmosphereResource publisher = p.resource();
+                    final AtmosphereResource subscriber = p.action().subscriber().resource();
+
+                    final Future<?> timerFuture = timer.scheduleAtFixedRate(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (time.get() == 0) return;
+
+                            Message m = new Message();
+                            m.setPath(Paths.ACTION_TIMER);
+                            try {
+                                m.setData(mapper.writeValueAsString(time.getAndDecrement()));
+
+                                Envelope e = Envelope.newPublisherMessage(p.uuid(), m);
+                                String w = mapper.writeValueAsString(e);
+                                publisher.write(w);
+
+                                e = Envelope.newSubscriberMessage(p.uuid(), m);
+                                w = mapper.writeValueAsString(e);
+                                subscriber.write(w);
+                            } catch (JsonProcessingException e1) {
+                                logger.error("", e1);
+                            }
+                        }
+                    }, 1, 1, TimeUnit.SECONDS);
+
+                    timer.schedule(new Runnable() {
+                        @Override
+                        public void run() {
+                            timerFuture.cancel(false);
+
+                            Message m = new Message();
+                            m.setPath(Paths.ACTION_COMPLETED);
+                            try {
+                                m.setData(mapper.writeValueAsString(new PublisherResults("OK")));
+
+                                Envelope e = Envelope.newPublisherMessage(p.uuid(), m);
+                                String w = mapper.writeValueAsString(e);
+                                publisher.write(w);
+
+                                m.setData(mapper.writeValueAsString(new SubscriberResults("OK")));
+                                e = Envelope.newSubscriberMessage(p.uuid(), m);
+                                w = mapper.writeValueAsString(e);
+                                subscriber.write(w);
+                            } catch (JsonProcessingException e1) {
+                                logger.error("", e1);
+                            }
+                        }
+                    }, p.action().time(), TimeUnit.SECONDS);
                 }
 
                 @Override
@@ -87,8 +134,6 @@ public class ActionServiceImpl implements ActionService {
                     logger.error("Unable to retrieve Publishere for {}", results.getUuid());
                 }
             });
-
-
 
 
         } catch (IOException e1) {
@@ -112,13 +157,14 @@ public class ActionServiceImpl implements ActionService {
 
     @Override
     public void validateAction(final Action action, final EventBusListener l) {
-        final SubscriberEndpoint s = action.endpoint();
+        final SubscriberEndpoint s = action.subscriber();
         final PublisherEndpoint p = s.publisherEndpoint();
 
         if (p.actionInProgress()) {
             l.failed(s);
             return;
         }
+        p.action(action);
 
         eventBus.dispatch(Paths.SUBSCRIBER_VALIDATE_STATE, s, new EventBusListener<SubscriberEndpoint>() {
             @Override
@@ -168,10 +214,10 @@ public class ActionServiceImpl implements ActionService {
         try {
             final Action action = mapper.readValue(e.getMessage().getData(), Action.class);
 
-            eventBus.dispatch(Paths.RETRIEVE_SUBSCRIBER, action.getSubscriberUUID(), new EventBusListener<SubscriberEndpoint>(){
+            eventBus.dispatch(Paths.RETRIEVE_SUBSCRIBER, action.getSubscriberUUID(), new EventBusListener<SubscriberEndpoint>() {
                 @Override
                 public void completed(SubscriberEndpoint s) {
-                    action.endpoint(s);
+                    action.subscriber(s);
                 }
 
                 @Override

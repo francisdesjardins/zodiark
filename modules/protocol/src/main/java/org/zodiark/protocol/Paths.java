@@ -28,7 +28,7 @@ public interface Paths {
 
     String CREATE_SUBSCRIBER_SESSION = "/subscriber/createUserSession";
 
-    String LOAD_CONFIG = "/REACT/EXECUTION/LOADCONFIG";
+    String LOAD_CONFIG = "/publisher/loadConfig";
 
     String VALIDATE_PUBLISHER_STREAMING_SESSION = "/publisher/validateStreamingSession";
 
@@ -83,4 +83,8 @@ public interface Paths {
     String WOWZA_OBFUSCATE_OK = "/wowza/obfuscate/ok";
 
     String ACTION_START_OK = "/action/start/ok";
+
+    String ACTION_TIMER = "/action/timer";
+
+    String ACTION_COMPLETED = "/action/completed";
 }

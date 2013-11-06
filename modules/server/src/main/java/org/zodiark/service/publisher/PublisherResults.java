@@ -13,6 +13,11 @@ public class PublisherResults implements Results {
         this.results = results;
     }
 
+    public PublisherResults(String results, String uuid) {
+        this.results = results;
+        this.uuid = uuid;
+    }
+
     public void setResults(String results) {
         this.results = results;
     }

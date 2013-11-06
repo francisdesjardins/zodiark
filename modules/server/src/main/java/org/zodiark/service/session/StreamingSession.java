@@ -33,9 +33,9 @@ public interface StreamingSession {
 
     StreamingSession validateAndJoin(SubscriberEndpoint s, EventBusListener<SubscriberEndpoint> e);
 
-    PublisherEndpoint owner();
+    PublisherEndpoint publisher();
 
-    StreamingSession owner(PublisherEndpoint p);
+    StreamingSession publisher(PublisherEndpoint p);
 
     ConcurrentLinkedQueue<SubscriberEndpoint> subscribers();
 

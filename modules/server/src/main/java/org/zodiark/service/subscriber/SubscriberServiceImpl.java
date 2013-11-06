@@ -96,7 +96,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
 
         try {
             Action a = mapper.readValue(m.getData(), Action.class);
-            a.endpoint(s);
+            a.subscriber(s);
             eventBus.dispatch(Paths.ACTION_VALIDATE, a, new EventBusListener<Action>() {
                 @Override
                 public void completed(Action action) {

@@ -32,13 +32,13 @@ public abstract class StreamingSessionBase implements StreamingSession {
     private Action pendingAction;
 
     @Override
-    public StreamingSession owner(PublisherEndpoint p) {
+    public StreamingSession publisher(PublisherEndpoint p) {
         endpoint = p;
         return this;
     }
 
     @Override
-    public PublisherEndpoint owner() {
+    public PublisherEndpoint publisher() {
         return endpoint;
     }
 

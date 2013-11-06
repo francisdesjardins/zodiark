@@ -201,6 +201,28 @@ public class Envelope {
                 .build();
     }
 
+    public final static Envelope newPublisherMessage(String uuid, Message message) {
+        return new Envelope.Builder()
+                .path(new Path("/message"))
+                .to(new To(ActorValue.PUBLISHER.value()))
+                .from(new From(ActorValue.SERVER.value()))
+                .traceId(new TraceId())
+                .message(message)
+                .uuid(uuid)
+                .build();
+    }
+
+    public final static Envelope newSubscriberMessage(String uuid, Message message) {
+        return new Envelope.Builder()
+                .path(new Path("/message"))
+                .to(new To(ActorValue.SUBSCRIBER.value()))
+                .from(new From(ActorValue.SUBSCRIBER.value()))
+                .traceId(new TraceId())
+                .message(message)
+                .uuid(uuid)
+                .build();
+    }
+
     private final static String replyValue(String path) {
         Path p = new Path(path);
         String left = p.left().startsWith("/") ? p.left() : "/" + p.left();

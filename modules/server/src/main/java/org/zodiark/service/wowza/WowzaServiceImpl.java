@@ -66,7 +66,7 @@ public class WowzaServiceImpl implements WowzaService {
                                 AtmosphereResource r = p.resource();
                                 Message m = new Message();
                                 m.setPath(Paths.ACTION_START);
-                                m.setData(mapper.writeValueAsString(new PublisherResults("OK")));
+                                m.setData(mapper.writeValueAsString(new PublisherResults("OK", w.getPublisherUUID())));
                                 Envelope newResponse = Envelope.newPublisherRequest(p.uuid(), m);
                                 r.write(mapper.writeValueAsString(newResponse));
                             } catch (JsonProcessingException e) {
@@ -98,7 +98,7 @@ public class WowzaServiceImpl implements WowzaService {
         switch (event) {
             case Paths.WOWZA_OBFUSCATE:
                 StreamingSession session = StreamingSession.class.cast(message);
-                WowzaEndpoint w = wowzaManager.lookup(session.owner().wowzaServerUUID());
+                WowzaEndpoint w = wowzaManager.lookup(session.publisher().wowzaServerUUID());
                 if (w != null) {
                     w.obfuscate(session, l);
                 } else {

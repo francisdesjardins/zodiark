@@ -112,7 +112,7 @@ public class WowzaEndpoint implements Endpoint {
         }
 
         WowzaMessage w = new WowzaMessage(uuids);
-        w.setPublisherUUID(session.owner().uuid());
+        w.setPublisherUUID(session.publisher().uuid());
         Message m = new Message();
 
         m.setPath(Paths.WOWZA_OBFUSCATE);
