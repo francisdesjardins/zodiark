@@ -260,6 +260,16 @@ public class Envelope {
                 .build();
     }
 
+    public final static Envelope newClientToServerRequest(String uuid, Message message) {
+        return new Builder()
+                .path(new Path(LeftPathValue.REQUEST, RightPathValue.ACTION))
+                .to(new To(ActorValue.SERVER.value()))
+                .from(new From(ActorValue.STREAM_SERVER.value()))
+                .message(message)
+                .uuid(uuid)
+                .build();
+    }
+
     public final static Envelope newClientReply(Envelope envelope, Message message) {
         return new Envelope.Builder()
                 .path(new Path(replyValue(envelope.getPath())))

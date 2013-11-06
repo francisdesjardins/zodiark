@@ -258,20 +258,20 @@ public class SubscriberTest {
                         uuid.set(e.getUuid());
                         break;
                     case Paths.SERVER_VALIDATE_OK:
-                        Envelope publisherOk = Envelope.newClientToServerRequest(
+                        Envelope publisherOk = Envelope.newClientToServerRequest(e.getUuid(),
                                 new Message(new Path(paths.get()), e.getMessage().getData()));
                         wowzaClient.send(publisherOk);
                         break;
                     case Paths.WOWZA_OBFUSCATE:
                         WowzaMessage wm = mapper.readValue(m.getData(), WowzaMessage.class);
-                        Envelope ok = Envelope.newClientToServerRequest(
+                        Envelope ok = Envelope.newClientToServerRequest(e.getUuid(),
                                 new Message(new Path(Paths.WOWZA_OBFUSCATE_OK), e.getMessage().getData()));
                         System.out.println("Obfuscating Subscribers");
                         wowzaClient.send(ok);
                     case Paths.WOWZA_DEOBFUSCATE:
                         wm = mapper.readValue(m.getData(), WowzaMessage.class);
                         System.out.println("De-obfuscating Subscribers");
-                        ok = Envelope.newClientToServerRequest(
+                        ok = Envelope.newClientToServerRequest(e.getUuid(),
                                 new Message(new Path(Paths.WOWZA_DEOBFUSCATE_OK), e.getMessage().getData()));
                         wowzaClient.send(ok);
                     default:
@@ -328,7 +328,7 @@ public class SubscriberTest {
                         break;
                     case Paths.ACTION_ACCEPT:
                         Action a = mapper.readValue(e.getMessage().getData(), Action.class);
-                        Envelope publisherOk = Envelope.newClientToServerRequest(
+                        Envelope publisherOk = Envelope.newClientToServerRequest(e.getUuid(),
                                 new Message(new Path(Paths.ACTION_ACCEPT_OK), e.getMessage().getData()));
                         publisherClient.send(publisherOk);
                         break;
@@ -337,7 +337,7 @@ public class SubscriberTest {
                         PublisherResults results = mapper.readValue(e.getMessage().getData(), PublisherResults.class);
                         System.out.println("==> Start Action " + results.getResults());
 
-                        publisherOk = Envelope.newClientToServerRequest(
+                        publisherOk = Envelope.newClientToServerRequest( e.getUuid(),
                                 new Message(new Path(Paths.ACTION_START_OK), e.getMessage().getData()));
                         publisherClient.send(publisherOk);
                         break;
