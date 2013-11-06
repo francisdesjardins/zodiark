@@ -51,8 +51,13 @@ public class EnvelopeDigester extends AtmosphereHandlerAdapter {
         String message = IOUtils.readEntirely(r).toString();
         if (!message.isEmpty()) {
             try {
-                logger.debug("\n\n{}\n\n", message);
                 Envelope e = mapper.readValue(message, Envelope.class);
+
+                if (e.getUuid().isEmpty()) {
+                    e.setUuid(r.uuid());
+                }
+                logger.debug("\n\n{}\n\n", message);
+
                 eventBus.dispatch(e, r);
             } catch (Exception ex) {
                 logger.error("", ex);
