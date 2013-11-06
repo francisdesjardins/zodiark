@@ -77,7 +77,12 @@ public class EnvelopeDigester extends AtmosphereHandlerAdapter {
                         }
                     });
                     r.getRequest().body(e.getMessage().getData()).attributes().put(FrameworkConfig.INJECTED_ATMOSPHERE_RESOURCE, r);
-                    r.getAtmosphereConfig().framework().doCometSupport(r.getRequest(), r.getResponse());
+                    try {
+                        r.getAtmosphereConfig().framework().doCometSupport(r.getRequest().destroyable(false), r.getResponse().destroyable(false));
+                    } finally {
+                        r.getRequest().destroyable(true);
+                        r.getResponse().destroyable(true);
+                    }
                 }
             } catch (Exception ex) {
                 logger.error("", ex);
