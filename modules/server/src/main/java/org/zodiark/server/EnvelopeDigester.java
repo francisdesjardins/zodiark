@@ -56,7 +56,7 @@ public class EnvelopeDigester extends AtmosphereHandlerAdapter {
     @Inject
     public EventBus eventBus;
 
-    public void onRequest(AtmosphereResource r) throws IOException {
+    public void onRequest(final AtmosphereResource r) throws IOException {
         String message = IOUtils.readEntirely(r).toString();
         if (!message.isEmpty()) {
             try {
@@ -78,7 +78,7 @@ public class EnvelopeDigester extends AtmosphereHandlerAdapter {
                     request.setAttribute(SUSPENDED_ATMOSPHERE_RESOURCE_UUID, null);
 
                     // We redispatch the request to Atmosphere, we create a virtual Broadcaster
-                    Broadcaster b = r.getAtmosphereConfig().getBroadcasterFactory().lookup(e.getMessage().getPath(), true);
+                    final Broadcaster b = r.getAtmosphereConfig().getBroadcasterFactory().lookup(e.getMessage().getPath(), true);
                     b.addAtmosphereResource(r);
 
                     r.setBroadcaster(b);
@@ -95,6 +95,7 @@ public class EnvelopeDigester extends AtmosphereHandlerAdapter {
                             try {
                                 os.write(message);
                             } finally {
+                                b.removeAtmosphereResource(r);
                                 request.destroy(true);
                                 response.destroy(true);
                             }

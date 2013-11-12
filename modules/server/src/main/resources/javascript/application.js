@@ -17,8 +17,9 @@ $(function () {
 
     var handler = new zodiark.EnvelopeHandler();
     handler.onEnvelope = function (envelope) {
+        input.removeAttr('disabled').focus();
         var message = envelope.getMessage().getData();
-        ;
+
         try {
             var json = atmosphere.util.parseJSON(message);
         } catch (e) {
@@ -26,7 +27,6 @@ $(function () {
             return;
         }
 
-        input.removeAttr('disabled').focus();
         if (!logged && myName) {
             logged = true;
             status.text(myName + ': ').css('color', 'blue');
@@ -45,7 +45,6 @@ $(function () {
     }
     handler.onClose = function (response) {
         content.html($('<p>', { text: 'Server closed the connection after a timeout' }));
-        input.attr('disabled', 'disabled');
     }
 
 
@@ -74,7 +73,6 @@ $(function () {
             socket.send(envelope);
             $(this).val('');
 
-            input.attr('disabled', 'disabled');
             if (myName === false) {
                 myName = msg;
             }
