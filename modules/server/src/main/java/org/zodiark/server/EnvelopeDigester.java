@@ -67,10 +67,17 @@ public class EnvelopeDigester extends AtmosphereHandlerAdapter {
                 }
 
                 logger.debug("\n\n{}\n\n", message);
-                // TODO: Dangerous
+                // TODO: Dangerous and inneficient. A hacker can broken us quite easily.
                 if (!e.getMessage().getPath().startsWith("/chat")) {
                     eventBus.dispatch(e, r);
                 } else {
+                    // TODO: This works only for websocket. Instead we need to creates the Chatroom
+                    // as soon as the Subscriber connect and dispatch the long-polled connection
+                    // to the associated Broadcaster
+                    /**
+                     * (1) Publisher Connect, Create the room
+                     * (2) Add automatically subscribers
+                     */
                     final AtmosphereRequest request = r.getRequest();
                     final AtmosphereResponse response = r.getResponse();
 
