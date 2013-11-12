@@ -11,7 +11,7 @@ zodiark = (function () {
         Options: {
             transport: 'websocket',
             reconnect: true,
-            method: 'GET',
+            method: 'POST',
             fallbackMethod: 'POST',
             fallbackTransport: 'long-polling',
             enableXDR: false,
@@ -53,7 +53,7 @@ zodiark = (function () {
 
         Message: function () {
             var _path = "/",
-                _data = "",
+                _data,
 
                 _self = {
                     path: function (path) {
@@ -73,8 +73,15 @@ zodiark = (function () {
                     },
 
                     _toJSON: function () {
+
+                        var m = "";
+                        if (_data) {
+                            m = atmosphere.util.stringifyJSON(_data).replace(/\\n/g, "\\n")
+                            .replace(/[\"]/g, '\\"');
+                        }
+
                         var s = "{\"path\" : \"" + _path + "\","
-                            + "\"data\" : \"" + _data + "\"}";
+                            + "\"data\" : \"" + m + "\"}";
 
                         return s;
                     }
@@ -196,7 +203,10 @@ zodiark = (function () {
 
             var _listeners = new Array();
 
+            var uuid = "0";
+
             var _self = {
+
                 /**
                  * Open a connection to the server.
                  *
@@ -205,36 +215,45 @@ zodiark = (function () {
                  * @private
                  */
                 open: function () {
-
                     var request = new atmosphere.AtmosphereRequest();
                     request.url = builder.getUrl();
+                    request.method = builder.getOptions().method;
                     request.transport = builder.getOptions().transport;
                     request.trackMessageLength = true;
+                    request.data = new zodiark.Envelope().uuid("0")
+                            .traceId("1")
+                            .path("/Request/Action")
+                            .to("Server")
+                            .from("Subscriber")
+                            .message(new zodiark.Message().path("/subscriber/handshake").data(""))._toJSON();
 
                     request.onMessage = function (response) {
                         try {
                             var json = atmosphere.util.parseJSON(response.responseBody);
+                            var envelope = new zodiark.Envelope().uuid(json.uuid)
+                                .traceId(json.traceId)
+                                .path(json.path)
+                                .to(json.to)
+                                .from(json.from)
+                                .message(new zodiark.Message().path(json.message.path).data(json.message.data))
+                                .protocol(json.protocol);
+
+                            for (var i = 0; i < _listeners.length; i++) {
+                                _listeners[i].onEnvelope(envelope);
+                            }
                         } catch (e) {
                             console.log('This doesn\'t look like a valid JSON: ', message);
                             return;
                         }
-
-                        var envelope = new zodiark.Envelope().uuid(json.uuid)
-                            .traceId(json.traceId)
-                            .path(json.path)
-                            .to(json.to)
-                            .from(json.from)
-                            .message(new zodiark.Message().path(json.message.path).data(json.message.data))
-                            .protocol(json.protocol);
-
-                        for (var i = 0; i < _listeners.length; i++) {
-                            _listeners[i].onEnvelope(envelope);
-                        }
                     };
 
                     request.onOpen = function (response) {
+                        uuid = response.request.uuid;
                     };
                     request.onClientTimeout = function (response) {
+                        for (var i = 0; i < _listeners.length; i++) {
+                            _listeners[i].onClose(response);
+                        }
                     };
                     request.onReopen = function (response) {
                     };
@@ -263,6 +282,7 @@ zodiark = (function () {
                  * @param request
                  */
                 send: function (envelope) {
+                    envelope.uuid(uuid);
                     _socket.push(envelope._toJSON())
                     return this;
                 },
