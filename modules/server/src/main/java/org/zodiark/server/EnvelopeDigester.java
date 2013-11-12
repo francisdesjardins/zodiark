@@ -60,13 +60,13 @@ public class EnvelopeDigester extends AtmosphereHandlerAdapter {
         String message = IOUtils.readEntirely(r).toString();
         if (!message.isEmpty()) {
             try {
-                logger.debug("\n\n{}\n\n", message);
                 final Envelope e = mapper.readValue(message, Envelope.class);
 
                 if (e.getUuid().isEmpty()) {
                     e.setUuid(r.uuid());
                 }
 
+                logger.debug("\n\n{}\n\n", message);
                 // TODO: Dangerous
                 if (!e.getMessage().getPath().startsWith("/chat")) {
                     eventBus.dispatch(e, r);
@@ -91,7 +91,7 @@ public class EnvelopeDigester extends AtmosphereHandlerAdapter {
                             Message m = new Message();
                             m.setPath(e.getMessage().getPath());
                             m.setData(o.toString());
-                            byte[] message = mapper.writeValueAsBytes(Envelope.newServerToSubscriberResponse(m));
+                            byte[] message = mapper.writeValueAsBytes(Envelope.newServerToSubscriberResponse(e.getUuid(), m));
                             try {
                                 os.write(message);
                             } finally {

@@ -252,21 +252,7 @@ public class Envelope {
     }
 
     public final static Envelope newClientToServerRequest(Message message) {
-        return new Envelope.Builder()
-                .path(new Path(LeftPathValue.REQUEST, RightPathValue.ACTION))
-                .to(new To(ActorValue.SERVER.value()))
-                .from(new From(ActorValue.STREAM_SERVER.value()))
-                .message(message)
-                .build();
-    }
-
-    public final static Envelope newServerToSubscriberResponse(Message message) {
-        return new Envelope.Builder()
-                .path(new Path(LeftPathValue.REQUEST, RightPathValue.ACTION))
-                .to(new To(ActorValue.SUBSCRIBER.value()))
-                .from(new From(ActorValue.SERVER.value()))
-                .message(message)
-                .build();
+        return newClientToServerRequest("0", message);
     }
 
     public final static Envelope newClientToServerRequest(String uuid, Message message) {
@@ -276,6 +262,20 @@ public class Envelope {
                 .from(new From(ActorValue.STREAM_SERVER.value()))
                 .message(message)
                 .uuid(uuid)
+                .build();
+    }
+
+    public final static Envelope newServerToSubscriberResponse(Message message) {
+        return newServerToSubscriberResponse("0", message);
+    }
+
+    public final static Envelope newServerToSubscriberResponse(String uuid, Message message) {
+        return new Envelope.Builder()
+                .path(new Path(LeftPathValue.REQUEST, RightPathValue.ACTION))
+                .to(new To(ActorValue.SUBSCRIBER.value()))
+                .from(new From(ActorValue.SERVER.value()))
+                .uuid(uuid)
+                .message(message)
                 .build();
     }
 
