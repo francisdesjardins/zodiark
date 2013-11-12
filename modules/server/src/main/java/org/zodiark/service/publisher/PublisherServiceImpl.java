@@ -22,18 +22,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
-import org.zodiark.protocol.Paths;
 import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
-import org.zodiark.service.util.UUID;
 import org.zodiark.service.Session;
+import org.zodiark.service.util.UUID;
 import org.zodiark.service.wowza.WowzaUUID;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.zodiark.protocol.Paths.BEGIN_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.CREATE_PUBLISHER_SESSION;
+import static org.zodiark.protocol.Paths.DB_CONFIG;
+import static org.zodiark.protocol.Paths.DB_INIT;
+import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.LOAD_CONFIG;
+import static org.zodiark.protocol.Paths.PUBLISHER_ABOUT_READY;
+import static org.zodiark.protocol.Paths.RETRIEVE_PUBLISHER;
+import static org.zodiark.protocol.Paths.START_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.TERMINATE_STREAMING_SESSSION;
+import static org.zodiark.protocol.Paths.VALIDATE_PUBLISHER_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.WOWZA_CONNECT;
+import static org.zodiark.protocol.Paths.WOWZA_ERROR_STREAMING_SESSION;
 
 @On("/publisher")
 public class PublisherServiceImpl implements PublisherService, Session<PublisherEndpoint> {
@@ -54,20 +67,20 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     public void serve(Envelope e, AtmosphereResource r) {
         logger.trace("Handling Publisher Envelop {} to Service {}", e, r.uuid());
         switch (e.getMessage().getPath()) {
-            case Paths.LOAD_CONFIG:
-            case Paths.CREATE_PUBLISHER_SESSION:
+            case LOAD_CONFIG:
+            case CREATE_PUBLISHER_SESSION:
                 createSession(e, r);
                 break;
-            case Paths.VALIDATE_PUBLISHER_STREAMING_SESSION:
+            case VALIDATE_PUBLISHER_STREAMING_SESSION:
                 createOrJoinStreamingSession(e);
                 break;
-            case Paths.START_STREAMING_SESSION:
+            case START_STREAMING_SESSION:
                 startStreamingSession(e);
                 break;
-            case Paths.WOWZA_ERROR_STREAMING_SESSION:
+            case WOWZA_ERROR_STREAMING_SESSION:
                 errorStreamingSession(e);
                 break;
-            case Paths.TERMINATE_STREAMING_SESSSION:
+            case TERMINATE_STREAMING_SESSSION:
                 String uuid = e.getMessage().getUUID();
                 PublisherEndpoint p = endpoints.get(uuid);
                 terminateStreamingSession(p, r);
@@ -93,7 +106,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             PublisherEndpoint p = endpoints.get(result.getUuid());
 
             Message m = new Message();
-            m.setPath(Paths.ERROR_STREAMING_SESSION);
+            m.setPath(ERROR_STREAMING_SESSION);
             try {
                 m.setData(mapper.writeValueAsString(new PublisherResults("ERROR")));
             } catch (JsonProcessingException e1) {
@@ -122,7 +135,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         }
 
         // TODO: Callback is not called at the moment as the dispatching to Wowza is asynchronous
-        eventBus.dispatch(Paths.WOWZA_CONNECT, p, new EventBusListener<PublisherEndpoint>() {
+        eventBus.dispatch(WOWZA_CONNECT, p, new EventBusListener<PublisherEndpoint>() {
             @Override
             public void completed(PublisherEndpoint p) {
                 // TODO: Proper Message
@@ -132,7 +145,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 
             @Override
             public void failed(PublisherEndpoint p) {
-                error(e, p, constructMessage(Paths.WOWZA_CONNECT, "error"));
+                error(e, p, constructMessage(WOWZA_CONNECT, "error"));
             }
         });
     }
@@ -147,15 +160,15 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         }
 
         PublisherEndpoint p = retrieve(uuid.getUuid());
-        eventBus.dispatch(Paths.BEGIN_STREAMING_SESSION, p, new EventBusListener<PublisherEndpoint>() {
+        eventBus.dispatch(BEGIN_STREAMING_SESSION, p, new EventBusListener<PublisherEndpoint>() {
             @Override
             public void completed(PublisherEndpoint p) {
-                response(e, p, constructMessage(Paths.BEGIN_STREAMING_SESSION, "OK"));
+                response(e, p, constructMessage(BEGIN_STREAMING_SESSION, "OK"));
             }
 
             @Override
             public void failed(PublisherEndpoint p) {
-                error(e, p, constructMessage(Paths.BEGIN_STREAMING_SESSION, "error"));
+                error(e, p, constructMessage(BEGIN_STREAMING_SESSION, "error"));
             }
         });
     }
@@ -193,10 +206,10 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     @Override
     public void serve(String event, Object message, EventBusListener l) {
         switch (event) {
-            case Paths.RETRIEVE_PUBLISHER:
+            case RETRIEVE_PUBLISHER:
                 retrieveEndpoint(message, l);
                 break;
-            case Paths.PUBLISHER_ABOUT_READY:
+            case PUBLISHER_ABOUT_READY:
                 resetEndpoint(message, l);
                 break;
 
@@ -209,7 +222,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             PublisherEndpoint p = endpoints.get(message.toString());
             AtmosphereResource r = p.resource();
             Message m = new Message();
-            m.setPath(Paths.PUBLISHER_ABOUT_READY);
+            m.setPath(PUBLISHER_ABOUT_READY);
             m.setData(mapper.writeValueAsString(new PublisherResults("READY")));
 
             Envelope e = Envelope.newPublisherRequest(p.uuid(), m);
@@ -229,7 +242,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             p.uuid(uuid).message(e.getMessage()).resource(resource);
 
             endpoints.put(uuid, p);
-            eventBus.dispatch(Paths.DB_INIT, p, new EventBusListener<PublisherEndpoint>() {
+            eventBus.dispatch(DB_INIT, p, new EventBusListener<PublisherEndpoint>() {
                 @Override
                 public void completed(PublisherEndpoint p) {
                     lookupConfig(e, p);
@@ -237,7 +250,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 
                 @Override
                 public void failed(PublisherEndpoint p) {
-                    error(e, p, constructMessage(Paths.VALIDATE_PUBLISHER_STREAMING_SESSION, "error"));
+                    error(e, p, constructMessage(VALIDATE_PUBLISHER_STREAMING_SESSION, "error"));
                 }
             });
         }
@@ -259,15 +272,15 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     }
 
     private void lookupConfig(final Envelope e, PublisherEndpoint p) {
-        eventBus.dispatch(Paths.DB_CONFIG, p, new EventBusListener<PublisherEndpoint>() {
+        eventBus.dispatch(DB_CONFIG, p, new EventBusListener<PublisherEndpoint>() {
             @Override
             public void completed(PublisherEndpoint p) {
-                response(e, p, constructMessage(Paths.CREATE_PUBLISHER_SESSION, "OK"));
+                response(e, p, constructMessage(CREATE_PUBLISHER_SESSION, "OK"));
             }
 
             @Override
             public void failed(PublisherEndpoint p) {
-                error(e, p, constructMessage(Paths.VALIDATE_PUBLISHER_STREAMING_SESSION, "error"));
+                error(e, p, constructMessage(VALIDATE_PUBLISHER_STREAMING_SESSION, "error"));
             }
         });
     }

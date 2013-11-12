@@ -99,4 +99,9 @@ public interface Paths {
     String PUBLISHER_ACTION_COMPLETED = "/publisher/actionCompleted";
 
     String PUBLISHER_ABOUT_READY = "/publisher/ready";
+
+    String SUBSCRIBER_BROWSER_HANDSHAKE = "/subscriber/handshake";
+
+    String SUBSCRIBER_BROWSER_HANDSHAKE_OK = "/subscriber/handshake/OK";
+
 }

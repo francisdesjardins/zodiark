@@ -13,18 +13,26 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.subscriber;
+package org.zodiark.service.chat;
 
-import org.atmosphere.cpr.AtmosphereResource;
-import org.zodiark.protocol.Envelope;
-import org.zodiark.server.EventBusListener;
-import org.zodiark.service.Service;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.atmosphere.config.managed.Decoder;
 
-public interface SubscriberService extends Service {
+import java.io.IOException;
 
-    public void requestForAction(Envelope e, AtmosphereResource r);
+/**
+ * Decode a String into a {@link Message}.
+ */
+public class JacksonDecoder implements Decoder<String, Message> {
 
-    public void retrieveEndpoint(Object s, EventBusListener l);
+    private final ObjectMapper mapper = new ObjectMapper();
 
-    public void connectEndpoint(AtmosphereResource r, Envelope e);
+    @Override
+    public Message decode(String s) {
+        try {
+            return mapper.readValue(s, Message.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

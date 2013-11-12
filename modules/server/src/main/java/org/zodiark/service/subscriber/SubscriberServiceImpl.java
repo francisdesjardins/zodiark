@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
-import org.zodiark.protocol.Paths;
 import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
@@ -36,6 +35,24 @@ import org.zodiark.service.util.UUID;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.zodiark.protocol.Paths.ACTION_VALIDATE;
+import static org.zodiark.protocol.Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.CREATE_SUBSCRIBER_SESSION;
+import static org.zodiark.protocol.Paths.DB_CONFIG;
+import static org.zodiark.protocol.Paths.DB_INIT;
+import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.JOIN_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.LOAD_CONFIG;
+import static org.zodiark.protocol.Paths.RETRIEVE_PUBLISHER;
+import static org.zodiark.protocol.Paths.RETRIEVE_SUBSCRIBER;
+import static org.zodiark.protocol.Paths.SUBSCRIBER_ACTION;
+import static org.zodiark.protocol.Paths.SUBSCRIBER_BROWSER_HANDSHAKE;
+import static org.zodiark.protocol.Paths.SUBSCRIBER_BROWSER_HANDSHAKE_OK;
+import static org.zodiark.protocol.Paths.TERMINATE_SUBSCRIBER_STREAMING_SESSSION;
+import static org.zodiark.protocol.Paths.VALIDATE_SUBSCRIBER_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.WOWZA_CONNECT;
+import static org.zodiark.protocol.Paths.WOWZA_ERROR_SUBSCRIBER_STREAMING_SESSION;
 
 @On("/subscriber")
 public class SubscriberServiceImpl implements SubscriberService, Session<SubscriberEndpoint> {
@@ -58,31 +75,42 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     @Override
     public void serve(Envelope e, AtmosphereResource r) {
         logger.trace("Handling Subscriber Envelop {} to Service {}", e, r.uuid());
+
+        // TODO: One service per Path instead?
         switch (e.getMessage().getPath()) {
-            case Paths.LOAD_CONFIG:
-            case Paths.CREATE_SUBSCRIBER_SESSION:
+            case LOAD_CONFIG:
+            case CREATE_SUBSCRIBER_SESSION:
                 createSession(e, r);
                 break;
-            case Paths.VALIDATE_SUBSCRIBER_STREAMING_SESSION:
+            case VALIDATE_SUBSCRIBER_STREAMING_SESSION:
                 createOrJoinStreamingSession(e);
                 break;
-            case Paths.JOIN_STREAMING_SESSION:
+            case JOIN_STREAMING_SESSION:
                 startStreamingSession(e);
                 break;
-            case Paths.WOWZA_ERROR_SUBSCRIBER_STREAMING_SESSION:
+            case WOWZA_ERROR_SUBSCRIBER_STREAMING_SESSION:
                 errorStreamingSession(e);
                 break;
-            case Paths.TERMINATE_SUBSCRIBER_STREAMING_SESSSION:
+            case TERMINATE_SUBSCRIBER_STREAMING_SESSSION:
                 String uuid = e.getMessage().getUUID();
                 SubscriberEndpoint p = endpoints.get(uuid);
                 terminateStreamingSession(p, r);
                 break;
-            case Paths.SUBSCRIBER_ACTION:
+            case SUBSCRIBER_ACTION:
                 requestForAction(e, r);
+                break;
+            case SUBSCRIBER_BROWSER_HANDSHAKE:
+                connectEndpoint(r, e);
                 break;
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
         }
+    }
+
+    @Override
+    public void connectEndpoint(AtmosphereResource r, Envelope e) {
+        logger.info("Subscriber Connected {}", e);
+        response(e, createEndpoint(r, e.getMessage()), constructMessage(SUBSCRIBER_BROWSER_HANDSHAKE_OK, "OK"));
     }
 
     @Override
@@ -97,20 +125,18 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         try {
             Action a = mapper.readValue(m.getData(), Action.class);
             a.subscriber(s);
-            eventBus.dispatch(Paths.ACTION_VALIDATE, a, new EventBusListener<Action>() {
+            eventBus.dispatch(ACTION_VALIDATE, a, new EventBusListener<Action>() {
                 @Override
                 public void completed(Action action) {
                     logger.debug("Action Accepted for {}", action.getSubscriberUUID());
-                    response(e, endpoints.get(action.getSubscriberUUID()), constructMessage(Paths.ACTION_VALIDATE, "OK"));
+                    response(e, endpoints.get(action.getSubscriberUUID()), constructMessage(ACTION_VALIDATE, "OK"));
                 }
 
                 @Override
                 public void failed(Action action) {
-                    error(e, s, constructMessage(Paths.ACTION_VALIDATE, "error"));
+                    error(e, s, constructMessage(ACTION_VALIDATE, "error"));
                 }
             });
-
-
         } catch (IOException e1) {
             logger.warn("{}", e1);
         }
@@ -121,7 +147,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         try {
             SubscriberResults result = mapper.readValue(e.getMessage().getData(), SubscriberResults.class);
             SubscriberEndpoint p = endpoints.get(result.getUuid());
-            error(e, p, constructMessage(Paths.ERROR_STREAMING_SESSION, "error"));
+            error(e, p, constructMessage(ERROR_STREAMING_SESSION, "error"));
         } catch (IOException e1) {
             logger.warn("{}", e1);
         }
@@ -139,19 +165,19 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             final SubscriberEndpoint s = retrieve(uuid);
             final StreamingRequest request = mapper.readValue(e.getMessage().getData(), requestClass.getClass());
 
-            eventBus.dispatch(Paths.RETRIEVE_PUBLISHER, request.getPublisherUUID(), new EventBusListener<PublisherEndpoint>() {
+            eventBus.dispatch(RETRIEVE_PUBLISHER, request.getPublisherUUID(), new EventBusListener<PublisherEndpoint>() {
                 @Override
                 public void completed(PublisherEndpoint p) {
                     s.wowzaServerUUID(request.getWowzaUUID()).publisherEndpoint(p);
 
                     // TODO: Callback is not called at the moment as the dispatching to Wowza is asynchronous
                     // TODO: Unit test
-                    eventBus.dispatch(Paths.WOWZA_CONNECT, s);
+                    eventBus.dispatch(WOWZA_CONNECT, s);
                 }
 
                 @Override
                 public void failed(PublisherEndpoint p) {
-                    error(e, s, constructMessage(Paths.VALIDATE_SUBSCRIBER_STREAMING_SESSION, "error"));
+                    error(e, s, constructMessage(VALIDATE_SUBSCRIBER_STREAMING_SESSION, "error"));
                 }
             });
         } catch (IOException e1) {
@@ -179,15 +205,15 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         }
 
         SubscriberEndpoint s = retrieve(uuid.getUuid());
-        eventBus.dispatch(Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION, s, new EventBusListener<SubscriberEndpoint>() {
+        eventBus.dispatch(BEGIN_SUBSCRIBER_STREAMING_SESSION, s, new EventBusListener<SubscriberEndpoint>() {
             @Override
             public void completed(SubscriberEndpoint s) {
-                response(e, s, constructMessage(Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION, "OK"));
+                response(e, s, constructMessage(BEGIN_SUBSCRIBER_STREAMING_SESSION, "OK"));
             }
 
             @Override
             public void failed(SubscriberEndpoint s) {
-                error(e, s, constructMessage(Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION, "error"));
+                error(e, s, constructMessage(BEGIN_SUBSCRIBER_STREAMING_SESSION, "error"));
             }
         });
     }
@@ -214,32 +240,39 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     @Override
     public void serve(String event, Object r, EventBusListener l) {
         switch (event) {
-            case Paths.RETRIEVE_SUBSCRIBER:
+            case RETRIEVE_SUBSCRIBER:
                 retrieveEndpoint(r, l);
                 break;
         }
+    }
+
+    private SubscriberEndpoint createEndpoint(AtmosphereResource resource, Message m) {
+        SubscriberEndpoint s = context.newInstance(SubscriberEndpoint.class);
+        s.uuid(resource.uuid()).message(m).resource(resource);
+        return s;
     }
 
     @Override
     public SubscriberEndpoint createSession(final Envelope e, AtmosphereResource resource) {
         String uuid = e.getUuid();
         SubscriberEndpoint s = endpoints.get(uuid);
-        if (s == null) {
-            s = context.newInstance(SubscriberEndpoint.class);
-            s.uuid(uuid).message(e.getMessage()).resource(resource);
-
+        if (s == null || !s.isAuthenticated()) {
+            s = createEndpoint(resource, e.getMessage());
             endpoints.put(uuid, s);
-            eventBus.dispatch(Paths.DB_INIT, s, new EventBusListener<SubscriberEndpoint>() {
+            eventBus.dispatch(DB_INIT, s, new EventBusListener<SubscriberEndpoint>() {
                 @Override
-                public void completed(SubscriberEndpoint p) {
-                    lookupConfig(e, p);
+                public void completed(SubscriberEndpoint s) {
+                    s.isAuthenticated(true);
+                    lookupConfig(e, s);
                 }
 
                 @Override
-                public void failed(SubscriberEndpoint p) {
-                    error(e, p, constructMessage(Paths.VALIDATE_SUBSCRIBER_STREAMING_SESSION, "error"));
+                public void failed(SubscriberEndpoint s) {
+                    error(e, s, constructMessage(VALIDATE_SUBSCRIBER_STREAMING_SESSION, "error"));
                 }
             });
+        } else {
+            logger.error("Subscriber Hacking Identity {}", s);
         }
         return s;
     }
@@ -259,15 +292,15 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     private void lookupConfig(final Envelope e, SubscriberEndpoint p) {
-        eventBus.dispatch(Paths.DB_CONFIG, p, new EventBusListener<SubscriberEndpoint>() {
+        eventBus.dispatch(DB_CONFIG, p, new EventBusListener<SubscriberEndpoint>() {
             @Override
             public void completed(SubscriberEndpoint p) {
-                response(e, p, constructMessage(Paths.CREATE_SUBSCRIBER_SESSION, "OK"));
+                response(e, p, constructMessage(CREATE_SUBSCRIBER_SESSION, "OK"));
             }
 
             @Override
             public void failed(SubscriberEndpoint p) {
-                error(e, p, constructMessage(Paths.VALIDATE_SUBSCRIBER_STREAMING_SESSION, "error"));
+                error(e, p, constructMessage(VALIDATE_SUBSCRIBER_STREAMING_SESSION, "error"));
             }
         });
     }

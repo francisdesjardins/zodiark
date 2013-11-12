@@ -21,9 +21,11 @@ import org.zodiark.service.publisher.PublisherEndpoint;
 public class SubscriberEndpoint extends EndpointAdapter<SubscriberEndpoint> {
 
     private PublisherEndpoint publisherEndpoint;
+    private boolean isAuthenticated = true;
 
     public SubscriberEndpoint() {
         super();
+        isAuthenticated = false;
     }
 
     public SubscriberEndpoint publisherEndpoint(PublisherEndpoint publisherEndpoint) {
@@ -33,5 +35,14 @@ public class SubscriberEndpoint extends EndpointAdapter<SubscriberEndpoint> {
 
     public PublisherEndpoint publisherEndpoint() {
         return publisherEndpoint;
+    }
+
+    public boolean isAuthenticated() {
+        return isAuthenticated;
+    }
+
+    public SubscriberEndpoint isAuthenticated(boolean isAuthenticated) {
+        this.isAuthenticated = isAuthenticated;
+        return this;
     }
 }

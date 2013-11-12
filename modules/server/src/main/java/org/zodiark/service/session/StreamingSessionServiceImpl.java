@@ -19,7 +19,6 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
-import org.zodiark.protocol.Paths;
 import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
@@ -36,6 +35,13 @@ import org.zodiark.service.session.impl.ViewStreamingSession;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.zodiark.protocol.Paths.BEGIN_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.STREAMING_COMPLETE_ACTION;
+import static org.zodiark.protocol.Paths.STREAMING_EXECUTE_ACTION;
+import static org.zodiark.protocol.Paths.WOWZA_DEOBFUSCATE;
+import static org.zodiark.protocol.Paths.WOWZA_OBFUSCATE;
 
 @On("/streaming")
 public class StreamingSessionServiceImpl implements StreamingSessionService {
@@ -59,7 +65,7 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
         logger.trace("Handling {}", event);
 
         switch(event) {
-            case Paths.BEGIN_STREAMING_SESSION:
+            case BEGIN_STREAMING_SESSION:
                 PublisherEndpoint p = PublisherEndpoint.class.cast(message);
 
                 boolean hasStreamingSession = hasStreamingSession(p);
@@ -69,14 +75,14 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
                     initiate(p, l);
                 }
                 break;
-            case Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION:
+            case BEGIN_SUBSCRIBER_STREAMING_SESSION:
                 join(SubscriberEndpoint.class.cast(message), l);
                 break;
-            case Paths.STREAMING_EXECUTE_ACTION:
+            case STREAMING_EXECUTE_ACTION:
                 Action a = Action.class.cast(message);
                 executeAction(a, l);
                 break;
-            case Paths.STREAMING_COMPLETE_ACTION:
+            case STREAMING_COMPLETE_ACTION:
                 p = PublisherEndpoint.class.cast(message);
                 completeAction(p);
                 break;
@@ -97,7 +103,7 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
         final Action completedAction = session.pendingAction();
         session.pendingAction(null);
 
-        eventBus.dispatch(Paths.WOWZA_DEOBFUSCATE, session, new EventBusListener<StreamingSession>() {
+        eventBus.dispatch(WOWZA_DEOBFUSCATE, session, new EventBusListener<StreamingSession>() {
             @Override
             public void completed(StreamingSession session) {
                 logger.trace("Wowza de-obfuscation executed {}", completedAction);
@@ -121,7 +127,7 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
         }
         session.pendingAction(a);
 
-        eventBus.dispatch(Paths.WOWZA_OBFUSCATE, session, new EventBusListener<StreamingSession>() {
+        eventBus.dispatch(WOWZA_OBFUSCATE, session, new EventBusListener<StreamingSession>() {
             @Override
             public void completed(StreamingSession session) {
                 logger.trace("Wowza obfuscation executed {}", a);
