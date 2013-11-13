@@ -38,11 +38,12 @@ public class ZodiarkServer {
     private Nettosphere server;
     private final List<String> packages = new ArrayList<String>();
     private URI uri;
+    private String factory = ZodiarkObjectFactory.class.getName();
 
     public ZodiarkServer() {
         builder.resource(EnvelopeDigester.class)
                 .initParam(ApplicationConfig.CUSTOM_ANNOTATION_PACKAGE, EventBusAnnotationProcessor.class.getPackage().getName())
-                .initParam(ApplicationConfig.OBJECT_FACTORY, ZodiarkObjectFactory.class.getName());
+                .initParam(ApplicationConfig.OBJECT_FACTORY, factory);
     }
 
     public ZodiarkServer listen(URI uri) {
@@ -86,6 +87,15 @@ public class ZodiarkServer {
             }
         }
         return this;
+    }
+
+    public ZodiarkServer factory(String factory) {
+        this.factory = factory;
+        return this;
+    }
+
+    public String factory() {
+        return factory;
     }
 
     private String toList() {
