@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.zodiark.protocol.Paths.BEGIN_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.BROADCASTER_CREATE;
 import static org.zodiark.protocol.Paths.CREATE_PUBLISHER_SESSION;
 import static org.zodiark.protocol.Paths.DB_CONFIG;
 import static org.zodiark.protocol.Paths.DB_INIT;
@@ -170,7 +171,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             public void failed(PublisherEndpoint p) {
                 error(e, p, constructMessage(BEGIN_STREAMING_SESSION, "error"));
             }
-        });
+        }).dispatch(BROADCASTER_CREATE, p);
     }
 
     Message constructMessage(String path, String status) {

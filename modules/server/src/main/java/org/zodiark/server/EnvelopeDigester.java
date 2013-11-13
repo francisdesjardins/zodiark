@@ -16,39 +16,21 @@
 package org.zodiark.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.atmosphere.cache.UUIDBroadcasterCache;
-import org.atmosphere.client.TrackMessageSizeInterceptor;
-import org.atmosphere.config.service.AtmosphereHandlerService;
-import org.atmosphere.cpr.AtmosphereRequest;
+import org.atmosphere.config.service.AtmosphereInterceptorService;
+import org.atmosphere.cpr.Action;
+import org.atmosphere.cpr.AtmosphereConfig;
+import org.atmosphere.cpr.AtmosphereInterceptor;
 import org.atmosphere.cpr.AtmosphereResource;
-import org.atmosphere.cpr.AtmosphereResourceEvent;
-import org.atmosphere.cpr.AtmosphereResponse;
-import org.atmosphere.cpr.Broadcaster;
-import org.atmosphere.cpr.FrameworkConfig;
-import org.atmosphere.cpr.Serializer;
-import org.atmosphere.handler.AtmosphereHandlerAdapter;
-import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
-import org.atmosphere.interceptor.HeartbeatInterceptor;
 import org.atmosphere.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
-import org.zodiark.protocol.Message;
 import org.zodiark.server.annotation.Inject;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
-import static org.atmosphere.cpr.ApplicationConfig.SUSPENDED_ATMOSPHERE_RESOURCE_UUID;
-
-@AtmosphereHandlerService(
-        path = "/",
-        broadcasterCache = UUIDBroadcasterCache.class,
-        interceptors = {AtmosphereResourceLifecycleInterceptor.class,
-                HeartbeatInterceptor.class,
-                TrackMessageSizeInterceptor.class}
-)
-public class EnvelopeDigester extends AtmosphereHandlerAdapter {
+@AtmosphereInterceptorService
+public class EnvelopeDigester implements AtmosphereInterceptor {
 
     private final ObjectMapper mapper = new ObjectMapper();
     private Logger logger = LoggerFactory.getLogger(EnvelopeDigester.class);
@@ -56,74 +38,44 @@ public class EnvelopeDigester extends AtmosphereHandlerAdapter {
     @Inject
     public EventBus eventBus;
 
-    public void onRequest(final AtmosphereResource r) throws IOException {
-        String message = IOUtils.readEntirely(r).toString();
-        if (!message.isEmpty()) {
-            try {
-                final Envelope e = mapper.readValue(message, Envelope.class);
-
-                if (e.getUuid().isEmpty()) {
-                    e.setUuid(r.uuid());
-                }
-
-                logger.debug("\n\n{}\n\n", message);
-                // TODO: Dangerous and inneficient. A hacker can broken us quite easily.
-                if (!e.getMessage().getPath().startsWith("/chat")) {
-                    eventBus.dispatch(e, r);
-                } else {
-                    // TODO: This works only for websocket. Instead we need to creates the Chatroom
-                    // as soon as the Subscriber connect and dispatch the long-polled connection
-                    // to the associated Broadcaster
-                    /**
-                     * (1) Publisher Connect, Create the room
-                     * (2) Add automatically subscribers
-                     */
-                    final AtmosphereRequest request = r.getRequest();
-                    final AtmosphereResponse response = r.getResponse();
-
-                    // Prevent Atmosphere from ignoring multi level Atmosphere dispatch
-                    request.setAttribute(SUSPENDED_ATMOSPHERE_RESOURCE_UUID, null);
-
-                    // We redispatch the request to Atmosphere, we create a virtual Broadcaster
-                    final Broadcaster b = r.getAtmosphereConfig().getBroadcasterFactory().lookup(e.getMessage().getPath(), true);
-                    b.addAtmosphereResource(r);
-
-                    r.setBroadcaster(b);
-                    request.pathInfo(e.getMessage().getPath())
-                        .body(e.getMessage().getData()).attributes().put(FrameworkConfig.INJECTED_ATMOSPHERE_RESOURCE, r);
-
-                    r.setSerializer(new Serializer() {
-                        @Override
-                        public void write(OutputStream os, Object o) throws IOException {
-                            Message m = new Message();
-                            m.setPath(e.getMessage().getPath());
-                            m.setData(o.toString());
-                            byte[] message = mapper.writeValueAsBytes(Envelope.newServerToSubscriberResponse(e.getUuid(), m));
-                            try {
-                                os.write(message);
-                            } finally {
-                                b.removeAtmosphereResource(r);
-                                request.destroy(true);
-                                response.destroy(true);
-                            }
-                        }
-                    });
-
-                    r.getAtmosphereConfig().framework().doCometSupport(request.destroyable(false), response.destroyable(false));
-                }
-            } catch (Exception ex) {
-                logger.error("", ex);
-                Envelope e = Envelope.newError(r.uuid());
-                r.write(mapper.writeValueAsString(e)).close();
-            }
-        } else {
-            logger.debug("Empty envelope for {}", r);
-        }
+    @Override
+    public void configure(AtmosphereConfig config) {
     }
 
     @Override
-    public void onStateChange(AtmosphereResourceEvent event) throws IOException {
-        logger.trace("onRequest {}", event.getResource().uuid());
+    public Action inspect(AtmosphereResource r) {
+        if (r.getRequest().getAttribute("dispatched") == null) {
+            String message = IOUtils.readEntirely(r).toString();
+            if (!message.isEmpty()) {
+                try {
+                    final Envelope e = mapper.readValue(message, Envelope.class);
+
+                    if (e.getUuid() == null || e.getUuid().isEmpty()) {
+                        e.setUuid(r.uuid());
+                    }
+
+                    logger.debug("\n\n{}\n\n", message);
+                    eventBus.dispatch(e, r);
+                } catch (Exception ex) {
+                    logger.error("", ex);
+                    Envelope e = Envelope.newError(r.uuid());
+                    try {
+                        r.write(mapper.writeValueAsString(e)).close();
+                    } catch (IOException e1) {
+                        logger.error("{}", e1);
+                    }
+                }
+                return Action.SKIP_ATMOSPHEREHANDLER;
+            }
+        } else {
+            logger.debug("Redispatching {}", r);
+            r.getRequest().removeAttribute("dispatched");
+        }
+        return Action.CONTINUE;
     }
 
+    @Override
+    public void postInspect(AtmosphereResource r) {
+
+    }
 }

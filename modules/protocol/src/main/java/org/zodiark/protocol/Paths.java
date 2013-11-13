@@ -104,4 +104,9 @@ public interface Paths {
 
     String SUBSCRIBER_BROWSER_HANDSHAKE_OK = "/subscriber/handshake/OK";
 
+    String BROADCASTER_CREATE = "/broadcaster/create";
+
+    String BROADCASTER_TRACK = "/broadcaster/track";
+
+    String BROADCASTER_DISPATCH = "/broadcaster/dispatch";
 }

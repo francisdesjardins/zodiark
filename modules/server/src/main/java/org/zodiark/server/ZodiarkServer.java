@@ -76,10 +76,13 @@ public class ZodiarkServer {
             packages.add(annotatedClass.getName());
         } else {
             On s = annotatedClass.getAnnotation(On.class);
-            try {
-                EventBusFactory.getDefault().eventBus().on(s.value(), server.framework().newClassInstance(annotatedClass));
-            } catch (Exception e) {
-                logger.error("Unable to create Service {}", annotatedClass, e);
+            String[] values = s.value();
+            for (String v : values) {
+                try {
+                    EventBusFactory.getDefault().eventBus().on(v, server.framework().newClassInstance(annotatedClass));
+                } catch (Exception e) {
+                    logger.error("Unable to create Service {}", annotatedClass, e);
+                }
             }
         }
         return this;

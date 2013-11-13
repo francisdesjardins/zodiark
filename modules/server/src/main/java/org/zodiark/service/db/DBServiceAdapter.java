@@ -25,7 +25,7 @@ public class DBServiceAdapter implements DBService {
     public void serve(Envelope e, AtmosphereResource r) {}
 
     @Override
-    public void serve(String event, Object r, EventBusListener l) {}
+    public void serve(String event, Object message, EventBusListener l) {}
 
 }
 

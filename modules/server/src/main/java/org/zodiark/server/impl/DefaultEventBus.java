@@ -60,7 +60,7 @@ public class DefaultEventBus implements EventBus {
 
         logger.debug("Dispatching Envelop {} to Service {}", e, s);
 
-        if (e.getUuid().isEmpty()) {
+        if (e.getUuid().isEmpty() || e.getUuid().equals("0")) {
             e.setUuid(r.uuid());
         }
 

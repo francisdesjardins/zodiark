@@ -16,8 +16,8 @@
 package org.zodiark.subscriber;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.zodiark.protocol.ActorValue;
 import org.zodiark.protocol.Envelope;
@@ -52,33 +52,33 @@ public class SubscriberTest {
     public final static int findFreePort() {
         ServerSocket socket = null;
 
-        try {
-            socket = new ServerSocket(0);
-
-            return socket.getLocalPort();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (socket != null) {
-                try {
-                    socket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+//        try {
+//            socket = new ServerSocket(0);
+//
+//            return socket.getLocalPort();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (socket != null) {
+//                try {
+//                    socket.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
         return 8080;
     }
 
     private ZodiarkServer server;
     private int port = 8080;
 
-    @BeforeClass
+    @BeforeMethod
     public void startZodiark() {
         server = new ZodiarkServer().listen(URI.create("http://127.0.0.1:" + port)).on();
     }
 
-    @AfterClass
+    @AfterMethod
     public void stopZodiark() {
         if (server != null) server.off();
     }
@@ -194,17 +194,19 @@ public class SubscriberTest {
         final AtomicReference<SubscriberResults> sanswer = new AtomicReference<>();
         final ZodiarkClient subscriberClient = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
         final CountDownLatch platch = new CountDownLatch(1);
+        final AtomicReference<String> subscriberUUID = new AtomicReference<>();
 
         subscriberClient.handler(new OnEnvelopHandler() {
             @Override
             public boolean onEnvelop(Envelope e) throws IOException {
                 sanswer.set(mapper.readValue(e.getMessage().getData(), SubscriberResults.class));
+                subscriberUUID.set(e.getUuid());
                 platch.countDown();
                 return true;
             }
         }).open();
 
-        createSessionMessage = Envelope.newClientToServerRequest(
+        createSessionMessage = Envelope.newClientToServerRequest(subscriberUUID.get(),
                 new Message(new Path(Paths.CREATE_SUBSCRIBER_SESSION), mapper.writeValueAsString(new UserPassword("123456", "bar"))));
         createSessionMessage.setFrom(new From(ActorValue.SUBSCRIBER));
         subscriberClient.send(createSessionMessage);
@@ -224,7 +226,7 @@ public class SubscriberTest {
 
         StreamingRequest request = new StreamingRequestImpl(publisherUUID.get(), uuid.get());
 
-        startStreamingSession = Envelope.newClientToServerRequest(
+        startStreamingSession = Envelope.newClientToServerRequest(subscriberUUID.get(),
                 new Message(new Path(Paths.VALIDATE_SUBSCRIBER_STREAMING_SESSION), mapper.writeValueAsString(request)));
         createSessionMessage.setFrom(new From(ActorValue.SUBSCRIBER));
         subscriberClient.send(startStreamingSession);
@@ -377,11 +379,13 @@ public class SubscriberTest {
         final AtomicReference<SubscriberResults> sanswer = new AtomicReference<>();
         final ZodiarkClient subscriberClient = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
         final CountDownLatch platch = new CountDownLatch(1);
+        final AtomicReference<String> subscriberUUID = new AtomicReference<>();
 
         subscriberClient.handler(new OnEnvelopHandler() {
             @Override
             public boolean onEnvelop(Envelope e) throws IOException {
                 sanswer.set(mapper.readValue(e.getMessage().getData(), SubscriberResults.class));
+                subscriberUUID.set(e.getUuid());
                 platch.countDown();
                 return true;
             }
@@ -389,7 +393,7 @@ public class SubscriberTest {
 
         // ================ Subscriber create the session
 
-        createSessionMessage = Envelope.newClientToServerRequest(
+        createSessionMessage = Envelope.newClientToServerRequest( subscriberUUID.get(),
                 new Message(new Path(Paths.CREATE_SUBSCRIBER_SESSION), mapper.writeValueAsString(new UserPassword("123456", "bar"))));
         createSessionMessage.setFrom(new From(ActorValue.SUBSCRIBER));
         subscriberClient.send(createSessionMessage);
@@ -411,7 +415,7 @@ public class SubscriberTest {
         // ================ Join the Publisher Session
 
         StreamingRequest request = new StreamingRequestImpl(publisherUUID.get(), uuid.get());
-        startStreamingSession = Envelope.newClientToServerRequest(
+        startStreamingSession = Envelope.newClientToServerRequest(subscriberUUID.get(),
                 new Message(new Path(Paths.VALIDATE_SUBSCRIBER_STREAMING_SESSION), mapper.writeValueAsString(request)));
         startStreamingSession.setFrom(new From(ActorValue.SUBSCRIBER));
         subscriberClient.send(startStreamingSession);
@@ -425,7 +429,7 @@ public class SubscriberTest {
         Action action = new Action();
         action.setPath("/action/doSomething");
         action.setData("{ \"foo\":\"bar\"");
-        Envelope e = Envelope.newClientToServerRequest(
+        Envelope e = Envelope.newClientToServerRequest(subscriberUUID.get(),
                 new Message(new Path(Paths.SUBSCRIBER_ACTION), mapper.writeValueAsString(action)));
         e.setFrom(new From(ActorValue.SUBSCRIBER));
         final CountDownLatch actionLatch = new CountDownLatch(1);

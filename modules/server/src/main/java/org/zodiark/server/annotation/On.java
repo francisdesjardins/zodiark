@@ -30,6 +30,6 @@ public @interface On {
     /**
      * The event name to get notified.
      */
-    String value() default "/";
+    String[] value() default "/";
 
 }

@@ -38,6 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static org.zodiark.protocol.Paths.ACTION_VALIDATE;
 import static org.zodiark.protocol.Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.BROADCASTER_TRACK;
 import static org.zodiark.protocol.Paths.CREATE_SUBSCRIBER_SESSION;
 import static org.zodiark.protocol.Paths.DB_CONFIG;
 import static org.zodiark.protocol.Paths.DB_INIT;
@@ -110,7 +111,8 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     @Override
     public void connectEndpoint(AtmosphereResource r, Envelope e) {
         logger.info("Subscriber Connected {}", e);
-        response(e, createEndpoint(r, e.getMessage()), constructMessage(SUBSCRIBER_BROWSER_HANDSHAKE_OK, "OK"));
+        SubscriberEndpoint s = createEndpoint(r, e.getMessage());
+        response(e, s, constructMessage(SUBSCRIBER_BROWSER_HANDSHAKE_OK, "OK"));
     }
 
     @Override
@@ -238,10 +240,10 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     @Override
-    public void serve(String event, Object r, EventBusListener l) {
+    public void serve(String event, Object message, EventBusListener l) {
         switch (event) {
             case RETRIEVE_SUBSCRIBER:
-                retrieveEndpoint(r, l);
+                retrieveEndpoint(message, l);
                 break;
         }
     }
@@ -249,6 +251,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     private SubscriberEndpoint createEndpoint(AtmosphereResource resource, Message m) {
         SubscriberEndpoint s = context.newInstance(SubscriberEndpoint.class);
         s.uuid(resource.uuid()).message(m).resource(resource);
+        eventBus.dispatch(BROADCASTER_TRACK, s);
         return s;
     }
 

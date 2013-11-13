@@ -12,6 +12,7 @@ $(function () {
     var logged = false;
     var socket;
     var traceId = 0;
+    var uuid;
 
     input.removeAttr('disabled').focus();
 
@@ -27,13 +28,15 @@ $(function () {
             return;
         }
 
-        if (!logged && myName) {
-            logged = true;
-            status.text(myName + ': ').css('color', 'blue');
-        } else {
+        uuid = envelope.getUUID();
+        console.log("uuid: " + uuid);
+
+        if (json.author) {
             var me = json.author == author;
             var date = typeof(json.time) == 'string' ? parseInt(json.time) : json.time;
             addMessage(json.author, json.message, me ? 'blue' : 'black', new Date(date));
+        } else {
+            addMessage("", "Connected",'blue' , new Date());
         }
     };
 
@@ -46,7 +49,6 @@ $(function () {
     handler.onClose = function (response) {
         content.html($('<p>', { text: 'Server closed the connection after a timeout' }));
     }
-
 
     socket = new zodiark.Builder().url(document.location.toString()).build();
 
@@ -62,7 +64,7 @@ $(function () {
             }
 
             var message = zodiark.Message();
-            message.path("/chat/room1").data({ author: author, message: msg });
+            message.path("/chat/" + uuid).data({ author: author, message: msg });
 
             var envelope = new zodiark.Envelope()
                 .traceId(++traceId)

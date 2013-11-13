@@ -25,6 +25,6 @@ public class ServiceAdapter implements Service {
     }
 
     @Override
-    public void serve(String event, Object r, EventBusListener l) {
+    public void serve(String event, Object message, EventBusListener l) {
     }
 }
