@@ -52,21 +52,7 @@ public class SubscriberTest {
     public final static int findFreePort() {
         ServerSocket socket = null;
 
-//        try {
-//            socket = new ServerSocket(0);
-//
-//            return socket.getLocalPort();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (socket != null) {
-//                try {
-//                    socket.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
+
         return 8080;
     }
 
@@ -91,7 +77,21 @@ public class SubscriberTest {
 
         publisherClient.handler(new OnEnvelopHandler() {
             @Override
-            public boolean onEnvelop(Envelope e) throws IOException {
+            public boolean onEnvelop(Envelope e) throws IOException {        try {
+                        socket = new ServerSocket(0);
+
+                        return socket.getLocalPort();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        if (socket != null) {
+                            try {
+                                socket.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
                 answer.set(mapper.readValue(e.getMessage().getData(), SubscriberResults.class));
                 latch.countDown();
                 return true;
