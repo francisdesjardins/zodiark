@@ -96,6 +96,18 @@ public class BroadcastServiceImpl implements BroadcasterService {
         AtmosphereFramework f = r.getAtmosphereConfig().framework();
         final Broadcaster b = f.getBroadcasterFactory().lookup("/chat/" + uuid, true);
 
+        eventBus.dispatch(Paths.DB_WORD, p, new EventBusListener<BroadcasterDBResult>() {
+
+            @Override
+            public void completed(BroadcasterDBResult result) {
+                b.getBroadcasterConfig().addFilter(new WordBroadcastFilter(result));
+            }
+
+            @Override
+            public void failed(BroadcasterDBResult result) {
+                logger.error("{}", result);
+            }
+        });
         r.setBroadcaster(b);
 
         r.getRequest().setAttribute(SUSPENDED_ATMOSPHERE_RESOURCE_UUID, null);
@@ -111,6 +123,7 @@ public class BroadcastServiceImpl implements BroadcasterService {
                     os.write(mapper.writeValueAsBytes(o));
                 } else {
                     r.getRequest().removeAttribute("dispatched");
+                    b.removeAtmosphereResource(r);
                     Message m = new Message();
                     m.setPath("/chat/" + uuid);
                     m.setData(o.toString());

@@ -56,6 +56,8 @@ public interface Paths {
 
     String DB_INIT = "/db/init";
 
+    String DB_WORD = "/db/word";
+
     String SUBSCRIBER_VALIDATE_STATE = "/db/validate";
 
     String TERMINATE_STREAMING_SESSSION = "/publisher/disconnect";
