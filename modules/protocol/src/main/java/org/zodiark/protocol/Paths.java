@@ -111,4 +111,6 @@ public interface Paths {
     String BROADCASTER_TRACK = "/broadcaster/track";
 
     String BROADCASTER_DISPATCH = "/broadcaster/dispatch";
+
+    String BROADCAST_TO_ALL = "/broadcaster/toAll";
 }

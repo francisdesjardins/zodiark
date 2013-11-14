@@ -28,4 +28,6 @@ public interface BroadcasterService extends Service {
 
     void associatedSubscriber(SubscriberEndpoint s);
 
+    void broadcastToAll(Object message);
+
 }

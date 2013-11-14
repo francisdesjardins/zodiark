@@ -38,6 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static org.zodiark.protocol.Paths.BEGIN_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.BROADCAST_TO_ALL;
 import static org.zodiark.protocol.Paths.STREAMING_COMPLETE_ACTION;
 import static org.zodiark.protocol.Paths.STREAMING_EXECUTE_ACTION;
 import static org.zodiark.protocol.Paths.WOWZA_DEOBFUSCATE;
@@ -158,6 +159,7 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
         sessions.put(p.uuid(), s);
         s.publisher(p);
 
+        eventBus.dispatch(BROADCAST_TO_ALL, p);
         s.initAndAct();
 
         l.completed(p);

@@ -21,12 +21,12 @@ import org.atmosphere.cpr.AtmosphereRequest;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.cpr.Broadcaster;
+import org.atmosphere.cpr.MetaBroadcaster;
 import org.atmosphere.cpr.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
-import org.zodiark.protocol.Paths;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusListener;
 import org.zodiark.server.annotation.Inject;
@@ -39,6 +39,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import static org.atmosphere.cpr.ApplicationConfig.SUSPENDED_ATMOSPHERE_RESOURCE_UUID;
+import static org.zodiark.protocol.Paths.BROADCASTER_CREATE;
+import static org.zodiark.protocol.Paths.BROADCASTER_TRACK;
+import static org.zodiark.protocol.Paths.BROADCAST_TO_ALL;
+import static org.zodiark.protocol.Paths.DB_WORD;
 
 @On({"/chat", "/broadcaster"})
 public class BroadcastServiceImpl implements BroadcasterService {
@@ -58,14 +62,31 @@ public class BroadcastServiceImpl implements BroadcasterService {
     @Override
     public void serve(String event, Object message, EventBusListener l) {
         switch (event) {
-            case Paths.BROADCASTER_CREATE:
+            case BROADCASTER_CREATE:
                 createBroadcaster(PublisherEndpoint.class.cast(message));
                 break;
-            case Paths.BROADCASTER_TRACK:
+            case BROADCASTER_TRACK:
                 associatedSubscriber(SubscriberEndpoint.class.cast(message));
                 break;
+            case BROADCAST_TO_ALL: {
+                broadcastToAll(message);
+                break;
+            }
             default:
                 logger.error("Unhandled message {}", message);
+        }
+    }
+
+    @Override
+    public void broadcastToAll(Object message) {
+        if (PublisherEndpoint.class.isAssignableFrom(message.getClass())) {
+            PublisherEndpoint p = PublisherEndpoint.class.cast(message);
+
+            // TODO: Service for retrieving the proper message.
+            String m = p + " is about to start a new streaming session";
+
+            logger.debug("About to broadcast to all connected Endpoint {}", m);
+            MetaBroadcaster.getDefault().broadcastTo("/*", m);
         }
     }
 
@@ -96,7 +117,7 @@ public class BroadcastServiceImpl implements BroadcasterService {
         AtmosphereFramework f = r.getAtmosphereConfig().framework();
         final Broadcaster b = f.getBroadcasterFactory().lookup("/chat/" + uuid, true);
 
-        eventBus.dispatch(Paths.DB_WORD, p, new EventBusListener<BroadcasterDBResult>() {
+        eventBus.dispatch(DB_WORD, p, new EventBusListener<BroadcasterDBResult>() {
 
             @Override
             public void completed(BroadcasterDBResult result) {
