@@ -113,4 +113,9 @@ public interface Paths {
     String BROADCASTER_DISPATCH = "/broadcaster/dispatch";
 
     String BROADCAST_TO_ALL = "/broadcaster/toAll";
+
+    String MONITOR_RESOURCE = "/monitor/configure";
+
+    String DISCONNECTED_RESOURCE = "/db/disconnected";
+
 }

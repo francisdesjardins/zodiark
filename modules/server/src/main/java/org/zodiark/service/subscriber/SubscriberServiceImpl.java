@@ -45,6 +45,7 @@ import static org.zodiark.protocol.Paths.DB_INIT;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.JOIN_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.LOAD_CONFIG;
+import static org.zodiark.protocol.Paths.MONITOR_RESOURCE;
 import static org.zodiark.protocol.Paths.RETRIEVE_PUBLISHER;
 import static org.zodiark.protocol.Paths.RETRIEVE_SUBSCRIBER;
 import static org.zodiark.protocol.Paths.SUBSCRIBER_ACTION;
@@ -251,7 +252,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     private SubscriberEndpoint createEndpoint(AtmosphereResource resource, Message m) {
         SubscriberEndpoint s = context.newInstance(SubscriberEndpoint.class);
         s.uuid(resource.uuid()).message(m).resource(resource);
-        eventBus.dispatch(BROADCASTER_TRACK, s);
+        eventBus.dispatch(BROADCASTER_TRACK, s).dispatch(MONITOR_RESOURCE, resource);
         return s;
     }
 
