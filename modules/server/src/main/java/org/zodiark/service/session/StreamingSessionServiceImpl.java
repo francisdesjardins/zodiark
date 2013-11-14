@@ -54,7 +54,7 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
     @Inject
     public EventBus eventBus;
 
-    private ConcurrentHashMap<String, StreamingSession> sessions = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, StreamingSession> sessions = new ConcurrentHashMap<>();
 
     @Override
     public void serve(Envelope e, AtmosphereResource r) {

@@ -18,6 +18,7 @@ package org.zodiark.service.wowza;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+// TODO: Allow Injection of this guy
 public class WowzaEndpointManagerImpl implements WowzaEndpointManager {
 
     private final Queue<WowzaEndpoint> endpoints = new ConcurrentLinkedQueue<WowzaEndpoint>();

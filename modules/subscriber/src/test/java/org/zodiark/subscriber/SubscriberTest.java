@@ -71,7 +71,7 @@ public class SubscriberTest {
     }
 
     private ZodiarkServer server;
-    private int port = 8080;
+    private int port = findFreePort();
 
     @BeforeMethod
     public void startZodiark() {
@@ -350,12 +350,12 @@ public class SubscriberTest {
                     case Paths.ACTION_COMPLETED:
                         results = mapper.readValue(e.getMessage().getData(), PublisherResults.class);
                         System.out.println("Publisher Action completed");
+                        completed.countDown();
                         break;
                     case Paths.PUBLISHER_ABOUT_READY:
                         results = mapper.readValue(e.getMessage().getData(), PublisherResults.class);
 
                         finalMessage.set(results.getResults());
-                        completed.countDown();
                        break;
                 }
                 return false;

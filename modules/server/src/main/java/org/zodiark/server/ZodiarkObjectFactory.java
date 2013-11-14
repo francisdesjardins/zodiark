@@ -43,7 +43,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
     private final Logger logger = LoggerFactory.getLogger(ZodiarkObjectFactory.class);
 
-    private final EventBus evenBus = EventBusFactory.getDefault().eventBus();
+    private final EventBus eventBus = EventBusFactory.getDefault().eventBus();
     private final ObjectMapper mapper = new ObjectMapper();
     private final WowzaEndpointManager wowzaService = new WowzaEndpointManagerImpl();
     private final Class<? extends AuthConfig> authConfig = OKAuthConfig.class;
@@ -85,7 +85,7 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
                 if (field.getType().isAssignableFrom(ObjectMapper.class)) {
                     field.set(instance, mapper);
                 } else if (field.getType().isAssignableFrom(EventBus.class)) {
-                    field.set(instance, evenBus);
+                    field.set(instance, eventBus);
                 } else if (field.getType().isAssignableFrom(RESTService.class)) {
                     field.set(instance, newClassInstance(framework, restService));
                 } else if (field.getType().isAssignableFrom(WowzaEndpointManager.class)) {

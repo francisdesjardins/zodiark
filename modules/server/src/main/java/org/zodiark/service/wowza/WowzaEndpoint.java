@@ -54,7 +54,7 @@ public class WowzaEndpoint implements Endpoint {
 
     @Override
     public TYPE type() {
-        return TYPE.WOOZA;
+        return TYPE.WOWZA;
     }
 
     @Override

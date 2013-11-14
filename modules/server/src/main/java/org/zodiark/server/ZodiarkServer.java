@@ -36,7 +36,7 @@ public class ZodiarkServer {
     private final static Logger logger = LoggerFactory.getLogger(ZodiarkServer.class);
     private final Config.Builder builder = new Config.Builder();
     private Nettosphere server;
-    private final List<String> packages = new ArrayList<String>();
+    private final List<String> packages = new ArrayList<>();
     private URI uri;
     private String factory = ZodiarkObjectFactory.class.getName();
 
@@ -63,7 +63,7 @@ public class ZodiarkServer {
         builder.initParam(ApplicationConfig.ANNOTATION_PACKAGE, toList());
 
         if (uri == null) {
-            uri = URI.create("http://127.0.0.1:8080");
+            uri = URI.create("http://0.0.0.0:8080");
         }
 
         builder.port(uri.getPort()).host(uri.getHost()).build();

@@ -20,7 +20,7 @@ package org.zodiark.service;
  */
 public interface Endpoint {
 
-    public enum TYPE { PUBLISHER, SUBSCRIBER, WOOZA }
+    public enum TYPE { PUBLISHER, SUBSCRIBER, WOWZA}
 
     TYPE type();
 
