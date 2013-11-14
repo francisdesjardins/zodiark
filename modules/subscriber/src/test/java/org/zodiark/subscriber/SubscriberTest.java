@@ -41,9 +41,11 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URI;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class SubscriberTest {
 
@@ -434,7 +436,7 @@ public class SubscriberTest {
         e.setFrom(new From(ActorValue.SUBSCRIBER));
         final CountDownLatch actionLatch = new CountDownLatch(1);
         final AtomicReference<Envelope> response = new AtomicReference<>();
-
+        final AtomicBoolean timerCalled = new AtomicBoolean();
         subscriberClient.handler(new OnEnvelopHandler() {
             @Override
             public boolean onEnvelop(Envelope e) throws IOException {
@@ -446,6 +448,7 @@ public class SubscriberTest {
                     case Paths.ACTION_TIMER:
                         Time t = mapper.readValue(e.getMessage().getData(), Time.class);
                         System.out.println("Subscriber ===>" + t);
+                        timerCalled.set(true);
                         break;
                     case Paths.ACTION_COMPLETED:
                         SubscriberResults results = mapper.readValue(e.getMessage().getData(), SubscriberResults.class);
@@ -465,6 +468,7 @@ public class SubscriberTest {
 
         completed.await();
 
+        assertTrue(timerCalled.get());
         assertEquals("READY", finalMessage.get());
     }
 
