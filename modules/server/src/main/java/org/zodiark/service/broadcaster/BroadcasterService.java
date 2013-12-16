@@ -20,14 +20,25 @@ import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 
 /**
- * @author Jeanfrancois Arcand
+ * Handle the life cycle of Atmosphere's {@link BroadcasterService}
  */
 public interface BroadcasterService extends Service {
-
+    /**
+     * Create a {@link org.atmosphere.cpr.Broadcaster} based on a {@link PublisherEndpoint}
+     * @param p a {@link PublisherEndpoint}
+     */
     void createBroadcaster(PublisherEndpoint p);
 
+    /**
+     * Associate a {@link SubscriberEndpoint} to a {@link BroadcasterService}
+     * @param s {@link SubscriberEndpoint}
+     */
     void associatedSubscriber(SubscriberEndpoint s);
 
+    /**
+     * Broadcast a message to all connected {@link SubscriberEndpoint}
+     * @param message
+     */
     void broadcastToAll(Object message);
 
 }

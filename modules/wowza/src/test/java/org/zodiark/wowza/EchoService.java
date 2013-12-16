@@ -19,7 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
-import org.zodiark.server.EventBusListener;
+import org.zodiark.server.Reply;
 import org.zodiark.service.Service;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
@@ -40,6 +40,6 @@ public class EchoService implements Service {
     }
 
     @Override
-    public void serve(String event, Object message, EventBusListener l) {
+    public void serve(String event, Object message, Reply l) {
     }
 }

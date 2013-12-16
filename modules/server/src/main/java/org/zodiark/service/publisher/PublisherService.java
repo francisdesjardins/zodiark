@@ -17,7 +17,7 @@ package org.zodiark.service.publisher;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
-import org.zodiark.server.EventBusListener;
+import org.zodiark.server.Reply;
 import org.zodiark.service.Service;
 
 public interface PublisherService extends Service {
@@ -26,10 +26,10 @@ public interface PublisherService extends Service {
     public void serve(Envelope e, AtmosphereResource r) ;
 
     @Override
-    public void serve(String event, Object message, EventBusListener l);
+    public void serve(String event, Object message, Reply l);
 
-    public void retrieveEndpoint(Object s, EventBusListener l);
+    public void retrieveEndpoint(Object s, Reply l);
 
-    public void resetEndpoint(Object message, EventBusListener l);
+    public void resetEndpoint(Object message, Reply l);
 }
 

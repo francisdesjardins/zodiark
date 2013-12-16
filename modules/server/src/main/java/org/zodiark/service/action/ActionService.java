@@ -17,28 +17,60 @@ package org.zodiark.service.action;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
-import org.zodiark.server.EventBusListener;
+import org.zodiark.server.Reply;
 import org.zodiark.service.Service;
 import org.zodiark.service.publisher.PublisherEndpoint;
 
 /**
- * @author Jeanfrancois Arcand
+ * A {@link Service} for handling {@link Action}
  */
 public interface ActionService extends Service {
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void serve(Envelope e, AtmosphereResource r);
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void serve(String event, Object message, EventBusListener l);
+    public void serve(String event, Object message, Reply l);
 
-    public void validateAction(Action action, EventBusListener l);
+    /**
+     * Validate an {@link Action}
+     *
+     * @param action {@link Action}
+     * @param reply  a {@link Reply} for answering the {@link Service} that asked for an {@link Action}
+     */
+    public void validateAction(Action action, Reply reply);
 
+    /**
+     * Accept an {@link Action}
+     *
+     * @param e {@link Envelope}
+     */
     public void actionAccepted(Envelope e);
 
+    /**
+     * Refuse an {@link Action}
+     *
+     * @param e {@link Envelope}
+     */
     public void actionRefused(Envelope e);
 
+    /**
+     * Start processing the validation of an {@link Action}
+     *
+     * @param p      a {@link PublisherEndpoint}
+     * @param action an {@link Action}
+     */
     public void requestForAction(PublisherEndpoint p, Action action);
 
+    /**
+     * Action just started.
+     *
+     * @param e an {@link Envelope}
+     */
     public void actionStarted(Envelope e);
 }

@@ -17,7 +17,11 @@ package org.zodiark.service.broadcaster;
 
 import org.zodiark.service.db.DBResult;
 
+/**
+ * A placeholer for storing words that aren't allowed when using the {@link org.zodiark.service.chat.Chat}
+ */
 public class BroadcasterDBResult implements DBResult {
+    // TODO: Not Implemented
     public boolean deny(Object message) {
         return false;
     }

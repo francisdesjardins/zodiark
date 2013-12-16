@@ -36,25 +36,100 @@ import org.zodiark.service.wowza.WowzaEndpointManager;
 import org.zodiark.service.wowza.WowzaEndpointManagerImpl;
 
 import java.lang.reflect.Field;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * An {@link AtmosphereObjectFactory} that handles the injection of Zodiark's object. Field injection are discovered via the
+ * {@link Inject} annotation. Injection uses {@link Injectable} and {@link Extendable} implementation to discover what to inject and which
+ * default implementation class to use. Those default can be overridden by calling the {@link #extendable(Class, org.zodiark.server.ZodiarkObjectFactory.Extendable)}
+ * and {@link #injectable(Class, org.zodiark.server.ZodiarkObjectFactory.Injectable)}
+ * <p/>
+ * Injectable instances are
+ *  {@link EventBus}, {@link ObjectMapper}, {@link WowzaEndpointManager}, {@link StreamingRequest}
+ * <p/>
+ * Extendable classes are
+ *  {@link AuthConfig}, {@link PublisherConfig}, {@link SubscriberConfig}, {@link RESTService}
+ * <p/>
+ * Injectable and Extendable can be replaced.
+ * <p/>
+ * This class contains all default instanced used by the {@link org.zodiark.service.Service} and object used by this framework.
+ * Override this class to replace the default object injection.
+ */
 public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
     private final Logger logger = LoggerFactory.getLogger(ZodiarkObjectFactory.class);
 
-    private final EventBus eventBus = EventBusFactory.getDefault().eventBus();
-    private final ObjectMapper mapper = new ObjectMapper();
-    private final WowzaEndpointManager wowzaService = new WowzaEndpointManagerImpl();
-    private final Class<? extends AuthConfig> authConfig = OKAuthConfig.class;
-    private final Class<? extends PublisherConfig> publisherConfig = PublisherConfigImpl.class;
-    private final Class<? extends SubscriberConfig> subscriberConfig = SubscriberConfigImpl.class;
-
-    private final Class<? extends RESTService> restService = OKRestService.class;
-    private final StreamingRequest streamingRequest = new StreamingRequestImpl();
+    private final ConcurrentHashMap<Class<?>, Injectable> injectRepository = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Class<?>, Extendable> implementationRepository = new ConcurrentHashMap<>();
+    private final AtomicBoolean added = new AtomicBoolean();
     private ScheduledExecutorService timer = Executors.newScheduledThreadPool(200);
 
-    private final AtomicBoolean added = new AtomicBoolean();
+    public ZodiarkObjectFactory() {
+        // Install the default injectable
+        injectable(EventBus.class, new Injectable<EventBus>() {
+
+            @Override
+            public EventBus construct(Class<EventBus> t) {
+                return EventBusFactory.getDefault().eventBus();
+            }
+        });
+        injectable(ObjectMapper.class, new Injectable<ObjectMapper>() {
+
+            private final ObjectMapper mapper = new ObjectMapper();
+
+            @Override
+            public ObjectMapper construct(Class<ObjectMapper> t) {
+                return mapper;
+            }
+        });
+        injectable(WowzaEndpointManager.class, new Injectable<WowzaEndpointManager>() {
+
+            private final WowzaEndpointManager wowzaService = new WowzaEndpointManagerImpl();
+
+            @Override
+            public WowzaEndpointManager construct(Class<WowzaEndpointManager> t) {
+                return wowzaService;
+            }
+        });
+        injectable(StreamingRequest.class, new Injectable<StreamingRequest>() {
+
+            private final StreamingRequest streamingRequest = new StreamingRequestImpl();
+
+            @Override
+            public StreamingRequest construct(Class<StreamingRequest> t) {
+                return streamingRequest;
+            }
+        });
+
+        // Install the default extensable
+        extendable(AuthConfig.class, new Extendable<AuthConfig>() {
+            @Override
+            public Class<OKAuthConfig> extend(Class<AuthConfig> t) {
+                return OKAuthConfig.class;
+            }
+        });
+        extendable(PublisherConfig.class, new Extendable<PublisherConfig>() {
+            @Override
+            public Class<PublisherConfigImpl> extend(Class<PublisherConfig> t) {
+                return PublisherConfigImpl.class;
+            }
+        });
+        extendable(SubscriberConfig.class, new Extendable<SubscriberConfig>() {
+            @Override
+            public Class<SubscriberConfigImpl> extend(Class<SubscriberConfig> t) {
+                return SubscriberConfigImpl.class;
+            }
+        });
+
+        extendable(RESTService.class, new Extendable<RESTService>() {
+            @Override
+            public Class<OKRestService> extend(Class<RESTService> t) {
+                return OKRestService.class;
+            }
+        });
+    }
 
     @Override
     public <T> T newClassInstance(final AtmosphereFramework framework, Class<T> tClass) throws InstantiationException, IllegalAccessException {
@@ -70,11 +145,11 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
         }
 
         if (tClass.isAssignableFrom(AuthConfig.class)) {
-            return (T) newClassInstance(framework, authConfig);
+            return (T) newClassInstance(framework, implement(AuthConfig.class));
         } else if (tClass.isAssignableFrom(PublisherConfig.class)) {
-            return (T) newClassInstance(framework, publisherConfig);
+            return (T) newClassInstance(framework, implement(PublisherConfig.class));
         } else if (tClass.isAssignableFrom(SubscriberConfig.class)) {
-            return (T) newClassInstance(framework, subscriberConfig);
+            return (T) newClassInstance(framework, implement(SubscriberConfig.class));
         }
 
         T instance = tClass.newInstance();
@@ -83,13 +158,13 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
         for (Field field : fields) {
             if (field.isAnnotationPresent(Inject.class)) {
                 if (field.getType().isAssignableFrom(ObjectMapper.class)) {
-                    field.set(instance, mapper);
+                    field.set(instance, inject(ObjectMapper.class));
                 } else if (field.getType().isAssignableFrom(EventBus.class)) {
-                    field.set(instance, eventBus);
+                    field.set(instance, inject(EventBus.class));
                 } else if (field.getType().isAssignableFrom(RESTService.class)) {
-                    field.set(instance, newClassInstance(framework, restService));
+                    field.set(instance, newClassInstance(framework, implement(RESTService.class)));
                 } else if (field.getType().isAssignableFrom(WowzaEndpointManager.class)) {
-                    field.set(instance, wowzaService);
+                    field.set(instance, inject(WowzaEndpointManager.class));
                 } else if (field.getType().isAssignableFrom(Context.class)) {
                     field.set(instance, new Context() {
 
@@ -103,18 +178,81 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
                         }
                     });
                 } else if (field.getType().isAssignableFrom(AuthConfig.class)) {
-                    field.set(instance, newClassInstance(framework, authConfig));
+                    field.set(instance, newClassInstance(framework, implement(AuthConfig.class)));
                 } else if (field.getType().isAssignableFrom(PublisherConfig.class)) {
-                    field.set(instance, newClassInstance(framework, publisherConfig));
+                    field.set(instance, newClassInstance(framework, implement(PublisherConfig.class)));
                 } else if (field.getType().isAssignableFrom(SubscriberConfig.class)) {
-                    field.set(instance, newClassInstance(framework, subscriberConfig));
+                    field.set(instance, newClassInstance(framework, implement(SubscriberConfig.class)));
                 } else if (field.getType().isAssignableFrom(StreamingRequest.class)) {
-                    field.set(instance, streamingRequest);
+                    field.set(instance, inject(StreamingRequest.class));
                 } else if (field.getType().isAssignableFrom(ScheduledExecutorService.class)) {
                     field.set(instance, timer);
                 }
             }
         }
         return instance;
+    }
+
+    private <T> T inject(Class<T> clazz) {
+        Injectable<T> t = injectRepository.get(clazz);
+        if (t != null) {
+            return t.construct(clazz);
+        }
+        return null;
+    }
+
+    private <T> Class<? extends T> implement(Class<T> clazz) {
+        Extendable<T> t = implementationRepository.get(clazz);
+        if (t != null) {
+            return t.extend(clazz);
+        }
+        return null;
+    }
+
+    /**
+     * Register an {@link Injectable} that will be responsible for creation class T
+     * @param clazz a class
+     * @param injectable its associated {@link Injectable}
+     * @return this
+     */
+    public <T> ZodiarkObjectFactory injectable(Class<T> clazz, Injectable<T> injectable) {
+        injectRepository.put(clazz, injectable);
+        return this;
+    }
+    /**
+     * Register an {@link Extendable} that will return the associated implementation of class T
+     * @param clazz a class
+     * @param extendable its associated {@link Injectable}
+     * @return this
+     */
+    public <T> ZodiarkObjectFactory extendable(Class<T> clazz, Extendable<T> extendable) {
+        implementationRepository.put(clazz, extendable);
+        return this;
+    }
+
+    /**
+     * Handle creation of object of type T
+     * @param <T> A class of type T
+     */
+    public static interface Injectable<T>  {
+        /**
+         * Create an instance of T
+         * @param t a class to be created
+         * @return an instance of T
+         */
+        T construct(Class<T> t);
+    }
+
+    /**
+     * Handle implementation of class of type T
+     * @param <T>
+     */
+    public static interface Extendable<T>  {
+        /**
+         * Return the class' extending of T
+         * @param t A class extending T
+         * @return a class extending T
+         */
+        Class<? extends T> extend(Class<T> t);
     }
 }

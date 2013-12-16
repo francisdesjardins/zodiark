@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.server.EventBus;
-import org.zodiark.server.EventBusListener;
+import org.zodiark.server.Reply;
 import org.zodiark.service.Service;
 
 import java.util.Collection;
@@ -37,25 +37,25 @@ public class DefaultEventBus implements EventBus {
 
     private final EndpointMapper<Service> mapper = new DefaultEndpointMapper<>();
     private final ConcurrentHashMap<String, Service> services = new ConcurrentHashMap<>();
-    private final EventBusListener l = new EventBusListener() {
+    private final Reply l = new Reply() {
         @Override
-        public void completed(Object response) {
+        public void ok(Object response) {
             logger.trace("completed", response);
         }
 
         @Override
-        public void failed(Object response) {
+        public void fail(Object response) {
             logger.trace("failed", response);
         }
     };
 
     @Override
-    public EventBus dispatch(Envelope e, AtmosphereResource o) {
-        return dispatch(e, o, l);
+    public EventBus ioEvent(Envelope e, AtmosphereResource o) {
+        return ioEvent(e, o, l);
     }
 
     @Override
-    public EventBus dispatch(Envelope e, AtmosphereResource r, EventBusListener l) {
+    public EventBus ioEvent(Envelope e, AtmosphereResource r, Reply reply) {
         Service s = mapper.map(e.getMessage().getPath(), services);
 
         logger.debug("Dispatching Envelop {} to Service {}", e, s);
@@ -71,39 +71,39 @@ public class DefaultEventBus implements EventBus {
             Message m = new Message();
             m.setPath("/error");
             Envelope error = Envelope.newServerReply(e, m);
-            dispatch(error, r);
+            ioEvent(error, r);
         }
         return this;
     }
 
     @Override
-    public EventBus dispatch(String e, Object r, EventBusListener l) {
-        Service s = mapper.map(e, services);
+    public EventBus message(String path, Object message, Reply reply) {
+        Service s = mapper.map(path, services);
 
-        logger.debug("Dispatching Message {} to {}", e, s);
+        logger.debug("Dispatching Message {} to {}", path, s);
 
         if (s != null) {
-            s.serve(e, r, l);
+            s.serve(path, message, reply);
         } else {
-            logger.error("No Service available for {}", e);
+            logger.error("No Service available for {}", path);
         }
         return this;
     }
 
     @Override
-    public EventBus dispatch(String message, Object o) {
-        return dispatch(message, o, l);
+    public EventBus message(String path, Object message) {
+        return message(path, message, l);
     }
 
     @Override
-    public EventBus on(String eventName, Service e) {
-        logger.debug("{} => {}", eventName, e);
-        services.put(eventName, e);
+    public EventBus on(String path, Service service) {
+        logger.debug("{} => {}", path, service);
+        services.put(path, service);
         return this;
     }
 
     @Override
-    public EventBus off(String eventName) {
+    public EventBus off(String path) {
         return null;
     }
 

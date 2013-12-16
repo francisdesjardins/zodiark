@@ -17,7 +17,7 @@ package org.zodiark.service.db;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zodiark.server.EventBusListener;
+import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
@@ -32,16 +32,16 @@ public class ValidateService extends DBServiceAdapter {
     public RESTService restService;
 
     @Override
-    public void serve(String event, Object message, EventBusListener l) {
+    public void serve(String event, Object message, Reply l) {
         logger.trace("Servicing {}", event);
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             EndpointAdapter p = EndpointAdapter.class.cast(message);
             SubscriberConfig config = restService.post("/validate/" + p.uuid(), p.message(), SubscriberConfig.class);
 
             if (config.isStateValid()) {
-                l.completed(p);
+                l.ok(p);
             } else {
-                l.failed(p);
+                l.fail(p);
             }
         }
     }

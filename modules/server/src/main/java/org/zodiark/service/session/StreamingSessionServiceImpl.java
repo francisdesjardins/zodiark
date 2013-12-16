@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
-import org.zodiark.server.EventBusListener;
+import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.action.Action;
@@ -62,7 +62,7 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
     }
 
     @Override
-    public void serve(String event, Object message, EventBusListener l) {
+    public void serve(String event, Object message, Reply l) {
         logger.trace("Handling {}", event);
 
         switch(event) {
@@ -104,22 +104,22 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
         final Action completedAction = session.pendingAction();
         session.pendingAction(null);
 
-        eventBus.dispatch(WOWZA_DEOBFUSCATE, session, new EventBusListener<StreamingSession>() {
+        eventBus.message(WOWZA_DEOBFUSCATE, session, new Reply<StreamingSession>() {
             @Override
-            public void completed(StreamingSession session) {
+            public void ok(StreamingSession session) {
                 logger.trace("Wowza de-obfuscation executed {}", completedAction);
                 session.completeAction(completedAction);
             }
 
             @Override
-            public void failed(StreamingSession action) {
+            public void fail(StreamingSession action) {
                 logger.error("Error finishing Session {}", action);
             }
         });
     }
 
     @Override
-    public void executeAction(final Action a, final EventBusListener l) {
+    public void executeAction(final Action a, final Reply l) {
 
         PublisherEndpoint p = a.subscriber().publisherEndpoint();
         final StreamingSession session = sessions.get(p.uuid());
@@ -128,48 +128,48 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
         }
         session.pendingAction(a);
 
-        eventBus.dispatch(WOWZA_OBFUSCATE, session, new EventBusListener<StreamingSession>() {
+        eventBus.message(WOWZA_OBFUSCATE, session, new Reply<StreamingSession>() {
             @Override
-            public void completed(StreamingSession session) {
+            public void ok(StreamingSession session) {
                 logger.trace("Wowza obfuscation executed {}", a);
                 session.executeAction(a);
                 // TODO: Do we need to call the subscriber
-                l.completed(a);
+                l.ok(a);
             }
 
             @Override
-            public void failed(StreamingSession action) {
-                l.failed(action);
+            public void fail(StreamingSession action) {
+                l.fail(action);
             }
         });
 
     }
 
     @Override
-    public void terminate(PublisherEndpoint p, EventBusListener l) {
+    public void terminate(PublisherEndpoint p, Reply l) {
         logger.trace("Terminating streaming session {}", p);
         StreamingSession s = sessions.remove(p.uuid());
         s.terminate();
     }
 
     @Override
-    public void initiate(PublisherEndpoint p, EventBusListener l) {
+    public void initiate(PublisherEndpoint p, Reply l) {
         logger.trace("Starting streaming session {}", p);
         StreamingSession s = sessionType(p);
         sessions.put(p.uuid(), s);
         s.publisher(p);
 
-        eventBus.dispatch(BROADCAST_TO_ALL, p);
+        eventBus.message(BROADCAST_TO_ALL, p);
         s.initAndAct();
 
-        l.completed(p);
+        l.ok(p);
     }
 
     @Override
-    public void join(SubscriberEndpoint s, EventBusListener l) {
+    public void join(SubscriberEndpoint s, Reply l) {
         boolean hasStreamingSession = hasStreamingSession(s.publisherEndpoint());
         if (!hasStreamingSession) {
-            l.failed(s);
+            l.fail(s);
         } else {
             StreamingSession streamingSession = sessions.get(s.publisherEndpoint().uuid());
             streamingSession.validateAndJoin(s, l);

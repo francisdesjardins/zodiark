@@ -18,6 +18,9 @@ package org.zodiark.service.broadcaster;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.PerRequestBroadcastFilter;
 
+/**
+ * A {@link org.atmosphere.cpr.BroadcastFilter} for filtering banned word from the {@link org.zodiark.service.chat.Chat}
+ */
 public class WordBroadcastFilter implements PerRequestBroadcastFilter {
 
     private final BroadcasterDBResult broadcasterDBResult;

@@ -27,7 +27,7 @@ import java.io.IOException;
 
 /**
  * Simple annotated class that demonstrate the power of Atmosphere. This class supports all transports, support
- * message length garantee, heart beat, message cache thanks to the @managedAService.
+ * message length guarantee, heart beat, message cache thanks to the @managedAService.
  */
 @ManagedService(path = "/{room}")
 public class Chat {
@@ -36,7 +36,7 @@ public class Chat {
     /**
      * Invoked when the connection as been fully established and suspended, e.g ready for receiving messages.
      *
-     * @param r
+     * @param r an {@link AtmosphereResource}
      */
     @Ready
     public void onReady(final AtmosphereResource r) {
@@ -46,7 +46,7 @@ public class Chat {
     /**
      * Invoked when the client disconnect or when an unexpected closing of the underlying connection happens.
      *
-     * @param event
+     * @param event {@link AtmosphereResourceEvent}
      */
     @Disconnect
     public void onDisconnect(AtmosphereResourceEvent event) {

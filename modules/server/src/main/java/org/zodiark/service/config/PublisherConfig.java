@@ -18,9 +18,22 @@ package org.zodiark.service.config;
 import org.zodiark.service.db.DBResult;
 import org.zodiark.service.session.StreamingSession;
 
+/**
+ * The data associated with a {@link org.zodiark.service.publisher.PublisherEndpoint}
+ */
 public interface PublisherConfig extends DBResult {
+    /**
+     * The current {@link StreamingSession.TYPE}
+     *
+     * @return the {@link StreamingSession.TYPE}
+     */
+    StreamingSession.TYPE sessionType();
 
-    StreamingSession.TYPE  sessionType();
-
+    /**
+     * Set the current {@link StreamingSession.TYPE}
+     *
+     * @param streamingSessionType {@link StreamingSession.TYPE}
+     * @return this
+     */
     PublisherConfig sessionType(StreamingSession.TYPE streamingSessionType);
 }

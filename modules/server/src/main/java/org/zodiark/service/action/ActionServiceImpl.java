@@ -25,7 +25,7 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.protocol.Paths;
 import org.zodiark.server.EventBus;
-import org.zodiark.server.EventBusListener;
+import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.publisher.PublisherEndpoint;
@@ -44,7 +44,7 @@ public class ActionServiceImpl implements ActionService {
 
     private final Logger logger = LoggerFactory.getLogger(ActionServiceImpl.class);
     // TODO: Timer to clear action that were never accepted.
-    private final ConcurrentHashMap<String, EventBusListener> handshakingActions = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Reply> handshakingActions = new ConcurrentHashMap<>();
 
     @Inject
     public EventBus eventBus;
@@ -70,12 +70,15 @@ public class ActionServiceImpl implements ActionService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void actionStarted(Envelope e) {
         try {
             final PublisherResults results = mapper.readValue(e.getMessage().getData(), PublisherResults.class);
-            eventBus.dispatch(Paths.RETRIEVE_PUBLISHER, results.getUuid(), new EventBusListener<PublisherEndpoint>() {
+            eventBus.message(Paths.RETRIEVE_PUBLISHER, results.getUuid(), new Reply<PublisherEndpoint>() {
                 @Override
-                public void completed(final PublisherEndpoint p) {
+                public void ok(final PublisherEndpoint p) {
 
                     final AtomicInteger time = new AtomicInteger(p.action().time());
                     final AtmosphereResource publisher = p.resource();
@@ -125,14 +128,14 @@ public class ActionServiceImpl implements ActionService {
                             } catch (JsonProcessingException e1) {
                                 logger.error("", e1);
                             } finally {
-                                eventBus.dispatch(Paths.STREAMING_COMPLETE_ACTION, p);
+                                eventBus.message(Paths.STREAMING_COMPLETE_ACTION, p);
                             }
                         }
                     }, p.action().time(), TimeUnit.SECONDS);
                 }
 
                 @Override
-                public void failed(PublisherEndpoint p) {
+                public void fail(PublisherEndpoint p) {
                     logger.error("Unable to retrieve Publishere for {}", results.getUuid());
                 }
             });
@@ -144,8 +147,11 @@ public class ActionServiceImpl implements ActionService {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void serve(String event, Object message, EventBusListener l) {
+    public void serve(String event, Object message, Reply l) {
         switch (event) {
             case Paths.ACTION_VALIDATE:
                 if (Action.class.isAssignableFrom(message.getClass())) {
@@ -157,35 +163,41 @@ public class ActionServiceImpl implements ActionService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void validateAction(final Action action, final EventBusListener l) {
+    public void validateAction(final Action action, final Reply reply) {
         final SubscriberEndpoint s = action.subscriber();
         final PublisherEndpoint p = s.publisherEndpoint();
 
         if (p.actionInProgress()) {
-            l.failed(s);
+            reply.fail(s);
             return;
         }
         p.action(action);
 
-        eventBus.dispatch(Paths.SUBSCRIBER_VALIDATE_STATE, s, new EventBusListener<SubscriberEndpoint>() {
+        eventBus.message(Paths.SUBSCRIBER_VALIDATE_STATE, s, new Reply<SubscriberEndpoint>() {
             @Override
-            public void completed(SubscriberEndpoint s) {
+            public void ok(SubscriberEndpoint s) {
                 logger.trace("Action {} succeeded. Sending request to publisher {}", action, s);
 
                 // No need to have a listener here since the response will be dispatched to EnvelopeDigester
                 action.setPath(Paths.ACTION_ACCEPT);
-                handshakingActions.put(s.uuid(), l);
+                handshakingActions.put(s.uuid(), reply);
                 requestForAction(p, action);
             }
 
             @Override
-            public void failed(SubscriberEndpoint s) {
-                l.failed(s);
+            public void fail(SubscriberEndpoint s) {
+                reply.fail(s);
             }
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void requestForAction(PublisherEndpoint p, Action action) {
         Message m = constructMessage(action);
@@ -210,40 +222,42 @@ public class ActionServiceImpl implements ActionService {
         return m;
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionAccepted(Envelope e) {
         try {
             final Action action = mapper.readValue(e.getMessage().getData(), Action.class);
 
-            eventBus.dispatch(Paths.RETRIEVE_SUBSCRIBER, action.getSubscriberUUID(), new EventBusListener<SubscriberEndpoint>() {
+            eventBus.message(Paths.RETRIEVE_SUBSCRIBER, action.getSubscriberUUID(), new Reply<SubscriberEndpoint>() {
                 @Override
-                public void completed(SubscriberEndpoint s) {
+                public void ok(SubscriberEndpoint s) {
                     action.subscriber(s);
                 }
 
                 @Override
-                public void failed(SubscriberEndpoint s) {
+                public void fail(SubscriberEndpoint s) {
                     logger.error("No Endpoint");
                 }
             });
 
-            EventBusListener l = handshakingActions.remove(action.getSubscriberUUID());
+            Reply l = handshakingActions.remove(action.getSubscriberUUID());
             if (l == null) {
                 throw new IllegalStateException("Invalid state");
             }
 
             // Send OK
-            l.completed(action);
+            l.ok(action);
 
-            eventBus.dispatch(Paths.STREAMING_EXECUTE_ACTION, action, new EventBusListener<Action>() {
+            eventBus.message(Paths.STREAMING_EXECUTE_ACTION, action, new Reply<Action>() {
                 @Override
-                public void completed(Action action) {
+                public void ok(Action action) {
 
                 }
 
                 @Override
-                public void failed(Action action) {
+                public void fail(Action action) {
 
                 }
             });
@@ -252,16 +266,19 @@ public class ActionServiceImpl implements ActionService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionRefused(Envelope e) {
         try {
             Action action = mapper.readValue(e.getMessage().getData(), Action.class);
-            EventBusListener l = handshakingActions.remove(action.getSubscriberUUID());
+            Reply l = handshakingActions.remove(action.getSubscriberUUID());
             if (l == null) {
                 throw new IllegalStateException("Invalid state");
             }
 
-            l.failed(action);
+            l.fail(action);
         } catch (IOException e1) {
             logger.error("", e1);
         }

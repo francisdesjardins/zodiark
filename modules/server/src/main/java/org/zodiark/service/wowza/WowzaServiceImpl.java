@@ -25,7 +25,7 @@ import org.zodiark.protocol.Message;
 import org.zodiark.protocol.Paths;
 import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
-import org.zodiark.server.EventBusListener;
+import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
@@ -59,9 +59,9 @@ public class WowzaServiceImpl implements WowzaService {
                 logger.debug("Obfuscation executed");
                 try {
                     final WowzaMessage w = mapper.readValue(e.getMessage().getData(), WowzaMessage.class);
-                    evenBus.dispatch(Paths.RETRIEVE_PUBLISHER, w.getPublisherUUID(), new EventBusListener<PublisherEndpoint>() {
+                    evenBus.message(Paths.RETRIEVE_PUBLISHER, w.getPublisherUUID(), new Reply<PublisherEndpoint>() {
                         @Override
-                        public void completed(PublisherEndpoint p) {
+                        public void ok(PublisherEndpoint p) {
                             try {
                                 AtmosphereResource r = p.resource();
                                 Message m = new Message();
@@ -75,7 +75,7 @@ public class WowzaServiceImpl implements WowzaService {
                         }
 
                         @Override
-                        public void failed(PublisherEndpoint p) {
+                        public void fail(PublisherEndpoint p) {
                             logger.error("No Publisher found", w.getPublisherUUID());
                         }
                     });
@@ -86,7 +86,7 @@ public class WowzaServiceImpl implements WowzaService {
             case Paths.WOWZA_DEOBFUSCATE_OK:
                 try {
                     final WowzaMessage w = mapper.readValue(e.getMessage().getData(), WowzaMessage.class);
-                    evenBus.dispatch(Paths.PUBLISHER_ABOUT_READY, w.getPublisherUUID());
+                    evenBus.message(Paths.PUBLISHER_ABOUT_READY, w.getPublisherUUID());
                 } catch (IOException e1) {
                     logger.error("{}", e1);
                 }
@@ -101,7 +101,7 @@ public class WowzaServiceImpl implements WowzaService {
 
     // Will be called when the Publisher is ready to start a streaming show
     @Override
-    public void serve(String event, Object message, EventBusListener l) {
+    public void serve(String event, Object message, Reply l) {
 
         switch (event) {
             case Paths.WOWZA_OBFUSCATE:
@@ -110,7 +110,7 @@ public class WowzaServiceImpl implements WowzaService {
                 if (w != null) {
                     w.obfuscate(session, l);
                 } else {
-                    l.failed(session);
+                    l.fail(session);
                 }
                 break;
             case Paths.WOWZA_DEOBFUSCATE:
@@ -119,7 +119,7 @@ public class WowzaServiceImpl implements WowzaService {
                 if (w != null) {
                     w.deobfuscate(session, l);
                 } else {
-                    l.failed(session);
+                    l.fail(session);
                 }
                 break;
             case Paths.WOWZA_CONNECT:
@@ -129,7 +129,7 @@ public class WowzaServiceImpl implements WowzaService {
                     if (w != null) {
                         w.isEndpointConnected(p, l);
                     } else {
-                        l.failed(p);
+                        l.fail(p);
                     }
                 }
                 break;

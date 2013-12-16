@@ -18,6 +18,9 @@ package org.zodiark.service.action;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 
+/**
+ * Represent an Action that can be submitted by a {@link SubscriberEndpoint}
+ */
 public class Action {
 
     private String path;

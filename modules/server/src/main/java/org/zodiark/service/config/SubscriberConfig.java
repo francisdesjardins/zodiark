@@ -18,11 +18,30 @@ package org.zodiark.service.config;
 import org.zodiark.service.db.DBResult;
 import org.zodiark.service.session.StreamingSession;
 
+/**
+ * The data associated with a {@link org.zodiark.service.subscriber.SubscriberEndpoint}
+ */
 public interface SubscriberConfig extends DBResult {
-
+    /**
+     * The current {@link StreamingSession.TYPE}
+     *
+     * @return the {@link StreamingSession.TYPE}
+     */
     StreamingSession.TYPE sessionType();
 
+    /**
+     * Set the current {@link StreamingSession.TYPE}
+     *
+     * @param streamingSessionType {@link StreamingSession.TYPE}
+     * @return this
+     */
     SubscriberConfig sessionType(StreamingSession.TYPE streamingSessionType);
 
+    /**
+     * Make sure the {@link org.zodiark.service.subscriber.SubscriberEndpoint} has the proper
+     * state for executing {@link org.zodiark.service.action.Action}, joining session/chat et.c
+     *
+     * @return true is valid
+     */
     boolean isStateValid();
 }

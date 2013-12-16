@@ -17,12 +17,12 @@ package org.zodiark.service;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
-import org.zodiark.server.EventBusListener;
+import org.zodiark.server.Reply;
 
 public interface Service {
 
     void serve(Envelope e, AtmosphereResource r);
 
-    void serve(String event, Object message, EventBusListener l);
+    void serve(String event, Object message, Reply l);
 
 }

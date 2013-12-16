@@ -15,10 +15,20 @@
  */
 package org.zodiark.server;
 
-public interface Reply
-        <T> {
-
-    void completed(T response);
-
-    void failed(T response);
+/**
+ * A {@link org.zodiark.service.Service} response to an {@link EventBus#ioEvent(org.zodiark.protocol.Envelope, org.atmosphere.cpr.AtmosphereResource, Reply)}
+ * event.
+ * @param <T>
+ */
+public interface Reply<T> {
+    /**
+     * The targeted {@link org.zodiark.service.Service} successfully processed the event delivered by the {@link EventBus}
+     * @param response the {@link org.zodiark.service.Service}'s success response
+     */
+    void ok(T response);
+    /**
+     * The targeted {@link org.zodiark.service.Service} failed to process the event delivered by the {@link EventBus}
+     * @param response the {@link org.zodiark.service.Service}'s failure response
+     */
+    void fail(T response);
 }

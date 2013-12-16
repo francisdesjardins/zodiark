@@ -31,6 +31,9 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Boostrap classes that configure Atmosphere and NettoSphere.
+ */
 public class ZodiarkServer {
 
     private final static Logger logger = LoggerFactory.getLogger(ZodiarkServer.class);
@@ -46,16 +49,30 @@ public class ZodiarkServer {
                 .initParam(ApplicationConfig.OBJECT_FACTORY, factory);
     }
 
+    /**
+     * The uri to listen to.
+     * @param uri the uri to listen to.
+     * @return this
+     */
     public ZodiarkServer listen(URI uri) {
         this.uri = uri;
         return this;
     }
 
+    /**
+     * Add a path used by Atmosphere to scan for static resource or dynamic resource.
+     * @param path used by Atmosphere to scan for static resource or dynamic resource.
+     * @return this
+     */
     public ZodiarkServer serve(String path) {
         builder.resource(path);
         return this;
     }
 
+    /**
+     * Start the {@link ZodiarkServer}
+     * @return this
+     */
     public ZodiarkServer on() {
         if (packages.isEmpty()) {
             packages.add(Service.class.getPackage().getName());
@@ -72,6 +89,11 @@ public class ZodiarkServer {
         return this;
     }
 
+    /**
+     * Add a {@link Service} which will become candidate for the {@link EventBus}
+     * @param annotatedClass a class annotated with {@link On} and implementing the {@link Service}
+     * @return this
+     */
     public ZodiarkServer service(Class<? extends Service> annotatedClass) {
         if (server == null || !server.isStarted()) {
             packages.add(annotatedClass.getName());
@@ -89,11 +111,20 @@ public class ZodiarkServer {
         return this;
     }
 
+    /**
+     * Replace the default {@link ZodiarkObjectFactory}
+     * @param factory an implementation of {@link org.atmosphere.cpr.AtmosphereObjectFactory}
+     * @return this
+     */
     public ZodiarkServer factory(String factory) {
         this.factory = factory;
         return this;
     }
 
+    /**
+     * The current {@link org.atmosphere.cpr.AtmosphereObjectFactory}
+     * @return the class's name of {@link org.atmosphere.cpr.AtmosphereObjectFactory}
+     */
     public String factory() {
         return factory;
     }
@@ -106,11 +137,20 @@ public class ZodiarkServer {
         return b.toString();
     }
 
+    /**
+     * Stop the {@link ZodiarkServer}
+     * @return this
+     */
     public ZodiarkServer off() {
         if (server != null) server.stop();
         return this;
     }
 
+    /**
+     * A default implementation for starting the {@link ZodiarkServer}
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
         String staticPath = "./modules/server/src/main/resources";
         if (args != null && args.length > 0) {

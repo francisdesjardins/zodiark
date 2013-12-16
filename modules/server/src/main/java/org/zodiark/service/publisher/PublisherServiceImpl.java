@@ -24,7 +24,7 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
-import org.zodiark.server.EventBusListener;
+import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.Session;
@@ -92,11 +92,11 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     }
 
     @Override
-    public void retrieveEndpoint(Object s, EventBusListener l) {
+    public void retrieveEndpoint(Object s, Reply l) {
         if (String.class.isAssignableFrom(s.getClass())) {
-            l.completed(endpoints.get(s.toString()));
+            l.ok(endpoints.get(s.toString()));
         } else {
-            l.failed(new Exception("No publisher associated"));
+            l.fail(new Exception("No publisher associated"));
         }
     }
 
@@ -136,16 +136,16 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         }
 
         // TODO: Callback is not called at the moment as the dispatching to Wowza is asynchronous
-        eventBus.dispatch(WOWZA_CONNECT, p, new EventBusListener<PublisherEndpoint>() {
+        eventBus.message(WOWZA_CONNECT, p, new Reply<PublisherEndpoint>() {
             @Override
-            public void completed(PublisherEndpoint p) {
+            public void ok(PublisherEndpoint p) {
                 // TODO: Proper Message
                 Message m = new Message();
                 response(e, p, m);
             }
 
             @Override
-            public void failed(PublisherEndpoint p) {
+            public void fail(PublisherEndpoint p) {
                 error(e, p, constructMessage(WOWZA_CONNECT, "error"));
             }
         });
@@ -161,17 +161,17 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         }
 
         PublisherEndpoint p = retrieve(uuid.getUuid());
-        eventBus.dispatch(BEGIN_STREAMING_SESSION, p, new EventBusListener<PublisherEndpoint>() {
+        eventBus.message(BEGIN_STREAMING_SESSION, p, new Reply<PublisherEndpoint>() {
             @Override
-            public void completed(PublisherEndpoint p) {
+            public void ok(PublisherEndpoint p) {
                 response(e, p, constructMessage(BEGIN_STREAMING_SESSION, "OK"));
             }
 
             @Override
-            public void failed(PublisherEndpoint p) {
+            public void fail(PublisherEndpoint p) {
                 error(e, p, constructMessage(BEGIN_STREAMING_SESSION, "error"));
             }
-        }).dispatch(BROADCASTER_CREATE, p);
+        }).message(BROADCASTER_CREATE, p);
     }
 
     Message constructMessage(String path, String status) {
@@ -205,7 +205,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     }
 
     @Override
-    public void serve(String event, Object message, EventBusListener l) {
+    public void serve(String event, Object message, Reply l) {
         switch (event) {
             case RETRIEVE_PUBLISHER:
                 retrieveEndpoint(message, l);
@@ -218,7 +218,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     }
 
     @Override
-    public void resetEndpoint(Object message, EventBusListener l) {
+    public void resetEndpoint(Object message, Reply l) {
         try {
             PublisherEndpoint p = endpoints.get(message.toString());
             AtmosphereResource r = p.resource();
@@ -230,7 +230,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             r.write(mapper.writeValueAsString(e));
         } catch (JsonProcessingException e1) {
             logger.debug("Unable to write {} {}", message);
-            l.failed(message);
+            l.fail(message);
         }
     }
 
@@ -243,14 +243,14 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             p.uuid(uuid).message(e.getMessage()).resource(resource);
 
             endpoints.put(uuid, p);
-            eventBus.dispatch(DB_INIT, p, new EventBusListener<PublisherEndpoint>() {
+            eventBus.message(DB_INIT, p, new Reply<PublisherEndpoint>() {
                 @Override
-                public void completed(PublisherEndpoint p) {
+                public void ok(PublisherEndpoint p) {
                     lookupConfig(e, p);
                 }
 
                 @Override
-                public void failed(PublisherEndpoint p) {
+                public void fail(PublisherEndpoint p) {
                     error(e, p, constructMessage(VALIDATE_PUBLISHER_STREAMING_SESSION, "error"));
                 }
             });
@@ -262,7 +262,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     public void error(Envelope e, PublisherEndpoint p, Message m) {
         AtmosphereResource r = p.resource();
         Envelope error = Envelope.newServerReply(e, m);
-        eventBus.dispatch(error, r);
+        eventBus.ioEvent(error, r);
     }
 
     @Override
@@ -273,14 +273,14 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     }
 
     private void lookupConfig(final Envelope e, PublisherEndpoint p) {
-        eventBus.dispatch(DB_CONFIG, p, new EventBusListener<PublisherEndpoint>() {
+        eventBus.message(DB_CONFIG, p, new Reply<PublisherEndpoint>() {
             @Override
-            public void completed(PublisherEndpoint p) {
+            public void ok(PublisherEndpoint p) {
                 response(e, p, constructMessage(CREATE_PUBLISHER_SESSION, "OK"));
             }
 
             @Override
-            public void failed(PublisherEndpoint p) {
+            public void fail(PublisherEndpoint p) {
                 error(e, p, constructMessage(VALIDATE_PUBLISHER_STREAMING_SESSION, "error"));
             }
         });

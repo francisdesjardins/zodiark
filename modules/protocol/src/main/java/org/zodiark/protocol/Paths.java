@@ -15,9 +15,6 @@
  */
 package org.zodiark.protocol;
 
-/**
- * @author Jeanfrancois Arcand
- */
 public interface Paths {
 
     String START_STREAMING_SESSION = "/publisher/startStreamingSession";

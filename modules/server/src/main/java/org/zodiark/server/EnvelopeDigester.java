@@ -18,8 +18,8 @@ package org.zodiark.server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.config.service.AtmosphereInterceptorService;
 import org.atmosphere.cpr.Action;
-import org.atmosphere.cpr.AtmosphereConfig;
 import org.atmosphere.cpr.AtmosphereInterceptor;
+import org.atmosphere.cpr.AtmosphereInterceptorAdapter;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.util.IOUtils;
 import org.slf4j.Logger;
@@ -29,22 +29,26 @@ import org.zodiark.server.annotation.Inject;
 
 import java.io.IOException;
 
+/**
+ * An {@link AtmosphereInterceptor} that intercept requests and dispatch them to the {@link EventBus} when the request's body
+ * can be deserialized as a {@link Envelope}, or dispatched to Atmosphere for normal request like decoded chat.
+ */
 @AtmosphereInterceptorService
-public class EnvelopeDigester implements AtmosphereInterceptor {
-
-    private final ObjectMapper mapper = new ObjectMapper();
+public class EnvelopeDigester extends AtmosphereInterceptorAdapter {
     private Logger logger = LoggerFactory.getLogger(EnvelopeDigester.class);
+    public final static String REQUEST_REDISPATCHED = EnvelopeDigester.class.getName() + ".dispatched";
+
+    @Inject
+    public ObjectMapper mapper;
 
     @Inject
     public EventBus eventBus;
 
     @Override
-    public void configure(AtmosphereConfig config) {
-    }
-
-    @Override
     public Action inspect(AtmosphereResource r) {
-        if (r.getRequest().getAttribute("dispatched") == null) {
+        // Service may redispatch the request to Atmosphere, hence we must make sure we aren't processing
+        // dispatched request and let them delivered to Atmosphere components directly.
+        if (r.getRequest().getAttribute(REQUEST_REDISPATCHED) == null) {
             String message = IOUtils.readEntirely(r).toString();
             if (!message.isEmpty()) {
                 try {
@@ -55,7 +59,7 @@ public class EnvelopeDigester implements AtmosphereInterceptor {
                     }
 
                     logger.debug("\n\n{}\n\n", message);
-                    eventBus.dispatch(e, r);
+                    eventBus.ioEvent(e, r);
                 } catch (Exception ex) {
                     logger.error("", ex);
                     Envelope e = Envelope.newError(r.uuid());
@@ -69,13 +73,9 @@ public class EnvelopeDigester implements AtmosphereInterceptor {
             }
         } else {
             logger.debug("Redispatching {}", r);
-            r.getRequest().removeAttribute("dispatched");
+            r.getRequest().removeAttribute(REQUEST_REDISPATCHED);
         }
         return Action.CONTINUE;
     }
 
-    @Override
-    public void postInspect(AtmosphereResource r) {
-
-    }
 }

@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Paths;
 import org.zodiark.server.EventBus;
-import org.zodiark.server.EventBusListener;
+import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
@@ -42,7 +42,7 @@ public class MonitoringServiceImpl implements MonitoringService {
     }
 
     @Override
-    public void serve(String event, Object message, EventBusListener l) {
+    public void serve(String event, Object message, Reply l) {
         switch (event) {
             case Paths.MONITOR_RESOURCE:
                 final AtmosphereResource r = AtmosphereResource.class.cast(message);
@@ -51,14 +51,14 @@ public class MonitoringServiceImpl implements MonitoringService {
                     public void onDisconnect(AtmosphereResourceEvent event) {
                         logger.trace("{} disconnected with {}", r, event);
 
-                        eventBus.dispatch(Paths.RETRIEVE_PUBLISHER, r.uuid(), new EventBusListener<EndpointAdapter>() {
+                        eventBus.message(Paths.RETRIEVE_PUBLISHER, r.uuid(), new Reply<EndpointAdapter>() {
                             @Override
-                            public void completed(EndpointAdapter p) {
-                                eventBus.dispatch(Paths.DISCONNECTED_RESOURCE, p);
+                            public void ok(EndpointAdapter p) {
+                                eventBus.message(Paths.DISCONNECTED_RESOURCE, p);
                             }
 
                             @Override
-                            public void failed(EndpointAdapter p) {
+                            public void fail(EndpointAdapter p) {
                                 logger.error("", p);
                             }
                         });

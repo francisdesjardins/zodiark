@@ -17,14 +17,14 @@ package org.zodiark.service.subscriber;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
-import org.zodiark.server.EventBusListener;
+import org.zodiark.server.Reply;
 import org.zodiark.service.Service;
 
 public interface SubscriberService extends Service {
 
     public void requestForAction(Envelope e, AtmosphereResource r);
 
-    public void retrieveEndpoint(Object s, EventBusListener l);
+    public void retrieveEndpoint(Object s, Reply l);
 
     public void connectEndpoint(AtmosphereResource r, Envelope e);
 }

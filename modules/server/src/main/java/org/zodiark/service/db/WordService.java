@@ -17,7 +17,7 @@ package org.zodiark.service.db;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zodiark.server.EventBusListener;
+import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
@@ -32,10 +32,10 @@ public class WordService extends DBServiceAdapter {
     public RESTService restService;
 
     @Override
-    public void serve(String event, Object message, EventBusListener l) {
+    public void serve(String event, Object message, Reply l) {
         logger.trace("Servicing {}", event);
         EndpointAdapter p = EndpointAdapter.class.cast(message);
         BroadcasterDBResult dbResult = restService.post("/banned/word" + p.uuid(), p.message(), BroadcasterDBResult.class);
-        l.completed(dbResult);
+        l.ok(dbResult);
     }
 }

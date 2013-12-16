@@ -25,6 +25,10 @@ import org.zodiark.server.EventBusFactory;
 import org.zodiark.service.Service;
 import org.zodiark.server.annotation.On;
 
+/**
+ * Register Zodiark's {@link Processor} with Atmosphere so class annotated with {@link On} will be instantiated and
+ * managed by the Atmosphere's Annotation Processor.
+ */
 @AtmosphereAnnotation(On.class)
 public class EventBusAnnotationProcessor implements Processor {
 

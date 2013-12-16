@@ -17,8 +17,14 @@ package org.zodiark.service.config;
 
 import org.zodiark.service.db.DBResult;
 
+/**
+ * A class for representing the publisher/subscriber authorization token.
+ */
 public interface AuthConfig extends DBResult {
-
+    /**
+     * Is the {@link org.zodiark.service.publisher.PublisherEndpoint
+     * @return
+     */
     boolean isAuthenticated();
 
 }

@@ -22,13 +22,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * An annotation to use with {@link org.zodiark.service.Service} implementation. The {@link org.zodiark.server.EventBus} will
+ * deliver event to a class based on the {@link #value()}.
+ */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface On {
 
     /**
-     * The event name to get notified.
+     * The event name for which
      */
     String[] value() default "/";
 

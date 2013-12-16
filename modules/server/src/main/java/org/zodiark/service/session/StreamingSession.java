@@ -15,7 +15,7 @@
  */
 package org.zodiark.service.session;
 
-import org.zodiark.server.EventBusListener;
+import org.zodiark.server.Reply;
 import org.zodiark.service.action.Action;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
@@ -34,7 +34,7 @@ public interface StreamingSession {
 
     StreamingSession completeAction(Action completedAction);
 
-    StreamingSession validateAndJoin(SubscriberEndpoint s, EventBusListener<SubscriberEndpoint> e);
+    StreamingSession validateAndJoin(SubscriberEndpoint s, Reply<SubscriberEndpoint> e);
 
     PublisherEndpoint publisher();
 

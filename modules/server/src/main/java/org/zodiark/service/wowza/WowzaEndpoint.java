@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.protocol.Paths;
-import org.zodiark.server.EventBusListener;
+import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.service.Endpoint;
 import org.zodiark.service.session.StreamingSession;
@@ -71,7 +71,7 @@ public class WowzaEndpoint implements Endpoint {
         return supportedEndpoints;
     }
 
-    public void isEndpointConnected(Endpoint p, EventBusListener l) {
+    public void isEndpointConnected(Endpoint p, Reply l) {
         Message m = new Message();
         m.setPath(Paths.SERVER_VALIDATE_OK);
         try {
@@ -81,7 +81,7 @@ public class WowzaEndpoint implements Endpoint {
             resource.write(mapper.writeValueAsString(e));
         } catch (Exception e) {
             logger.error("", e);
-            l.failed(p);
+            l.fail(p);
         }
 
     }
@@ -101,7 +101,7 @@ public class WowzaEndpoint implements Endpoint {
         return this;
     }
 
-    public void obfuscate(StreamingSession session, EventBusListener l) {
+    public void obfuscate(StreamingSession session, Reply l) {
         String executorUuid = session.pendingAction().getSubscriberUUID();
         List<String> uuids = new ArrayList<>();
 
@@ -123,12 +123,12 @@ public class WowzaEndpoint implements Endpoint {
             resource.write(mapper.writeValueAsString(e));
         } catch (JsonProcessingException e1) {
             logger.error("", e1);
-            l.failed(session.pendingAction());
+            l.fail(session.pendingAction());
         }
 
     }
 
-    public void deobfuscate(StreamingSession session, EventBusListener l) {
+    public void deobfuscate(StreamingSession session, Reply l) {
         String executorUuid = session.pendingAction().getSubscriberUUID();
         List<String> uuids = new ArrayList<>();
 
@@ -150,7 +150,7 @@ public class WowzaEndpoint implements Endpoint {
             resource.write(mapper.writeValueAsString(e));
         } catch (JsonProcessingException e1) {
             logger.error("", e1);
-            l.failed(session.pendingAction());
+            l.fail(session.pendingAction());
         }
 
     }
