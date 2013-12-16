@@ -15,7 +15,8 @@
  */
 package org.zodiark.server;
 
-public interface EventBusListener<T> {
+public interface Reply
+        <T> {
 
     void completed(T response);
 

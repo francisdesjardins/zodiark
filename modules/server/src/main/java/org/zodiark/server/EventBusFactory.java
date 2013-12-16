@@ -17,6 +17,10 @@ package org.zodiark.server;
 
 import org.zodiark.server.impl.DefaultEventBus;
 
+/**
+ * A factory for retrieving an instance of {@link EventBus}. It is not recommended to use this class directly from a Service.
+ * Instead, use the Inject annotation to install EventBus.
+ */
 public class EventBusFactory {
 
     private static EventBusFactory factory;
@@ -25,15 +29,20 @@ public class EventBusFactory {
     private EventBusFactory() {
         eventBus = new DefaultEventBus();
     }
-
+    /**
+     * Return this factory
+     * @return a {@link EventBusFactory}
+     */
     public final synchronized static EventBusFactory getDefault() {
         if (factory == null) {
             factory = new EventBusFactory();
         }
         return factory;
     }
-
-
+    /**
+     * Return the default {@link EventBus}
+     * @return {@link EventBus}
+     */
     public EventBus eventBus() {
         return eventBus;
     }
