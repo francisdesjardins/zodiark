@@ -7,8 +7,7 @@ git checkout master && \
 git pull && \
 mvn clean jxr:aggregate javadoc:aggregate && \
 git checkout gh-pages && \
-#for x in apidocs xref; do rm -r $x && git rm -r $x && mv target/site/$x ./ && git add $x; done && \
-mv target/site/$x ./ && git add $x; done && \
+for x in apidocs xref; do rm -r $x && git rm -r $x && mv target/site/$x ./ && git add $x; done && \
 git commit -m "JXR & JavaDoc update" && \
 git push origin gh-pages && \
 git checkout master
