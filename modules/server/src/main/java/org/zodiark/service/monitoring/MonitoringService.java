@@ -18,7 +18,7 @@ package org.zodiark.service.monitoring;
 import org.zodiark.service.Service;
 
 /**
- * @author Jeanfrancois Arcand
+ * A place older for monitoring data.
  */
 public interface MonitoringService extends Service {
 }

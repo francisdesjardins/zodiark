@@ -19,6 +19,9 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.Reply;
 
+/**
+ * All Database/Web Service {@link org.zodiark.service.Service} must extend this simple adapter.
+ */
 public class DBServiceAdapter implements DBService {
 
     @Override

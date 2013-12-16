@@ -15,5 +15,8 @@
  */
 package org.zodiark.service.db;
 
+/**
+ * A marker for all Web Service/Database data holder.
+ */
 public interface DBResult {
 }

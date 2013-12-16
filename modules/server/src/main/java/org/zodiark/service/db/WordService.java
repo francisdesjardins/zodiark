@@ -24,6 +24,9 @@ import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.broadcaster.BroadcasterDBResult;
 import org.zodiark.service.util.RESTService;
 
+/**
+ * Retrieve the list of banned word for the {@link org.zodiark.service.chat.Chat} Service.
+ */
 @On("/db/words")
 public class WordService extends DBServiceAdapter {
     private final Logger logger = LoggerFactory.getLogger(WordService.class);

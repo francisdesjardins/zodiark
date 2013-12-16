@@ -28,6 +28,9 @@ import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
 
+/**
+ * Monitor {@link org.zodiark.service.Endpoint} disconnect.
+ */
 @On("/monitor")
 public class MonitoringServiceImpl implements MonitoringService {
 
@@ -38,7 +41,6 @@ public class MonitoringServiceImpl implements MonitoringService {
 
     @Override
     public void serve(Envelope e, AtmosphereResource r) {
-
     }
 
     @Override

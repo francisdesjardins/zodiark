@@ -18,18 +18,27 @@ package org.zodiark.service.publisher;
 import org.zodiark.service.config.PublisherConfig;
 import org.zodiark.service.session.StreamingSession;
 
+/**
+ * A {@link PublisherEndpoint} data representation. Instance of this class are populated from a database/web service.
+ */
 public class PublisherConfigImpl implements PublisherConfig {
     private StreamingSession.TYPE streamingSessionType;
 
-    public PublisherConfigImpl(){
+    public PublisherConfigImpl() {
         sessionType(StreamingSession.TYPE.PRIVATE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public PublisherConfig sessionType(StreamingSession.TYPE streamingSessionType) {
         this.streamingSessionType = streamingSessionType;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public StreamingSession.TYPE sessionType() {
         return streamingSessionType;
     }

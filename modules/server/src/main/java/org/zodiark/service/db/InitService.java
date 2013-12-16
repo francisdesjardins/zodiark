@@ -24,6 +24,10 @@ import org.zodiark.service.config.AuthConfig;
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.util.RESTService;
 
+/**
+ * Initialize a remove session in a Database/Web Service for an {@link org.zodiark.service.Endpoint}. This class
+ * use the injected {@link RESTService} to communicate with the remote endpoint.
+ */
 @On("/db/init")
 public class InitService extends DBServiceAdapter {
 

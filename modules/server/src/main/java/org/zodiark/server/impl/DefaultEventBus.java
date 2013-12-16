@@ -49,11 +49,17 @@ public class DefaultEventBus implements EventBus {
         }
     };
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public EventBus ioEvent(Envelope e, AtmosphereResource o) {
         return ioEvent(e, o, l);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public EventBus ioEvent(Envelope e, AtmosphereResource r, Reply reply) {
         Service s = mapper.map(e.getMessage().getPath(), services);
@@ -76,6 +82,9 @@ public class DefaultEventBus implements EventBus {
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public EventBus message(String path, Object message, Reply reply) {
         Service s = mapper.map(path, services);
@@ -90,11 +99,17 @@ public class DefaultEventBus implements EventBus {
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public EventBus message(String path, Object message) {
         return message(path, message, l);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public EventBus on(String path, Service service) {
         logger.debug("{} => {}", path, service);
@@ -102,6 +117,9 @@ public class DefaultEventBus implements EventBus {
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public EventBus off(String path) {
         return null;

@@ -20,6 +20,11 @@ import org.zodiark.service.action.Action;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * A {@link PublisherEndpoint} is the coordinator of all operation. It's the representation of a remote publisher and
+ * can be associated with one or more {@link org.zodiark.service.subscriber.SubscriberEndpoint}. A {@link PublisherEndpoint}
+ * can execute {@link Action} requested by {@link org.zodiark.service.subscriber.SubscriberEndpoint}
+ */
 public class PublisherEndpoint extends EndpointAdapter<PublisherEndpoint> {
 
     private final AtomicBoolean actionInProgress = new AtomicBoolean();

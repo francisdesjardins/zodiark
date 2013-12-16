@@ -49,6 +49,7 @@ import static org.zodiark.protocol.Paths.VALIDATE_PUBLISHER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.WOWZA_CONNECT;
 import static org.zodiark.protocol.Paths.WOWZA_ERROR_STREAMING_SESSION;
 
+
 @On("/publisher")
 public class PublisherServiceImpl implements PublisherService, Session<PublisherEndpoint> {
 
@@ -92,11 +93,11 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     }
 
     @Override
-    public void retrieveEndpoint(Object s, Reply l) {
-        if (String.class.isAssignableFrom(s.getClass())) {
-            l.ok(endpoints.get(s.toString()));
+    public void retrieveEndpoint(Object publisherEndpointUuid, Reply reply) {
+        if (String.class.isAssignableFrom(publisherEndpointUuid.getClass())) {
+            reply.ok(endpoints.get(publisherEndpointUuid.toString()));
         } else {
-            l.fail(new Exception("No publisher associated"));
+            reply.fail(new Exception("No publisher associated"));
         }
     }
 
@@ -218,9 +219,9 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     }
 
     @Override
-    public void resetEndpoint(Object message, Reply l) {
+    public void resetEndpoint(Object publisherEndpointUuid, Reply reply) {
         try {
-            PublisherEndpoint p = endpoints.get(message.toString());
+            PublisherEndpoint p = endpoints.get(publisherEndpointUuid.toString());
             AtmosphereResource r = p.resource();
             Message m = new Message();
             m.setPath(PUBLISHER_ABOUT_READY);
@@ -229,8 +230,8 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             Envelope e = Envelope.newPublisherRequest(p.uuid(), m);
             r.write(mapper.writeValueAsString(e));
         } catch (JsonProcessingException e1) {
-            logger.debug("Unable to write {} {}", message);
-            l.fail(message);
+            logger.debug("Unable to write {} {}", publisherEndpointUuid);
+            reply.fail(publisherEndpointUuid);
         }
     }
 

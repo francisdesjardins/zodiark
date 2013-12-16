@@ -20,16 +20,38 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.server.Reply;
 import org.zodiark.service.Service;
 
+/**
+ * A base class for Publisher's Service implementation.
+ */
 public interface PublisherService extends Service {
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void serve(Envelope e, AtmosphereResource r) ;
+    public void serve(Envelope e, AtmosphereResource r);
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void serve(String event, Object message, Reply l);
 
-    public void retrieveEndpoint(Object s, Reply l);
+    /**
+     * Retrieve a {@link PublisherEndpoint} based on a String. It is recommended to pass the {@link PublisherEndpoint#uuid}
+     * as a key for retrieving the Endpoint. The {@link Reply#ok(Object)} will be invoked if an {@link PublisherEndpoint}  \
+     * is found, or {@link Reply#fail(Object)} if no {@link PublisherEndpoint} is associated with the key.
+     *
+     * @param publisherEndpointUuid The {@link PublisherEndpoint#uuid}
+     * @param reply a {@link Reply}
+     */
+    public void retrieveEndpoint(Object publisherEndpointUuid, Reply reply);
 
-    public void resetEndpoint(Object message, Reply l);
+    /**
+     * When an {@link org.zodiark.service.action.Action} is ready to be executed, send a ready message back to the client
+     * and wait for its response. The publisherEndpointUuid can be retrieved from an {@link Envelope}
+     * @param publisherEndpointUuid The {@link PublisherEndpoint#uuid}
+     * @param reply a {@link Reply}
+     */
+    public void resetEndpoint(Object publisherEndpointUuid, Reply reply);
 }
 

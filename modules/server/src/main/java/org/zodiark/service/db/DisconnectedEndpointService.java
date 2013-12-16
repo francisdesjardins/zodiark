@@ -23,6 +23,9 @@ import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.util.RESTService;
 
+/**
+ * Disconnect the {@link org.zodiark.service.Endpoint} by calling the remote Database/Web Service.
+ */
 @On("/db/disconnected")
 public class DisconnectedEndpointService extends DBServiceAdapter {
 

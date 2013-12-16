@@ -24,6 +24,10 @@ import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.config.PublisherConfig;
 import org.zodiark.service.util.RESTService;
 
+/**
+ * Construct the {@link PublisherConfig} based on {@link org.zodiark.service.publisher.PublisherEndpoint#uuid} from the
+ * remote database/web service.
+ */
 @On("/db/config")
 public class ConfigService extends DBServiceAdapter {
 
