@@ -8,6 +8,7 @@ org.zodiark.service.broadcaster
 org.zodiark.service.chat
 org.zodiark.service.config
 org.zodiark.service.db
+org.zodiark.service.error
 org.zodiark.service.monitoring
 org.zodiark.service.publisher
 org.zodiark.service.session
