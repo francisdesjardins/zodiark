@@ -105,9 +105,6 @@ public class BroadcastServiceImpl implements BroadcasterService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void dispatchMessage(final Envelope e, final AtmosphereResource r) {
         final AtmosphereRequest request = r.getRequest();
         final AtmosphereResponse response = r.getResponse();

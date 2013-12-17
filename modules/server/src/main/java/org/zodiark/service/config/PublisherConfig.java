@@ -23,16 +23,16 @@ import org.zodiark.service.session.StreamingSession;
  */
 public interface PublisherConfig extends DBResult {
     /**
-     * The current {@link StreamingSession.TYPE}
+     * The current {@link org.zodiark.service.session.StreamingSession#type()}
      *
-     * @return the {@link StreamingSession.TYPE}
+     * @return the {@link org.zodiark.service.session.StreamingSession#type()}
      */
     StreamingSession.TYPE sessionType();
 
     /**
-     * Set the current {@link StreamingSession.TYPE}
+     * Set the current {@link org.zodiark.service.session.StreamingSession#type()}
      *
-     * @param streamingSessionType {@link StreamingSession.TYPE}
+     * @param streamingSessionType {@link org.zodiark.service.session.StreamingSession#type()}
      * @return this
      */
     PublisherConfig sessionType(StreamingSession.TYPE streamingSessionType);

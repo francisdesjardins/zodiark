@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
-import org.zodiark.protocol.Paths;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
@@ -38,6 +37,19 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.zodiark.protocol.Paths.ACTION_ACCEPT;
+import static org.zodiark.protocol.Paths.ACTION_ACCEPT_OK;
+import static org.zodiark.protocol.Paths.ACTION_ACCEPT_REFUSED;
+import static org.zodiark.protocol.Paths.ACTION_COMPLETED;
+import static org.zodiark.protocol.Paths.ACTION_START_OK;
+import static org.zodiark.protocol.Paths.ACTION_TIMER;
+import static org.zodiark.protocol.Paths.ACTION_VALIDATE;
+import static org.zodiark.protocol.Paths.RETRIEVE_PUBLISHER;
+import static org.zodiark.protocol.Paths.RETRIEVE_SUBSCRIBER;
+import static org.zodiark.protocol.Paths.STREAMING_COMPLETE_ACTION;
+import static org.zodiark.protocol.Paths.STREAMING_EXECUTE_ACTION;
+import static org.zodiark.protocol.Paths.SUBSCRIBER_VALIDATE_STATE;
 
 @On("/action")
 public class ActionServiceImpl implements ActionService {
@@ -58,13 +70,13 @@ public class ActionServiceImpl implements ActionService {
     @Override
     public void reactTo(Envelope e, AtmosphereResource r) {
         switch (e.getMessage().getPath()) {
-            case Paths.ACTION_ACCEPT_OK:
+            case ACTION_ACCEPT_OK:
                 actionAccepted(e);
                 break;
-            case Paths.ACTION_ACCEPT_REFUSED:
+            case ACTION_ACCEPT_REFUSED:
                 actionRefused(e);
                 break;
-            case Paths.ACTION_START_OK:
+            case ACTION_START_OK:
                 actionStarted(e);
                 break;
         }
@@ -76,7 +88,7 @@ public class ActionServiceImpl implements ActionService {
     public void actionStarted(Envelope e) {
         try {
             final PublisherResults results = mapper.readValue(e.getMessage().getData(), PublisherResults.class);
-            eventBus.message(Paths.RETRIEVE_PUBLISHER, results.getUuid(), new Reply<PublisherEndpoint>() {
+            eventBus.message(RETRIEVE_PUBLISHER, results.getUuid(), new Reply<PublisherEndpoint>() {
                 @Override
                 public void ok(final PublisherEndpoint p) {
 
@@ -90,7 +102,7 @@ public class ActionServiceImpl implements ActionService {
                             if (time.get() == 0) return;
 
                             Message m = new Message();
-                            m.setPath(Paths.ACTION_TIMER);
+                            m.setPath(ACTION_TIMER);
                             try {
                                 m.setData(mapper.writeValueAsString(time.getAndDecrement()));
 
@@ -113,7 +125,7 @@ public class ActionServiceImpl implements ActionService {
                             timerFuture.cancel(false);
 
                             Message m = new Message();
-                            m.setPath(Paths.ACTION_COMPLETED);
+                            m.setPath(ACTION_COMPLETED);
                             try {
                                 m.setData(mapper.writeValueAsString(new PublisherResults("OK")));
 
@@ -128,7 +140,7 @@ public class ActionServiceImpl implements ActionService {
                             } catch (JsonProcessingException e1) {
                                 logger.error("", e1);
                             } finally {
-                                eventBus.message(Paths.STREAMING_COMPLETE_ACTION, p);
+                                eventBus.message(STREAMING_COMPLETE_ACTION, p);
                             }
                         }
                     }, p.action().time(), TimeUnit.SECONDS);
@@ -153,7 +165,7 @@ public class ActionServiceImpl implements ActionService {
     @Override
     public void reactTo(String path, Object message, Reply reply) {
         switch (path) {
-            case Paths.ACTION_VALIDATE:
+            case ACTION_VALIDATE:
                 if (Action.class.isAssignableFrom(message.getClass())) {
                     Action action = Action.class.cast(message);
                     validateAction(action, reply);
@@ -177,13 +189,13 @@ public class ActionServiceImpl implements ActionService {
         }
         p.action(action);
 
-        eventBus.message(Paths.SUBSCRIBER_VALIDATE_STATE, s, new Reply<SubscriberEndpoint>() {
+        eventBus.message(SUBSCRIBER_VALIDATE_STATE, s, new Reply<SubscriberEndpoint>() {
             @Override
             public void ok(SubscriberEndpoint s) {
                 logger.trace("Action {} succeeded. Sending request to publisher {}", action, s);
 
                 // No need to have a listener here since the response will be dispatched to EnvelopeDigester
-                action.setPath(Paths.ACTION_ACCEPT);
+                action.setPath(ACTION_ACCEPT);
                 handshakingActions.put(s.uuid(), reply);
                 requestForAction(p, action);
             }
@@ -230,7 +242,7 @@ public class ActionServiceImpl implements ActionService {
         try {
             final Action action = mapper.readValue(e.getMessage().getData(), Action.class);
 
-            eventBus.message(Paths.RETRIEVE_SUBSCRIBER, action.getSubscriberUUID(), new Reply<SubscriberEndpoint>() {
+            eventBus.message(RETRIEVE_SUBSCRIBER, action.getSubscriberUUID(), new Reply<SubscriberEndpoint>() {
                 @Override
                 public void ok(SubscriberEndpoint s) {
                     action.subscriber(s);
@@ -250,7 +262,7 @@ public class ActionServiceImpl implements ActionService {
             // Send OK
             l.ok(action);
 
-            eventBus.message(Paths.STREAMING_EXECUTE_ACTION, action, new Reply<Action>() {
+            eventBus.message(STREAMING_EXECUTE_ACTION, action, new Reply<Action>() {
                 @Override
                 public void ok(Action action) {
 

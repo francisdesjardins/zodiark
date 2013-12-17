@@ -58,15 +58,16 @@ public class Chat {
     }
 
     /**
-     * Simple annotated class that demonstrate how {@link org.atmosphere.config.managed.Encoder} and {@link org.atmosphere.config.managed.Decoder
+     * Simple annotated class that demonstrate how {@link org.atmosphere.config.managed.Encoder} and {@link org.atmosphere.config.managed.Decoder}
      * can be used.
      *
      * @param message an instance of {@link Message}
-     * @return
+     * @return a Message
      * @throws IOException
      */
     @org.atmosphere.config.service.Message(encoders = {JacksonEncoder.class}, decoders = {JacksonDecoder.class})
     public Message onMessage(Message message) throws IOException {
+        // TODO: We don't need to use Jackson here
         logger.info("{} just send {}", message.getAuthor(), message.getMessage());
         return message;
     }

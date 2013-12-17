@@ -20,7 +20,6 @@ import org.atmosphere.cpr.AtmosphereResourceEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
-import org.zodiark.protocol.Paths;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
@@ -28,6 +27,9 @@ import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
 
 import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnDisconnect;
+import static org.zodiark.protocol.Paths.DISCONNECTED_RESOURCE;
+import static org.zodiark.protocol.Paths.MONITOR_RESOURCE;
+import static org.zodiark.protocol.Paths.RETRIEVE_PUBLISHER;
 
 /**
  * Monitor {@link org.zodiark.service.Endpoint} disconnect.
@@ -47,17 +49,19 @@ public class MonitoringServiceImpl implements MonitoringService {
     @Override
     public void reactTo(String path, Object message, Reply reply) {
         switch (path) {
-            case Paths.MONITOR_RESOURCE:
+            case MONITOR_RESOURCE:
                 final AtmosphereResource r = AtmosphereResource.class.cast(message);
                 r.addEventListener(new OnDisconnect() {
                     @Override
                     public void onDisconnect(AtmosphereResourceEvent event) {
                         logger.trace("{} disconnected with {}", r, event);
 
-                        eventBus.message(Paths.RETRIEVE_PUBLISHER, r.uuid(), new Reply<EndpointAdapter>() {
+                        // TODO: This message goes into the void right now
+                        eventBus.message(RETRIEVE_PUBLISHER, r.uuid(), new Reply<EndpointAdapter>() {
                             @Override
                             public void ok(EndpointAdapter p) {
-                                eventBus.message(Paths.DISCONNECTED_RESOURCE, p);
+                                // TODO: This message goes into the void right now
+                                eventBus.message(DISCONNECTED_RESOURCE, p);
                             }
 
                             @Override

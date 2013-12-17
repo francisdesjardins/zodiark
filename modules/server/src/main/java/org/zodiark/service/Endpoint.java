@@ -20,11 +20,12 @@ package org.zodiark.service;
  */
 public interface Endpoint {
 
-    public enum TYPE { PUBLISHER, SUBSCRIBER, WOWZA, SUPER_USER, MONITOR}
+    public enum TYPE {PUBLISHER, SUBSCRIBER, WOWZA, SUPER_USER, MONITOR}
 
     /**
      * The {@link TYPE}
-     * @return
+     *
+     * @return {@link TYPE}
      */
     TYPE type();
 
@@ -35,6 +36,7 @@ public interface Endpoint {
 
     /**
      * A unique UUID for an Endpoint
+     *
      * @return unique UUID for an Endpoint
      */
     public String uuid();

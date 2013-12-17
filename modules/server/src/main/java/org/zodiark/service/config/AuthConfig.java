@@ -23,7 +23,7 @@ import org.zodiark.service.db.DBResult;
 public interface AuthConfig extends DBResult {
     /**
      * Is the {@link org.zodiark.service.publisher.PublisherEndpoint
-     * @return
+     * @return true if authenticated
      */
     boolean isAuthenticated();
 

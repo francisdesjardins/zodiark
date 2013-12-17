@@ -21,28 +21,28 @@ package org.zodiark.protocol;
 public interface Paths {
 
     /**
-     * Start the Publisher Streaming Session
+     * An I/O event to start the Publisher Streaming Session
      */
     String START_PUBLISHER_STREAMING_SESSION = "/publisher/startStreamingSession";
     /**
-     * Join an existing Publisher streaming Session
+     * An I/O event to join an existing Publisher streaming Session
      */
     String JOIN_SUBSCRIBER_STREAMING_SESSION = "/subscriber/joinStreamingSession";
     /**
-     * Create the PublisherEndpoint's Session
+     * An I/O event to create the PublisherEndpoint's Session
      */
     String CREATE_PUBLISHER_SESSION = "/publisher/createUserSession";
     /**
-     * Create the SubscriberEndpoint's Session
+     * An I/O event sent Create the SubscriberEndpoint's Session
      */
     String CREATE_SUBSCRIBER_SESSION = "/subscriber/createUserSession";
 
     /**
-     * Load the Publisher Session
+     * A Message tolLoad the Publisher Session
      */
     String LOAD_PUBLISHER_CONFIG = "/publisher/loadConfig";
     /**
-     * Create or prepare the Streaming Session by load the data from the dabatase/web service, and by requesting
+     * An I/O event to create or prepare the Streaming Session by load the data from the dabatase/web service, and by requesting
      * access to a remote Wowza Endpoint.
      */
     String VALIDATE_PUBLISHER_STREAMING_SESSION = "/publisher/validateStreamingSession";
@@ -75,13 +75,21 @@ public interface Paths {
      * Send a request to Wowza asking for a Streaming Session Approval
      */
     String WOWZA_CONNECT = "/wowza/connect";
-
+    /**
+     * Advise the WowzaService that its needs to start the obfuscation process
+     */
     String WOWZA_OBFUSCATE = "/wowza/obfuscate";
-
+    /**
+     * Advise the WowzaService that its needs to start the deobfuscation process
+     */
     String WOWZA_DEOBFUSCATE = "/wowza/deobfuscate";
-
+    /**
+     * Received from a Wowxa endpoint when the obfuscation process is completed and the action can start.
+     */
     String WOWZA_OBFUSCATE_OK = "/wowza/obfuscate/ok";
-
+    /**
+     * Received from a Wowxa endpoint when the deobfuscation process is completed and the normal behavior
+     */
     String WOWZA_DEOBFUSCATE_OK = "/wowza/deobfuscate/ok";
 
     /**
@@ -111,27 +119,49 @@ public interface Paths {
      * Leave the current Streaming Session
      */
     String TERMINATE_SUBSCRIBER_STREAMING_SESSSION = "/subscriber/disconnect";
-
+    /**
+     * Wowza response to a request for a validation request
+     */
     String SERVER_VALIDATE_OK = "/wowza/validate";
-
+    /**
+     * Request for an Action
+     */
     String REQUEST_ACTION = "/request/action";
-
+    /**
+     * A request for Action. This path is used by tan Envelope
+     */
     String MESSAGE_ACTION = "/message/action";
-
+    /**
+     * Retrieve the publisher
+     */
     String RETRIEVE_PUBLISHER = "/publisher/retrieve";
-
+    /**
+     * Retrieve the subscriber
+     */
     String RETRIEVE_SUBSCRIBER = "/subscriber/retrieve";
-
+    /**
+     * An I/O event for Action requested by a Subscriber
+     */
     String SUBSCRIBER_ACTION = "/subscriber/action";
-
+    /**
+     * A message to validate if an Action can be executed by a Publisher, from a Subscriber
+     */
     String ACTION_VALIDATE = "/action/validate";
-
+    /**
+     * A message to request an Action
+     */
     String ACTION_ACCEPT = "/action/accept";
-
+    /**
+     * A I/O event from the publisher when accepting an Action
+     */
     String ACTION_ACCEPT_OK = "/action/actionAccepted";
-
+    /**
+     * A Message sent to the Publisher and Subscriber when an Action is about to start
+     */
     String ACTION_START = "/action/start";
-
+    /**
+     * A message from a Publisher rejecting an Action
+     */
     String ACTION_ACCEPT_REFUSED = "/action/actionRefused";
 
     /**
@@ -147,22 +177,41 @@ public interface Paths {
      */
     String STREAMING_COMPLETE_ACTION = "/streaming/completeAction";
 
+    /**
+     * An I/O event received when a publisher accept an Action
+     */
     String ACTION_START_OK = "/action/start/ok";
-
+    /**
+     * An I/O event sent to Publisher/Subscriber when timing an Action
+     */
     String ACTION_TIMER = "/action/timer";
-
+    /**
+     * An I/O event sent to Publisher announcing the Action is completed.
+     */
     String ACTION_COMPLETED = "/action/completed";
-
+    /**
+     * An I/O event received from the publisher when an Action is received.
+     */
     String PUBLISHER_ACTION_COMPLETED = "/publisher/actionCompleted";
-
+    /**
+     * An I/O event sent to Publisher when an Action is ready to be executed
+     */
     String PUBLISHER_ABOUT_READY = "/publisher/ready";
-
+    /**
+     * An I/O event received from the Subscriber at the beginning of a Session
+     */
     String SUBSCRIBER_BROWSER_HANDSHAKE = "/subscriber/handshake";
-
+    /**
+     * An I/O event sent to the Subscriber at the beginning of a Session
+     */
     String SUBSCRIBER_BROWSER_HANDSHAKE_OK = "/subscriber/handshake/OK";
-
+    /**
+     * A message sent to the BroadcasterService to create a Broadcaster
+     */
     String BROADCASTER_CREATE = "/broadcaster/create";
-
+    /**
+     * A message sent to the BroadcasterService asking to associate a subscriber with a publisher's session
+     */
     String BROADCASTER_TRACK = "/broadcaster/track";
 
     String BROADCASTER_DISPATCH = "/broadcaster/dispatch";
@@ -170,9 +219,13 @@ public interface Paths {
      * Broadcast a message to all chat room
      */
     String BROADCAST_TO_ALL = "/broadcaster/toAll";
-
+    /**
+     * A Message for tracking connection's disconnect.
+     */
     String MONITOR_RESOURCE = "/monitor/configure";
-
+    /**
+     * A Message for initiating publisher/subscriber state in the database/remote webservice
+     */
     String DISCONNECTED_RESOURCE = "/db/disconnected";
 
 }

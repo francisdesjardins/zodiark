@@ -76,7 +76,7 @@ public class WowzaEndpoint implements Endpoint {
 
     /**
      * TODO: For later use
-     * @return
+     * @return list of Endpoint
      */
     public List<Endpoint> supportedEndpoints() {
         return supportedEndpoints;
@@ -122,7 +122,7 @@ public class WowzaEndpoint implements Endpoint {
     /**
      * Set a {@link Message} who most probably will contains some information like geo localisation.
      *
-     * @param m a {@link Message
+     * @param m a {@link Message}
      * @return this.
      */
     public WowzaEndpoint message(Message m) {
