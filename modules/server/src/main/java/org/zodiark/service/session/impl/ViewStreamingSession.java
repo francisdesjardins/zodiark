@@ -17,6 +17,9 @@ package org.zodiark.service.session.impl;
 
 import org.zodiark.service.session.StreamingSessionBase;
 
+/**
+ * A View Only Session Implementation
+ */
 public class ViewStreamingSession extends StreamingSessionBase {
 
     @Override

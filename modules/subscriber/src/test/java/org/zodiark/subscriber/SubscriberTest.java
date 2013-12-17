@@ -117,7 +117,7 @@ public class SubscriberTest {
 
         // =============== Wowza
 
-        paths.set(Paths.START_STREAMING_SESSION);
+        paths.set(Paths.START_PUBLISHER_STREAMING_SESSION);
         wowzaClient.handler(new OnEnvelopHandler() {
             @Override
             public boolean onEnvelop(Envelope e) throws IOException {
@@ -192,7 +192,7 @@ public class SubscriberTest {
 
         // ================ Subscriber
 
-        paths.set(Paths.JOIN_STREAMING_SESSION);
+        paths.set(Paths.JOIN_SUBSCRIBER_STREAMING_SESSION);
         final AtomicReference<SubscriberResults> sanswer = new AtomicReference<>();
         final ZodiarkClient subscriberClient = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
         final CountDownLatch platch = new CountDownLatch(1);
@@ -250,7 +250,7 @@ public class SubscriberTest {
 
         // =============== Wowza
 
-        paths.set(Paths.START_STREAMING_SESSION);
+        paths.set(Paths.START_PUBLISHER_STREAMING_SESSION);
         wowzaClient.handler(new OnEnvelopHandler() {
             @Override
             public boolean onEnvelop(Envelope e) throws IOException {
@@ -377,7 +377,7 @@ public class SubscriberTest {
 
         // ================ Subscriber
 
-        paths.set(Paths.JOIN_STREAMING_SESSION);
+        paths.set(Paths.JOIN_SUBSCRIBER_STREAMING_SESSION);
         final AtomicReference<SubscriberResults> sanswer = new AtomicReference<>();
         final ZodiarkClient subscriberClient = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
         final CountDownLatch platch = new CountDownLatch(1);

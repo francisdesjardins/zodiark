@@ -18,6 +18,7 @@ package org.zodiark.service.publisher;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.AtmosphereResourceEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
@@ -34,22 +35,25 @@ import org.zodiark.service.wowza.WowzaUUID;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnDisconnect;
 import static org.zodiark.protocol.Paths.BEGIN_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCASTER_CREATE;
 import static org.zodiark.protocol.Paths.CREATE_PUBLISHER_SESSION;
 import static org.zodiark.protocol.Paths.DB_CONFIG;
 import static org.zodiark.protocol.Paths.DB_INIT;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
-import static org.zodiark.protocol.Paths.LOAD_CONFIG;
+import static org.zodiark.protocol.Paths.FAILED_PUBLISHER_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.LOAD_PUBLISHER_CONFIG;
 import static org.zodiark.protocol.Paths.PUBLISHER_ABOUT_READY;
 import static org.zodiark.protocol.Paths.RETRIEVE_PUBLISHER;
-import static org.zodiark.protocol.Paths.START_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.START_PUBLISHER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.TERMINATE_STREAMING_SESSSION;
 import static org.zodiark.protocol.Paths.VALIDATE_PUBLISHER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.WOWZA_CONNECT;
-import static org.zodiark.protocol.Paths.WOWZA_ERROR_STREAMING_SESSION;
 
-
+/**
+ * The Publisher's application logic for validating, creating and starting a {@link org.zodiark.service.session.StreamingSession}
+ */
 @On("/publisher")
 public class PublisherServiceImpl implements PublisherService, Session<PublisherEndpoint> {
 
@@ -69,17 +73,17 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     public void serve(Envelope e, AtmosphereResource r) {
         logger.trace("Handling Publisher Envelop {} to Service {}", e, r.uuid());
         switch (e.getMessage().getPath()) {
-            case LOAD_CONFIG:
+            case LOAD_PUBLISHER_CONFIG:
             case CREATE_PUBLISHER_SESSION:
                 createSession(e, r);
                 break;
             case VALIDATE_PUBLISHER_STREAMING_SESSION:
                 createOrJoinStreamingSession(e);
                 break;
-            case START_STREAMING_SESSION:
+            case START_PUBLISHER_STREAMING_SESSION:
                 startStreamingSession(e);
                 break;
-            case WOWZA_ERROR_STREAMING_SESSION:
+            case FAILED_PUBLISHER_STREAMING_SESSION:
                 errorStreamingSession(e);
                 break;
             case TERMINATE_STREAMING_SESSSION:
@@ -92,6 +96,9 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void retrieveEndpoint(Object publisherEndpointUuid, Reply reply) {
         if (String.class.isAssignableFrom(publisherEndpointUuid.getClass())) {
@@ -101,6 +108,9 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void errorStreamingSession(Envelope e) {
         try {
@@ -120,11 +130,17 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void terminateStreamingSession(PublisherEndpoint p, AtmosphereResource r) {
+    public void terminateStreamingSession(PublisherEndpoint endpoint, AtmosphereResource r) {
         // TODO:
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void createOrJoinStreamingSession(final Envelope e) {
         String uuid = e.getUuid();
@@ -152,6 +168,9 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void startStreamingSession(final Envelope e) {
         UUID uuid = null;
@@ -186,14 +205,17 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         return m;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void response(Envelope e, PublisherEndpoint p, Message m) {
-        AtmosphereResource r = p.resource();
+    public void response(Envelope e, PublisherEndpoint endpoint, Message m) {
+        AtmosphereResource r = endpoint.resource();
         Envelope newResponse = Envelope.newServerReply(e, m);
         try {
             r.write(mapper.writeValueAsString(newResponse));
         } catch (JsonProcessingException e1) {
-            logger.debug("Unable to write {} {}", p, m);
+            logger.debug("Unable to write {} {}", endpoint, m);
         }
     }
 
@@ -205,6 +227,9 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         return p;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void serve(String event, Object message, Reply l) {
         switch (event) {
@@ -214,10 +239,12 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             case PUBLISHER_ABOUT_READY:
                 resetEndpoint(message, l);
                 break;
-
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void resetEndpoint(Object publisherEndpointUuid, Reply reply) {
         try {
@@ -235,9 +262,12 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public PublisherEndpoint createSession(final Envelope e, AtmosphereResource resource) {
-        String uuid = e.getUuid();
+    public PublisherEndpoint createSession(final Envelope e, final AtmosphereResource resource) {
+        final String uuid = e.getUuid();
         PublisherEndpoint p = endpoints.get(uuid);
         if (p == null) {
             p = context.newInstance(PublisherEndpoint.class);
@@ -256,16 +286,30 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                 }
             });
         }
+
+        resource.addEventListener(new OnDisconnect() {
+            @Override
+            public void onDisconnect(AtmosphereResourceEvent event) {
+                logger.debug("Publisher {} disconnected", uuid);
+                endpoints.remove(uuid);
+            }
+        });
         return p;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void error(Envelope e, PublisherEndpoint p, Message m) {
-        AtmosphereResource r = p.resource();
+    public void error(Envelope e, PublisherEndpoint endpoint, Message m) {
+        AtmosphereResource r = endpoint.resource();
         Envelope error = Envelope.newServerReply(e, m);
         eventBus.ioEvent(error, r);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PublisherEndpoint config(Envelope e) {
         PublisherEndpoint p = endpoints.get(e.getUuid());
@@ -285,9 +329,5 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                 error(e, p, constructMessage(VALIDATE_PUBLISHER_STREAMING_SESSION, "error"));
             }
         });
-    }
-
-    public ConcurrentHashMap<String, PublisherEndpoint> endpoints() {
-        return endpoints;
     }
 }

@@ -120,7 +120,7 @@ public class PublisherTest {
                         break;
                     case Paths.SERVER_VALIDATE_OK:
                         Envelope publisherOk = Envelope.newClientToServerRequest(
-                                new Message(new Path(Paths.START_STREAMING_SESSION), e.getMessage().getData()));
+                                new Message(new Path(Paths.START_PUBLISHER_STREAMING_SESSION), e.getMessage().getData()));
                         wowzaClient.send(publisherOk);
                         break;
                     default:
@@ -201,7 +201,7 @@ public class PublisherTest {
                         PublisherResults result = new PublisherResults("error");
                         result.setUuid(uuid.getUuid());
                         Envelope publisherOk = Envelope.newClientToServerRequest(
-                                new Message(new Path(Paths.WOWZA_ERROR_STREAMING_SESSION), mapper.writeValueAsString(result)));
+                                new Message(new Path(Paths.FAILED_PUBLISHER_STREAMING_SESSION), mapper.writeValueAsString(result)));
                         wowzaClient.send(publisherOk);
                         break;
                     default:

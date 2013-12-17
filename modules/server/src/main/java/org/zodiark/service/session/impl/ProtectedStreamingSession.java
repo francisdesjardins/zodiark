@@ -17,6 +17,9 @@ package org.zodiark.service.session.impl;
 
 import org.zodiark.service.session.StreamingSessionBase;
 
+/**
+ * A Protected Session Implementation
+ */
 public class ProtectedStreamingSession extends StreamingSessionBase {
 
     @Override

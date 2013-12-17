@@ -43,8 +43,8 @@ import static org.zodiark.protocol.Paths.CREATE_SUBSCRIBER_SESSION;
 import static org.zodiark.protocol.Paths.DB_CONFIG;
 import static org.zodiark.protocol.Paths.DB_INIT;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
-import static org.zodiark.protocol.Paths.JOIN_STREAMING_SESSION;
-import static org.zodiark.protocol.Paths.LOAD_CONFIG;
+import static org.zodiark.protocol.Paths.JOIN_SUBSCRIBER_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.LOAD_PUBLISHER_CONFIG;
 import static org.zodiark.protocol.Paths.MONITOR_RESOURCE;
 import static org.zodiark.protocol.Paths.RETRIEVE_PUBLISHER;
 import static org.zodiark.protocol.Paths.RETRIEVE_SUBSCRIBER;
@@ -54,7 +54,7 @@ import static org.zodiark.protocol.Paths.SUBSCRIBER_BROWSER_HANDSHAKE_OK;
 import static org.zodiark.protocol.Paths.TERMINATE_SUBSCRIBER_STREAMING_SESSSION;
 import static org.zodiark.protocol.Paths.VALIDATE_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.WOWZA_CONNECT;
-import static org.zodiark.protocol.Paths.WOWZA_ERROR_SUBSCRIBER_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.FAILED_SUBSCRIBER_STREAMING_SESSION;
 
 @On("/subscriber")
 public class SubscriberServiceImpl implements SubscriberService, Session<SubscriberEndpoint> {
@@ -80,17 +80,17 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
 
         // TODO: One service per Path instead?
         switch (e.getMessage().getPath()) {
-            case LOAD_CONFIG:
+            case LOAD_PUBLISHER_CONFIG:
             case CREATE_SUBSCRIBER_SESSION:
                 createSession(e, r);
                 break;
             case VALIDATE_SUBSCRIBER_STREAMING_SESSION:
                 createOrJoinStreamingSession(e);
                 break;
-            case JOIN_STREAMING_SESSION:
+            case JOIN_SUBSCRIBER_STREAMING_SESSION:
                 startStreamingSession(e);
                 break;
-            case WOWZA_ERROR_SUBSCRIBER_STREAMING_SESSION:
+            case FAILED_SUBSCRIBER_STREAMING_SESSION:
                 errorStreamingSession(e);
                 break;
             case TERMINATE_SUBSCRIBER_STREAMING_SESSSION:
@@ -157,7 +157,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     @Override
-    public void terminateStreamingSession(SubscriberEndpoint p, AtmosphereResource r) {
+    public void terminateStreamingSession(SubscriberEndpoint endpoint, AtmosphereResource r) {
         // TODO:
     }
 
@@ -222,13 +222,13 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     @Override
-    public void response(Envelope e, SubscriberEndpoint s, Message m) {
-        AtmosphereResource r = s.resource();
+    public void response(Envelope e, SubscriberEndpoint endpoint, Message m) {
+        AtmosphereResource r = endpoint.resource();
         Envelope newResponse = Envelope.newServerReply(e, m);
         try {
             r.write(mapper.writeValueAsString(newResponse));
         } catch (JsonProcessingException e1) {
-            logger.debug("Unable to write {} {}", s, m);
+            logger.debug("Unable to write {} {}", endpoint, m);
         }
     }
 
@@ -282,8 +282,8 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     @Override
-    public void error(Envelope e, SubscriberEndpoint p, Message m) {
-        AtmosphereResource r = p.resource();
+    public void error(Envelope e, SubscriberEndpoint endpoint, Message m) {
+        AtmosphereResource r = endpoint.resource();
         Envelope error = Envelope.newServerReply(e, m);
         eventBus.ioEvent(error, r);
     }

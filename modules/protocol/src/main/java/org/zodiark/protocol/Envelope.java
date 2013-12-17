@@ -17,6 +17,9 @@ package org.zodiark.protocol;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * An Envelope is the vehicule for exchanging data between Zodiark's Endpoint. All communication must be serialized using an Envelope.
+ */
 public class Envelope {
 
     private String path;

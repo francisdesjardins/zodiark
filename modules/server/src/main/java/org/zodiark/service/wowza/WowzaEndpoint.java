@@ -71,6 +71,16 @@ public class WowzaEndpoint implements Endpoint {
         return supportedEndpoints;
     }
 
+    /**
+     * Send a {@link Paths#SERVER_VALIDATE_OK} to Wowza and listen for the response. The response will be delivered
+     * to the {@link org.zodiark.service.publisher.PublisherService}
+     * <p/>
+     *     {@link Paths#START_PUBLISHER_STREAMING_SESSION} if the streaming session is accepted.
+     * </p>
+     *     {@link Paths#FAILED_PUBLISHER_STREAMING_SESSION} if the streaming session is not accepted, for whatever reason.
+     * @param p
+     * @param l
+     */
     public void isEndpointConnected(Endpoint p, Reply l) {
         Message m = new Message();
         m.setPath(Paths.SERVER_VALIDATE_OK);

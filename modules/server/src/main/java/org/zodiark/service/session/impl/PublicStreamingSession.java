@@ -17,6 +17,9 @@ package org.zodiark.service.session.impl;
 
 import org.zodiark.service.session.StreamingSessionBase;
 
+/**
+ * A Public Session Implementation
+ */
 public class PublicStreamingSession extends StreamingSessionBase {
 
     @Override

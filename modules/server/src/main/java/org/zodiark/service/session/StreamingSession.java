@@ -22,30 +22,84 @@ import org.zodiark.service.subscriber.SubscriberEndpoint;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * A Streaming Session representation.
+ */
 public interface StreamingSession {
-
+    /**
+     * The type of Session.
+     */
     enum TYPE { PUBLIC, PRIVATE, PROTECTED, SHARED_PRIVATE, VIEW}
 
-    StreamingSession executeAction(Action a);
+    /**
+     * Execute an {@link Action}
+     * @param action  {@link Action}
+     * @return this
+     */
+    StreamingSession executeAction(Action action);
 
+    /**
+     * Return the current pending action.
+     * @return
+     */
     Action pendingAction();
 
+    /**
+     * Set the current streaming {@link Action}
+     * @param action {@link Action}
+     * @return this
+     */
     StreamingSession pendingAction(Action action);
 
+    /**
+     * Invoked when an Action has been completed an Wowza deobfuscated the stream
+     * @param completedAction {@link Action}
+     * @return this
+     */
     StreamingSession completeAction(Action completedAction);
 
-    StreamingSession validateAndJoin(SubscriberEndpoint s, Reply<SubscriberEndpoint> e);
+    /**
+     * Validate the {@link SubscriberEndpoint} and then join the {@link Action}
+     * @param subscriberEndpoint  {@link SubscriberEndpoint}
+     * @param reply a {@link Reply}
+     * @return this
+     */
+    StreamingSession validateAndJoin(SubscriberEndpoint subscriberEndpoint, Reply<SubscriberEndpoint> reply);
 
+    /**
+     * Return the {@link PublisherEndpoint} associated with this session.
+     * @return {@link PublisherEndpoint}
+     */
     PublisherEndpoint publisher();
 
-    StreamingSession publisher(PublisherEndpoint p);
+    /**
+     * Set the {@link PublisherEndpoint}
+     * @param publisherEndpoint {@link PublisherEndpoint}
+     * @return this
+     */
+    StreamingSession publisher(PublisherEndpoint publisherEndpoint);
 
+    /**
+     * Return the list of {@link SubscriberEndpoint} associated with this session
+     * @return ConcurrentLinkedQueue<SubscriberEndpoint>
+     */
     ConcurrentLinkedQueue<SubscriberEndpoint> subscribers();
 
+    /**
+     * The {@link StreamingSession.TYPE}
+     * @return {@link StreamingSession.TYPE}
+     */
     TYPE type();
 
+    /**
+     * Terminate this session
+     */
     void terminate();
 
+    /**
+     * Initialize and prepare the streaming session.
+     * @return this
+     */
     StreamingSession initAndAct();
 
 }

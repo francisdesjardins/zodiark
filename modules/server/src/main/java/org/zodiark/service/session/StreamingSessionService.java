@@ -22,18 +22,46 @@ import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 
 /**
- * @author Jeanfrancois Arcand
+ * The Service responsible for creating and manipulating streaming session workflow.
  */
 public interface StreamingSessionService extends Service {
+    /**
+     * Terminate the session
+     *
+     * @param publisherEndpoint {@link PublisherEndpoint}
+     * @param reply             {@link Reply}
+     */
+    void terminate(PublisherEndpoint publisherEndpoint, Reply reply);
 
-    void terminate(PublisherEndpoint p, Reply l);
+    /**
+     * Initialize the {@link StreamingSession} by broadcasting a message to all other chat session.
+     *
+     * @param publisherEndpoint {@link PublisherEndpoint}
+     * @param reply             {@link Reply}
+     */
+    void initiate(PublisherEndpoint publisherEndpoint, Reply reply);
 
-    void initiate(PublisherEndpoint p, Reply l);
+    /**
+     * Join an already started session by retriving the session associated with the {@link PublisherEndpoint}
+     *
+     * @param subscriberEndpoint  {@link SubscriberEndpoint}
+     * @param reply              {@link Reply}
+     */
+    void join(SubscriberEndpoint subscriberEndpoint, Reply reply);
 
-    void join(SubscriberEndpoint s, Reply l);
+    /**
+     * Execute an {@link Action}
+     *
+     * @param a     an {@link Action}
+     * @param reply {@link Reply}
+     */
+    void executeAction(final Action a, final Reply reply);
 
-    void executeAction(final Action a, final Reply l);
-
-    void completeAction(PublisherEndpoint p);
+    /**
+     * Complete an {@link Action}. This method is responsible for invoking Wowza server in order to de-obfuscate
+     * the {@link org.zodiark.service.Endpoint} not included by this {@link Action}
+     * @param publisherEndpoint {@link PublisherEndpoint}
+     */
+    void completeAction(PublisherEndpoint publisherEndpoint);
 
 }

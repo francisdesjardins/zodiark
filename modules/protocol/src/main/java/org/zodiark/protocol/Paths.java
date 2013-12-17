@@ -17,28 +17,60 @@ package org.zodiark.protocol;
 
 public interface Paths {
 
-    String START_STREAMING_SESSION = "/publisher/startStreamingSession";
-
-    String JOIN_STREAMING_SESSION = "/subscriber/joinStreamingSession";
-
+    /**
+     * Start the Publisher Streaming Session
+     */
+    String START_PUBLISHER_STREAMING_SESSION = "/publisher/startStreamingSession";
+    /**
+     * Join an existing Publisher streaming Session
+     */
+    String JOIN_SUBSCRIBER_STREAMING_SESSION = "/subscriber/joinStreamingSession";
+    /**
+     * Create the PublisherEndpoint's Session
+     */
     String CREATE_PUBLISHER_SESSION = "/publisher/createUserSession";
-
+    /**
+     * Create the SubscriberEndpoint's Session
+     */
     String CREATE_SUBSCRIBER_SESSION = "/subscriber/createUserSession";
 
-    String LOAD_CONFIG = "/publisher/loadConfig";
-
+    /**
+     * Load the Publisher Session
+     */
+    String LOAD_PUBLISHER_CONFIG = "/publisher/loadConfig";
+    /**
+     * Create or prepare the Streaming Session by load the data from the dabatase/web service, and by requesting
+     * access to a remote Wowza Endpoint.
+     */
     String VALIDATE_PUBLISHER_STREAMING_SESSION = "/publisher/validateStreamingSession";
 
+    /**
+     * Validate the Subscriber Streaming Session
+     */
     String VALIDATE_SUBSCRIBER_STREAMING_SESSION = "/subscriber/validateStreamingSession";
 
-    String WOWZA_ERROR_STREAMING_SESSION = "/publisher/errorStreamingSession";
+    /**
+     * Send by Wowza when the Streaming Session cannot be started, for whatever reason, for a Publisher.
+     */
+    String FAILED_PUBLISHER_STREAMING_SESSION = "/publisher/errorStreamingSession";
+    /**
+     * Send by Wowza when the Streaming Session cannot be started, for whatever reason, for a Subscriber.
+     */
+    String FAILED_SUBSCRIBER_STREAMING_SESSION = "/subscriber/errorStreamingSession";
 
-    String WOWZA_ERROR_SUBSCRIBER_STREAMING_SESSION = "/subscriber/errorStreamingSession";
-
+    /**
+     * A {@link Message#path} sent back to the remote Endpoint
+     */
     String ERROR_STREAMING_SESSION = "/error/errorStreamingSession";
-
+    /**
+     * Once the Publisher has been authorized to Stream, the PublisherService will
+     * fire this event to start the streaming session via the StreamingService.
+     */
     String BEGIN_STREAMING_SESSION = "/streaming/begin/publisher";
 
+    /**
+     * Send a request to Wowza asking for a Streaming Session Approval
+     */
     String WOWZA_CONNECT = "/wowza/connect";
 
     String WOWZA_OBFUSCATE = "/wowza/obfuscate";
@@ -83,10 +115,17 @@ public interface Paths {
 
     String ACTION_ACCEPT_REFUSED = "/action/actionRefused";
 
+    /**
+     * Join an existing Publisher Session
+     */
     String BEGIN_SUBSCRIBER_STREAMING_SESSION = "/streaming/join";
-
+    /**
+     * Once accepted, request the Publisher to execute an Action
+     */
     String STREAMING_EXECUTE_ACTION = "/streaming/executeAction";
-
+    /**
+     * Fired when an Action is completed.
+     */
     String STREAMING_COMPLETE_ACTION = "/streaming/completeAction";
 
     String ACTION_START_OK = "/action/start/ok";
@@ -108,7 +147,9 @@ public interface Paths {
     String BROADCASTER_TRACK = "/broadcaster/track";
 
     String BROADCASTER_DISPATCH = "/broadcaster/dispatch";
-
+    /**
+     * Broadcast a message to all chat room
+     */
     String BROADCAST_TO_ALL = "/broadcaster/toAll";
 
     String MONITOR_RESOURCE = "/monitor/configure";

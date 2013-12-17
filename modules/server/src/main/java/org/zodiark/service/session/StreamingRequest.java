@@ -15,9 +15,22 @@
  */
 package org.zodiark.service.session;
 
+/**
+ * A simple object used to represent a request from a Subscriber to join an existing Streaming Session
+ */
 public interface StreamingRequest {
 
+    /**
+     * The Publisher' UUID, which will be used to retrieve the streaming session.
+     *
+     * @return Publisher' UUID
+     */
     public String getPublisherUUID();
 
+    /**
+     * Return the Wowza's UUID, which will be used to for the streaming session.
+     *
+     * @return Wowza's UUID
+     */
     public String getWowzaUUID();
 }

@@ -44,6 +44,9 @@ import static org.zodiark.protocol.Paths.STREAMING_EXECUTE_ACTION;
 import static org.zodiark.protocol.Paths.WOWZA_DEOBFUSCATE;
 import static org.zodiark.protocol.Paths.WOWZA_OBFUSCATE;
 
+/**
+ * The Default StreamingService implementation.
+ */
 @On("/streaming")
 public class StreamingSessionServiceImpl implements StreamingSessionService {
 
@@ -65,7 +68,7 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
     public void serve(String event, Object message, Reply l) {
         logger.trace("Handling {}", event);
 
-        switch(event) {
+        switch (event) {
             case BEGIN_STREAMING_SESSION:
                 PublisherEndpoint p = PublisherEndpoint.class.cast(message);
 
@@ -93,12 +96,15 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void completeAction(PublisherEndpoint p) {
-        p.actionInProgress(false);
-        final StreamingSession session = sessions.get(p.uuid());
+    public void completeAction(PublisherEndpoint publisherEndpoint) {
+        publisherEndpoint.actionInProgress(false);
+        final StreamingSession session = sessions.get(publisherEndpoint.uuid());
         if (session == null) {
-            throw new IllegalStateException("No live session for " + p.uuid());
+            throw new IllegalStateException("No live session for " + publisherEndpoint.uuid());
         }
 
         final Action completedAction = session.pendingAction();
@@ -118,8 +124,11 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void executeAction(final Action a, final Reply l) {
+    public void executeAction(final Action a, final Reply reply) {
 
         PublisherEndpoint p = a.subscriber().publisherEndpoint();
         final StreamingSession session = sessions.get(p.uuid());
@@ -134,45 +143,54 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
                 logger.trace("Wowza obfuscation executed {}", a);
                 session.executeAction(a);
                 // TODO: Do we need to call the subscriber
-                l.ok(a);
+                reply.ok(a);
             }
 
             @Override
             public void fail(StreamingSession action) {
-                l.fail(action);
+                reply.fail(action);
             }
         });
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void terminate(PublisherEndpoint p, Reply l) {
-        logger.trace("Terminating streaming session {}", p);
-        StreamingSession s = sessions.remove(p.uuid());
+    public void terminate(PublisherEndpoint publisherEndpoint, Reply reply) {
+        logger.trace("Terminating streaming session {}", publisherEndpoint);
+        StreamingSession s = sessions.remove(publisherEndpoint.uuid());
         s.terminate();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void initiate(PublisherEndpoint p, Reply l) {
-        logger.trace("Starting streaming session {}", p);
-        StreamingSession s = sessionType(p);
-        sessions.put(p.uuid(), s);
-        s.publisher(p);
+    public void initiate(PublisherEndpoint publisherEndpoint, Reply reply) {
+        logger.trace("Starting streaming session {}", publisherEndpoint);
+        StreamingSession s = sessionType(publisherEndpoint);
+        sessions.put(publisherEndpoint.uuid(), s);
+        s.publisher(publisherEndpoint);
 
-        eventBus.message(BROADCAST_TO_ALL, p);
+        eventBus.message(BROADCAST_TO_ALL, publisherEndpoint);
         s.initAndAct();
 
-        l.ok(p);
+        reply.ok(publisherEndpoint);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void join(SubscriberEndpoint s, Reply l) {
-        boolean hasStreamingSession = hasStreamingSession(s.publisherEndpoint());
+    public void join(SubscriberEndpoint subscriberEndpoint, Reply reply) {
+        boolean hasStreamingSession = hasStreamingSession(subscriberEndpoint.publisherEndpoint());
         if (!hasStreamingSession) {
-            l.fail(s);
+            reply.fail(subscriberEndpoint);
         } else {
-            StreamingSession streamingSession = sessions.get(s.publisherEndpoint().uuid());
-            streamingSession.validateAndJoin(s, l);
+            StreamingSession streamingSession = sessions.get(subscriberEndpoint.publisherEndpoint().uuid());
+            streamingSession.validateAndJoin(subscriberEndpoint, reply);
         }
 
     }

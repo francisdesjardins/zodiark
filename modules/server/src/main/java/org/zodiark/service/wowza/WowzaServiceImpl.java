@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
-import org.zodiark.protocol.Paths;
 import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
@@ -34,6 +33,15 @@ import org.zodiark.service.publisher.PublisherResults;
 import org.zodiark.service.session.StreamingSession;
 
 import java.io.IOException;
+
+import static org.zodiark.protocol.Paths.ACTION_START;
+import static org.zodiark.protocol.Paths.PUBLISHER_ABOUT_READY;
+import static org.zodiark.protocol.Paths.RETRIEVE_PUBLISHER;
+import static org.zodiark.protocol.Paths.WOWZA_CONNECT;
+import static org.zodiark.protocol.Paths.WOWZA_DEOBFUSCATE;
+import static org.zodiark.protocol.Paths.WOWZA_DEOBFUSCATE_OK;
+import static org.zodiark.protocol.Paths.WOWZA_OBFUSCATE;
+import static org.zodiark.protocol.Paths.WOWZA_OBFUSCATE_OK;
 
 @On("/wowza")
 public class WowzaServiceImpl implements WowzaService {
@@ -55,17 +63,17 @@ public class WowzaServiceImpl implements WowzaService {
     public void serve(Envelope e, AtmosphereResource r) {
         String uuid = e.getUuid();
         switch (e.getMessage().getPath()) {
-            case Paths.WOWZA_OBFUSCATE_OK:
+            case WOWZA_OBFUSCATE_OK:
                 logger.debug("Obfuscation executed");
                 try {
                     final WowzaMessage w = mapper.readValue(e.getMessage().getData(), WowzaMessage.class);
-                    evenBus.message(Paths.RETRIEVE_PUBLISHER, w.getPublisherUUID(), new Reply<PublisherEndpoint>() {
+                    evenBus.message(RETRIEVE_PUBLISHER, w.getPublisherUUID(), new Reply<PublisherEndpoint>() {
                         @Override
                         public void ok(PublisherEndpoint p) {
                             try {
                                 AtmosphereResource r = p.resource();
                                 Message m = new Message();
-                                m.setPath(Paths.ACTION_START);
+                                m.setPath(ACTION_START);
                                 m.setData(mapper.writeValueAsString(new PublisherResults("OK", w.getPublisherUUID())));
                                 Envelope newResponse = Envelope.newPublisherRequest(p.uuid(), m);
                                 r.write(mapper.writeValueAsString(newResponse));
@@ -83,15 +91,15 @@ public class WowzaServiceImpl implements WowzaService {
                     logger.error("{}", e1);
                 }
                 break;
-            case Paths.WOWZA_DEOBFUSCATE_OK:
+            case WOWZA_DEOBFUSCATE_OK:
                 try {
                     final WowzaMessage w = mapper.readValue(e.getMessage().getData(), WowzaMessage.class);
-                    evenBus.message(Paths.PUBLISHER_ABOUT_READY, w.getPublisherUUID());
+                    evenBus.message(PUBLISHER_ABOUT_READY, w.getPublisherUUID());
                 } catch (IOException e1) {
                     logger.error("{}", e1);
                 }
                 break;
-            case Paths.WOWZA_CONNECT:
+            case WOWZA_CONNECT:
                 WowzaEndpoint endpoint = wowzaManager.lookup(uuid);
                 if (endpoint == null) {
                     connected(e, r);
@@ -104,7 +112,7 @@ public class WowzaServiceImpl implements WowzaService {
     public void serve(String event, Object message, Reply l) {
 
         switch (event) {
-            case Paths.WOWZA_OBFUSCATE:
+            case WOWZA_OBFUSCATE:
                 StreamingSession session = StreamingSession.class.cast(message);
                 WowzaEndpoint w = wowzaManager.lookup(session.publisher().wowzaServerUUID());
                 if (w != null) {
@@ -113,7 +121,7 @@ public class WowzaServiceImpl implements WowzaService {
                     l.fail(session);
                 }
                 break;
-            case Paths.WOWZA_DEOBFUSCATE:
+            case WOWZA_DEOBFUSCATE:
                 session = StreamingSession.class.cast(message);
                 w = wowzaManager.lookup(session.publisher().wowzaServerUUID());
                 if (w != null) {
@@ -122,7 +130,7 @@ public class WowzaServiceImpl implements WowzaService {
                     l.fail(session);
                 }
                 break;
-            case Paths.WOWZA_CONNECT:
+            case WOWZA_CONNECT:
                 if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
                     EndpointAdapter p = EndpointAdapter.class.cast(message);
                     w = wowzaManager.lookup(p.wowzaServerUUID());
@@ -147,7 +155,7 @@ public class WowzaServiceImpl implements WowzaService {
 
         wowzaManager.bind(context.newInstance(WowzaEndpoint.class).uuid(uuid).message(m).resource(r));
         Message responseMessage = new Message();
-        responseMessage.setPath(Paths.WOWZA_CONNECT);
+        responseMessage.setPath(WOWZA_CONNECT);
         try {
             responseMessage.setData(mapper.writeValueAsString(new WowzaResults("OK")));
         } catch (JsonProcessingException e1) {

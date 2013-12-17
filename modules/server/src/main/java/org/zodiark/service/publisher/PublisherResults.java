@@ -17,6 +17,10 @@ package org.zodiark.service.publisher;
 
 import org.zodiark.service.Results;
 
+/**
+ * A simple object used as an Enveloppe's {@link org.zodiark.protocol.Message} to send some state information to remote endpoint like
+ * {@link PublisherEndpoint}, {@link org.zodiark.service.config.SubscriberConfig} or {@link org.zodiark.service.wowza.WowzaEndpoint}.
+ */
 public class PublisherResults implements Results {
 
     private String results;

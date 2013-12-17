@@ -24,6 +24,9 @@ import org.zodiark.service.subscriber.SubscriberEndpoint;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * Default implementation of a Streaming Session.
+ */
 public abstract class StreamingSessionBase implements StreamingSession {
 
     private final Logger logger = LoggerFactory.getLogger(StreamingSessionBase.class);
@@ -31,34 +34,49 @@ public abstract class StreamingSessionBase implements StreamingSession {
     private final ConcurrentLinkedQueue<SubscriberEndpoint> subscribers = new ConcurrentLinkedQueue<>();
     private Action pendingAction;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public StreamingSession publisher(PublisherEndpoint p) {
-        endpoint = p;
+    public StreamingSession publisher(PublisherEndpoint publisherEndpoint) {
+        endpoint = publisherEndpoint;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PublisherEndpoint publisher() {
         return endpoint;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ConcurrentLinkedQueue<SubscriberEndpoint> subscribers() {
         return subscribers;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public StreamingSession validateAndJoin(SubscriberEndpoint s, Reply<SubscriberEndpoint> e) {
-        if (!validateSession(s)) {
-            e.fail(s);
+    public StreamingSession validateAndJoin(SubscriberEndpoint subscriberEndpoint, Reply<SubscriberEndpoint> reply) {
+        if (!validateSession(subscriberEndpoint)) {
+            reply.fail(subscriberEndpoint);
         } else {
-            logger.debug("Subscriber {} joined Publisher {}", s, endpoint);
-            subscribers.add(s);
-            e.ok(s);
+            logger.debug("Subscriber {} joined Publisher {}", subscriberEndpoint, endpoint);
+            subscribers.add(subscriberEndpoint);
+            reply.ok(subscriberEndpoint);
         }
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void terminate() {
         endpoint.terminate();
@@ -67,34 +85,54 @@ public abstract class StreamingSessionBase implements StreamingSession {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     private boolean validateSession(SubscriberEndpoint s) {
         // TODO: Validate the Publisher.
         // Can it be added to the session ?
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public StreamingSession initAndAct() {
         // TODO: DB CALL
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public StreamingSession executeAction(Action action) {
-
+        // TODO:
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public StreamingSession completeAction(Action completedAction) {
-
+        // TODO:
         return this;
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Action pendingAction() {
         return pendingAction;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public StreamingSession pendingAction(Action action) {
         this.pendingAction = action;
         return this;
