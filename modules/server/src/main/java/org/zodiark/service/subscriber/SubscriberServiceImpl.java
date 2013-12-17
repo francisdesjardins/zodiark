@@ -56,6 +56,9 @@ import static org.zodiark.protocol.Paths.VALIDATE_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.WOWZA_CONNECT;
 import static org.zodiark.protocol.Paths.FAILED_SUBSCRIBER_STREAMING_SESSION;
 
+/**
+ * A Service responsible for managing {@link SubscriberEndpoint}
+ */
 @On("/subscriber")
 public class SubscriberServiceImpl implements SubscriberService, Session<SubscriberEndpoint> {
 
@@ -75,7 +78,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     public StreamingRequest requestClass;
 
     @Override
-    public void serve(Envelope e, AtmosphereResource r) {
+    public void reactTo(Envelope e, AtmosphereResource r) {
         logger.trace("Handling Subscriber Envelop {} to Service {}", e, r.uuid());
 
         // TODO: One service per Path instead?
@@ -102,7 +105,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
                 requestForAction(e, r);
                 break;
             case SUBSCRIBER_BROWSER_HANDSHAKE:
-                connectEndpoint(r, e);
+                connectEndpoint(e, r);
                 break;
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
@@ -110,7 +113,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     @Override
-    public void connectEndpoint(AtmosphereResource r, Envelope e) {
+    public void connectEndpoint(Envelope e, AtmosphereResource r) {
         logger.info("Subscriber Connected {}", e);
         SubscriberEndpoint s = createEndpoint(r, e.getMessage());
         response(e, s, constructMessage(SUBSCRIBER_BROWSER_HANDSHAKE_OK, "OK"));
@@ -190,11 +193,11 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     @Override
-    public void retrieveEndpoint(Object s, Reply l) {
-        if (String.class.isAssignableFrom(s.getClass())) {
-            l.ok(endpoints.get(s.toString()));
+    public void retrieveEndpoint(Object subscriberUuid, Reply reply) {
+        if (String.class.isAssignableFrom(subscriberUuid.getClass())) {
+            reply.ok(endpoints.get(subscriberUuid.toString()));
         } else {
-            l.fail(new Exception("No Sunscriber associated"));
+            reply.fail(new Exception("No Sunscriber associated"));
         }
     }
 
@@ -241,10 +244,10 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     @Override
-    public void serve(String event, Object message, Reply l) {
-        switch (event) {
+    public void reactTo(String path, Object message, Reply reply) {
+        switch (path) {
             case RETRIEVE_SUBSCRIBER:
-                retrieveEndpoint(message, l);
+                retrieveEndpoint(message, reply);
                 break;
         }
     }

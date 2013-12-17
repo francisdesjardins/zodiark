@@ -52,4 +52,9 @@ public class PublisherEndpoint extends EndpointAdapter<PublisherEndpoint> {
         this.action = action;
         return this;
     }
+
+    @Override
+    public TYPE type() {
+        return TYPE.PUBLISHER;
+    }
 }

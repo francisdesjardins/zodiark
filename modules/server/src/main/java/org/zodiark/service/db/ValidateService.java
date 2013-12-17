@@ -32,16 +32,16 @@ public class ValidateService extends DBServiceAdapter {
     public RESTService restService;
 
     @Override
-    public void serve(String event, Object message, Reply l) {
-        logger.trace("Servicing {}", event);
+    public void reactTo(String path, Object message, Reply reply) {
+        logger.trace("Servicing {}", path);
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             EndpointAdapter p = EndpointAdapter.class.cast(message);
             SubscriberConfig config = restService.post("/validate/" + p.uuid(), p.message(), SubscriberConfig.class);
 
             if (config.isStateValid()) {
-                l.ok(p);
+                reply.ok(p);
             } else {
-                l.fail(p);
+                reply.fail(p);
             }
         }
     }

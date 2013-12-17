@@ -35,10 +35,10 @@ public class WordService extends DBServiceAdapter {
     public RESTService restService;
 
     @Override
-    public void serve(String event, Object message, Reply l) {
-        logger.trace("Servicing {}", event);
+    public void reactTo(String path, Object message, Reply reply) {
+        logger.trace("Servicing {}", path);
         EndpointAdapter p = EndpointAdapter.class.cast(message);
         BroadcasterDBResult dbResult = restService.post("/banned/word" + p.uuid(), p.message(), BroadcasterDBResult.class);
-        l.ok(dbResult);
+        reply.ok(dbResult);
     }
 }

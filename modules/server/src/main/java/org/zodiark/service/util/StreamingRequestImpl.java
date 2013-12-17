@@ -17,6 +17,9 @@ package org.zodiark.service.util;
 
 import org.zodiark.service.session.StreamingRequest;
 
+/**
+ * Simple implementation of a {@link StreamingRequest}
+ */
 public class StreamingRequestImpl implements StreamingRequest {
 
     private String publisherUUID;

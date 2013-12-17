@@ -56,7 +56,7 @@ public class ActionServiceImpl implements ActionService {
     public ScheduledExecutorService timer;
 
     @Override
-    public void serve(Envelope e, AtmosphereResource r) {
+    public void reactTo(Envelope e, AtmosphereResource r) {
         switch (e.getMessage().getPath()) {
             case Paths.ACTION_ACCEPT_OK:
                 actionAccepted(e);
@@ -151,12 +151,12 @@ public class ActionServiceImpl implements ActionService {
      * {@inheritDoc}
      */
     @Override
-    public void serve(String event, Object message, Reply l) {
-        switch (event) {
+    public void reactTo(String path, Object message, Reply reply) {
+        switch (path) {
             case Paths.ACTION_VALIDATE:
                 if (Action.class.isAssignableFrom(message.getClass())) {
                     Action action = Action.class.cast(message);
-                    validateAction(action, l);
+                    validateAction(action, reply);
                 }
                 break;
 

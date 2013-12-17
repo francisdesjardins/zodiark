@@ -37,14 +37,14 @@ public class ConfigService extends DBServiceAdapter {
     public RESTService restService;
 
     @Override
-    public void serve(String event, Object message, Reply l) {
-        logger.trace("Servicing {}", event);
+    public void reactTo(String path, Object message, Reply reply) {
+        logger.trace("Servicing {}", path);
 
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             EndpointAdapter p = EndpointAdapter.class.cast(message);
             PublisherConfig config = restService.get("/config/" + p.uuid(), PublisherConfig.class);
             p.config(config);
-            l.ok(p);
+            reply.ok(p);
         }
     }
 }

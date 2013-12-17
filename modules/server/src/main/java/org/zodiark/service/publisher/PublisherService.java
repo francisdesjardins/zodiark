@@ -28,13 +28,13 @@ public interface PublisherService extends Service {
      * {@inheritDoc}
      */
     @Override
-    public void serve(Envelope e, AtmosphereResource r);
+    public void reactTo(Envelope e, AtmosphereResource r);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void serve(String event, Object message, Reply l);
+    public void reactTo(String path, Object message, Reply reply);
 
     /**
      * Retrieve a {@link PublisherEndpoint} based on a String. It is recommended to pass the {@link PublisherEndpoint#uuid}

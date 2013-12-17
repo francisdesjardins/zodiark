@@ -71,7 +71,7 @@ public class DefaultEventBus implements EventBus {
         }
 
         if (s != null) {
-            s.serve(e, r);
+            s.reactTo(e, r);
         } else {
             logger.error("No Service available for {}", e);
             Message m = new Message();
@@ -92,7 +92,7 @@ public class DefaultEventBus implements EventBus {
         logger.debug("Dispatching Message {} to {}", path, s);
 
         if (s != null) {
-            s.serve(path, message, reply);
+            s.reactTo(path, message, reply);
         } else {
             logger.error("No Service available for {}", path);
         }

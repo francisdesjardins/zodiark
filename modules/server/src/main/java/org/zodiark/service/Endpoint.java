@@ -16,16 +16,27 @@
 package org.zodiark.service;
 
 /**
- * @author Jeanfrancois Arcand
+ * Representation of a remote endpoint: can be a subscriber, a publisher, a super user or a wowza instance.
  */
 public interface Endpoint {
 
-    public enum TYPE { PUBLISHER, SUBSCRIBER, WOWZA}
+    public enum TYPE { PUBLISHER, SUBSCRIBER, WOWZA, SUPER_USER, MONITOR}
 
+    /**
+     * The {@link TYPE}
+     * @return
+     */
     TYPE type();
 
+    /**
+     * Terminate the Endpoint
+     */
     public void terminate();
 
+    /**
+     * A unique UUID for an Endpoint
+     * @return unique UUID for an Endpoint
+     */
     public String uuid();
 
 }

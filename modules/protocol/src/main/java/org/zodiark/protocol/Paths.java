@@ -15,6 +15,9 @@
  */
 package org.zodiark.protocol;
 
+/**
+ * REST path for firing event using an EventBus, sending messages, etc. The targetted Service is alwaus the first part of the path.
+ */
 public interface Paths {
 
     /**
@@ -81,16 +84,32 @@ public interface Paths {
 
     String WOWZA_DEOBFUSCATE_OK = "/wowza/deobfuscate/ok";
 
+    /**
+     * Retrieve the data from an Endpoint
+     */
     String DB_CONFIG = "/db/config";
 
+    /**
+     * Initialize an Endpoint Session within the remote database/web service endpoint.
+     */
     String DB_INIT = "/db/init";
 
+    /**
+     * Retrieve the list of banned word for a Streaming Session Chat.
+     */
     String DB_WORD = "/db/word";
 
+    /**
+     * Validate the state of a Subscriber
+     */
     String SUBSCRIBER_VALIDATE_STATE = "/db/validate";
-
+    /**
+     * Leave the current Publisher Streaming Session
+     */
     String TERMINATE_STREAMING_SESSSION = "/publisher/disconnect";
-
+    /**
+     * Leave the current Streaming Session
+     */
     String TERMINATE_SUBSCRIBER_STREAMING_SESSSION = "/subscriber/disconnect";
 
     String SERVER_VALIDATE_OK = "/wowza/validate";

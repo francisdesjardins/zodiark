@@ -60,7 +60,7 @@ public class WowzaServiceImpl implements WowzaService {
     public ObjectMapper mapper;
 
     @Override
-    public void serve(Envelope e, AtmosphereResource r) {
+    public void reactTo(Envelope e, AtmosphereResource r) {
         String uuid = e.getUuid();
         switch (e.getMessage().getPath()) {
             case WOWZA_OBFUSCATE_OK:
@@ -109,25 +109,25 @@ public class WowzaServiceImpl implements WowzaService {
 
     // Will be called when the Publisher is ready to start a streaming show
     @Override
-    public void serve(String event, Object message, Reply l) {
+    public void reactTo(String path, Object message, Reply reply) {
 
-        switch (event) {
+        switch (path) {
             case WOWZA_OBFUSCATE:
                 StreamingSession session = StreamingSession.class.cast(message);
                 WowzaEndpoint w = wowzaManager.lookup(session.publisher().wowzaServerUUID());
                 if (w != null) {
-                    w.obfuscate(session, l);
+                    w.obfuscate(session, reply);
                 } else {
-                    l.fail(session);
+                    reply.fail(session);
                 }
                 break;
             case WOWZA_DEOBFUSCATE:
                 session = StreamingSession.class.cast(message);
                 w = wowzaManager.lookup(session.publisher().wowzaServerUUID());
                 if (w != null) {
-                    w.deobfuscate(session, l);
+                    w.deobfuscate(session, reply);
                 } else {
-                    l.fail(session);
+                    reply.fail(session);
                 }
                 break;
             case WOWZA_CONNECT:
@@ -135,14 +135,14 @@ public class WowzaServiceImpl implements WowzaService {
                     EndpointAdapter p = EndpointAdapter.class.cast(message);
                     w = wowzaManager.lookup(p.wowzaServerUUID());
                     if (w != null) {
-                        w.isEndpointConnected(p, l);
+                        w.isEndpointConnected(p, reply);
                     } else {
-                        l.fail(p);
+                        reply.fail(p);
                     }
                 }
                 break;
             default:
-                logger.error("Unhandled event {}", event);
+                logger.error("Unhandled event {}", path);
         }
     }
 

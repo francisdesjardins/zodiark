@@ -37,16 +37,16 @@ public class InitService extends DBServiceAdapter {
     public RESTService restService;
 
     @Override
-    public void serve(String event, Object message, Reply l) {
-        logger.trace("Servicing {}", event);
+    public void reactTo(String path, Object message, Reply reply) {
+        logger.trace("Servicing {}", path);
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             EndpointAdapter p = EndpointAdapter.class.cast(message);
             AuthConfig config = restService.post("/init/" + p.uuid(), p.message(), AuthConfig.class);
 
             if (config.isAuthenticated()) {
-                l.ok(p);
+                reply.ok(p);
             } else {
-                l.fail(p);
+                reply.fail(p);
             }
         }
     }

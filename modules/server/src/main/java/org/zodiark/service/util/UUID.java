@@ -15,6 +15,9 @@
  */
 package org.zodiark.service.util;
 
+/**
+ * Simple JSON friendly class for representing a UUID.
+ */
 public class UUID {
 
     private String uuid;

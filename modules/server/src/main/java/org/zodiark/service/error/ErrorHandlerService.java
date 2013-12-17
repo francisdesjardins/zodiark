@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.util;
+package org.zodiark.service.error;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,6 +26,9 @@ import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.Service;
 
+/**
+ * A Service for handling unexpected error.
+ */
 @On("/error")
 public class ErrorHandlerService implements Service {
 
@@ -35,7 +38,7 @@ public class ErrorHandlerService implements Service {
     public ObjectMapper mapper;
 
     @Override
-    public void serve(Envelope error, AtmosphereResource r) {
+    public void reactTo(Envelope error, AtmosphereResource r) {
         try {
             r.write(mapper.writeValueAsString(error));
         } catch (JsonProcessingException e1) {
@@ -44,7 +47,7 @@ public class ErrorHandlerService implements Service {
     }
 
     @Override
-    public void serve(String event, Object message, Reply l) {
+    public void reactTo(String path, Object message, Reply reply) {
 
     }
 }

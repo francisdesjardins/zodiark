@@ -19,6 +19,9 @@ import org.zodiark.server.Context;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.service.util.RESTService;
 
+/**
+ * Mock class for testing purpose only. This class does nothing.
+ */
 public class OKRestService implements RESTService {
 
     @Inject

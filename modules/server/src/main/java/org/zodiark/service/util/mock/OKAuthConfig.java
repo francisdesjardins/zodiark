@@ -17,6 +17,9 @@ package org.zodiark.service.util.mock;
 
 import org.zodiark.service.config.AuthConfig;
 
+/**
+ * Mock class for testing purpose only.
+ */
 public class OKAuthConfig implements AuthConfig {
     @Override
     public boolean isAuthenticated() {

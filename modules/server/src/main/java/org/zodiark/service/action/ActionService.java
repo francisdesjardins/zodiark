@@ -29,13 +29,13 @@ public interface ActionService extends Service {
      * {@inheritDoc}
      */
     @Override
-    public void serve(Envelope e, AtmosphereResource r);
+    public void reactTo(Envelope e, AtmosphereResource r);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void serve(String event, Object message, Reply l);
+    public void reactTo(String path, Object message, Reply reply);
 
     /**
      * Validate an {@link Action}

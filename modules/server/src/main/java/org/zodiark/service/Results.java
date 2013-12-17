@@ -15,5 +15,8 @@
  */
 package org.zodiark.service;
 
+/**
+ * Simple marker interface for {@link org.zodiark.service.chat.Message#message} sent from to {@link Endpoint}
+ */
 public interface Results {
 }

@@ -19,10 +19,26 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.Reply;
 
+/**
+ * A Service is a target of an {@link org.zodiark.server.EventBus}. A Service can react to I/O events and messages dispatched
+ * via the {@link org.zodiark.server.EventBus}. A Service implementation must be annotated with the {@link org.zodiark.server.annotation.On}
+ * annotated in order to be discovered at runtime and made available to an EventBus.
+ * <p/>
+ */
 public interface Service {
+    /**
+     * React to I/O events produced by a remote {@link Endpoint} and received via an {@link AtmosphereResource} connection.
+     * @param e an {@link Envelope}
+     * @param r a {@link AtmosphereResource}, representing the connection from the remote {@link Endpoint}
+     */
+    void reactTo(Envelope e, AtmosphereResource r);
 
-    void serve(Envelope e, AtmosphereResource r);
-
-    void serve(String event, Object message, Reply l);
+    /**
+     * React to message produced by other {@link Service}
+     * @param path a {@link org.zodiark.protocol.Paths}
+     * @param message a message
+     * @param reply a {@link Reply}
+     */
+    void reactTo(String path, Object message, Reply reply);
 
 }

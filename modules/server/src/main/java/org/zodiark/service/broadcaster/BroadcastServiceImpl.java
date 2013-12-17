@@ -64,7 +64,7 @@ public class BroadcastServiceImpl implements BroadcasterService {
      * {@inheritDoc}
      */
     @Override
-    public void serve(Envelope e, AtmosphereResource r) {
+    public void reactTo(Envelope e, AtmosphereResource r) {
         dispatchMessage(e, r);
     }
 
@@ -72,8 +72,8 @@ public class BroadcastServiceImpl implements BroadcasterService {
      * {@inheritDoc}
      */
     @Override
-    public void serve(String event, Object message, Reply l) {
-        switch (event) {
+    public void reactTo(String path, Object message, Reply reply) {
+        switch (path) {
             case BROADCASTER_CREATE:
                 createBroadcaster(PublisherEndpoint.class.cast(message));
                 break;

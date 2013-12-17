@@ -61,37 +61,37 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
     private final ConcurrentHashMap<String, StreamingSession> sessions = new ConcurrentHashMap<>();
 
     @Override
-    public void serve(Envelope e, AtmosphereResource r) {
+    public void reactTo(Envelope e, AtmosphereResource r) {
     }
 
     @Override
-    public void serve(String event, Object message, Reply l) {
-        logger.trace("Handling {}", event);
+    public void reactTo(String path, Object message, Reply reply) {
+        logger.trace("Handling {}", path);
 
-        switch (event) {
+        switch (path) {
             case BEGIN_STREAMING_SESSION:
                 PublisherEndpoint p = PublisherEndpoint.class.cast(message);
 
                 boolean hasStreamingSession = hasStreamingSession(p);
                 if (hasStreamingSession) {
-                    terminate(p, l);
+                    terminate(p, reply);
                 } else {
-                    initiate(p, l);
+                    initiate(p, reply);
                 }
                 break;
             case BEGIN_SUBSCRIBER_STREAMING_SESSION:
-                join(SubscriberEndpoint.class.cast(message), l);
+                join(SubscriberEndpoint.class.cast(message), reply);
                 break;
             case STREAMING_EXECUTE_ACTION:
                 Action a = Action.class.cast(message);
-                executeAction(a, l);
+                executeAction(a, reply);
                 break;
             case STREAMING_COMPLETE_ACTION:
                 p = PublisherEndpoint.class.cast(message);
                 completeAction(p);
                 break;
             default:
-                logger.error("Not Supported {}", event);
+                logger.error("Not Supported {}", path);
         }
 
     }

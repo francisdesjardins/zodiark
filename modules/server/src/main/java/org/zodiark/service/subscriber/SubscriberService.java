@@ -20,11 +20,30 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.server.Reply;
 import org.zodiark.service.Service;
 
+/**
+ * Base class for Service responsible for managing Subscriber.
+ */
 public interface SubscriberService extends Service {
 
+    /**
+     * Sent by a remote {@link SubscriberEndpoint} asking to execute an {@link org.zodiark.service.action.Action} with
+     * a {@link org.zodiark.service.publisher.PublisherEndpoint}'s Streaming Session.
+     * @param e an {@link Envelope} containing the subscriber's request
+     * @param r an {@link AtmosphereResource} connected to the subscriber
+     */
     public void requestForAction(Envelope e, AtmosphereResource r);
 
-    public void retrieveEndpoint(Object s, Reply l);
+    /**
+     * Retrieve the {@link SubscriberEndpoint} associated with a
+     * @param subscriberUuid
+     * @param reply
+     */
+    public void retrieveEndpoint(Object subscriberUuid, Reply reply);
 
-    public void connectEndpoint(AtmosphereResource r, Envelope e);
+    /**
+     * Create a {@link SubscriberEndpoint} from an {@link Envelope} received from the remote endpoint
+     * @param e an {@link Envelope}
+     * @param r an {@link AtmosphereResource}
+     */
+    public void connectEndpoint(Envelope e, AtmosphereResource r);
 }

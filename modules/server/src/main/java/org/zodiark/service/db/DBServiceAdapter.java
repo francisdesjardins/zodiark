@@ -25,10 +25,10 @@ import org.zodiark.server.Reply;
 public class DBServiceAdapter implements DBService {
 
     @Override
-    public void serve(Envelope e, AtmosphereResource r) {}
+    public void reactTo(Envelope e, AtmosphereResource r) {}
 
     @Override
-    public void serve(String event, Object message, Reply l) {}
+    public void reactTo(String path, Object message, Reply reply) {}
 
 }
 

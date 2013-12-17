@@ -19,6 +19,10 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Message;
 import org.zodiark.service.config.PublisherConfig;
 
+/**
+ * Base class for {@link Endpoint}
+ * @param <T>
+ */
 public class EndpointAdapter<T> implements Endpoint {
     protected String uuid;
     protected PublisherConfig config;
@@ -54,7 +58,7 @@ public class EndpointAdapter<T> implements Endpoint {
 
     @Override
     public TYPE type() {
-        return TYPE.PUBLISHER;
+        return TYPE.SUPER_USER;
     }
 
     @Override

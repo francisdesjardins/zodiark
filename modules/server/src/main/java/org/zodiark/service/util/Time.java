@@ -15,6 +15,9 @@
  */
 package org.zodiark.service.util;
 
+/**
+ * A Timer class for {@link org.zodiark.service.action.Action}
+ */
 public class Time {
 
     private int time = 30;

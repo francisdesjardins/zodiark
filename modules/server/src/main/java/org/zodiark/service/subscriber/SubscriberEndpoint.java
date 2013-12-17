@@ -18,6 +18,9 @@ package org.zodiark.service.subscriber;
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.publisher.PublisherEndpoint;
 
+/**
+ * Represent the remote endpoint Subscriber.
+ */
 public class SubscriberEndpoint extends EndpointAdapter<SubscriberEndpoint> {
 
     private PublisherEndpoint publisherEndpoint;
@@ -44,5 +47,10 @@ public class SubscriberEndpoint extends EndpointAdapter<SubscriberEndpoint> {
     public SubscriberEndpoint isAuthenticated(boolean isAuthenticated) {
         this.isAuthenticated = isAuthenticated;
         return this;
+    }
+
+    @Override
+    public TYPE type() {
+        return TYPE.SUBSCRIBER;
     }
 }

@@ -18,26 +18,42 @@ package org.zodiark.service.subscriber;
 import org.zodiark.service.config.SubscriberConfig;
 import org.zodiark.service.session.StreamingSession;
 
+/**
+ * The {@link SubscriberEndpoint} database/web service local state.
+ */
 public class SubscriberConfigImpl implements SubscriberConfig {
 
     private StreamingSession.TYPE sessionType;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public StreamingSession.TYPE sessionType() {
         return sessionType;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SubscriberConfig sessionType(StreamingSession.TYPE sessionType) {
         this.sessionType = sessionType;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isStateValid() {
         return true;
     }
 
+    /**
+     * Populate the state of this instance representing the remote {@link SubscriberEndpoint}
+     * @param state
+     */
     public void populate(String state) {
         // TODO: Receive the state from the database.
     }

@@ -70,7 +70,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     public Context context;
 
     @Override
-    public void serve(Envelope e, AtmosphereResource r) {
+    public void reactTo(Envelope e, AtmosphereResource r) {
         logger.trace("Handling Publisher Envelop {} to Service {}", e, r.uuid());
         switch (e.getMessage().getPath()) {
             case LOAD_PUBLISHER_CONFIG:
@@ -231,13 +231,13 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
      * {@inheritDoc}
      */
     @Override
-    public void serve(String event, Object message, Reply l) {
-        switch (event) {
+    public void reactTo(String path, Object message, Reply reply) {
+        switch (path) {
             case RETRIEVE_PUBLISHER:
-                retrieveEndpoint(message, l);
+                retrieveEndpoint(message, reply);
                 break;
             case PUBLISHER_ABOUT_READY:
-                resetEndpoint(message, l);
+                resetEndpoint(message, reply);
                 break;
         }
     }
