@@ -46,97 +46,89 @@ public interface Paths {
      * access to a remote Wowza Endpoint.
      */
     String VALIDATE_PUBLISHER_STREAMING_SESSION = "/publisher/validateStreamingSession";
-
     /**
-     * Validate the Subscriber Streaming Session
+     * An I/O event to validate the Subscriber Streaming Session
      */
     String VALIDATE_SUBSCRIBER_STREAMING_SESSION = "/subscriber/validateStreamingSession";
-
     /**
-     * Send by Wowza when the Streaming Session cannot be started, for whatever reason, for a Publisher.
+     * An I/O event Send by Wowza when the Streaming Session cannot be started, for whatever reason, for a Publisher.
      */
     String FAILED_PUBLISHER_STREAMING_SESSION = "/publisher/errorStreamingSession";
     /**
-     * Send by Wowza when the Streaming Session cannot be started, for whatever reason, for a Subscriber.
+     * An I/O event Send by Wowza when the Streaming Session cannot be started, for whatever reason, for a Subscriber.
      */
     String FAILED_SUBSCRIBER_STREAMING_SESSION = "/subscriber/errorStreamingSession";
-
     /**
-     * A {@link Message#path} sent back to the remote Endpoint
+     * An I/O event {@link Message#path} sent back to the remote Endpoint
      */
     String ERROR_STREAMING_SESSION = "/error/errorStreamingSession";
     /**
-     * Once the Publisher has been authorized to Stream, the PublisherService will
+     * An I/O event and a message. Once the Publisher has been authorized to Stream, the PublisherService will
      * fire this event to start the streaming session via the StreamingService.
      */
     String BEGIN_STREAMING_SESSION = "/streaming/begin/publisher";
-
     /**
-     * Send a request to Wowza asking for a Streaming Session Approval
+     * An I/O event. Send a request to Wowza asking for a Streaming Session Approval
      */
     String WOWZA_CONNECT = "/wowza/connect";
     /**
-     * Advise the WowzaService that its needs to start the obfuscation process
+     * A Message to Advise the WowzaService that its needs to start the obfuscation process
      */
     String WOWZA_OBFUSCATE = "/wowza/obfuscate";
     /**
-     * Advise the WowzaService that its needs to start the deobfuscation process
+     * A Message to advise the WowzaService that its needs to start the deobfuscation process
      */
     String WOWZA_DEOBFUSCATE = "/wowza/deobfuscate";
     /**
-     * Received from a Wowxa endpoint when the obfuscation process is completed and the action can start.
+     * An I/O event received from a Wowxa endpoint when the obfuscation process is completed and the action can start.
      */
     String WOWZA_OBFUSCATE_OK = "/wowza/obfuscate/ok";
     /**
-     * Received from a Wowxa endpoint when the deobfuscation process is completed and the normal behavior
+     * An I/O event Received from a Wowxa endpoint when the deobfuscation process is completed and the normal behavior
      */
     String WOWZA_DEOBFUSCATE_OK = "/wowza/deobfuscate/ok";
-
     /**
-     * Retrieve the data from an Endpoint
+     * A message to retrieve the data from an Endpoint
      */
     String DB_CONFIG = "/db/config";
-
     /**
-     * Initialize an Endpoint Session within the remote database/web service endpoint.
+     * A message to Initialize an Endpoint Session within the remote database/web service endpoint.
      */
     String DB_INIT = "/db/init";
-
     /**
-     * Retrieve the list of banned word for a Streaming Session Chat.
+     * A Message to retrieve the list of banned word for a Streaming Session Chat.
      */
     String DB_WORD = "/db/word";
-
     /**
-     * Validate the state of a Subscriber
+     * a Message to validate the state of a Subscriber
      */
     String SUBSCRIBER_VALIDATE_STATE = "/db/validate";
     /**
-     * Leave the current Publisher Streaming Session
+     * An I/O event to leave the current Publisher Streaming Session
      */
     String TERMINATE_STREAMING_SESSSION = "/publisher/disconnect";
     /**
-     * Leave the current Streaming Session
+     * An I/O event to leave the current Streaming Session
      */
     String TERMINATE_SUBSCRIBER_STREAMING_SESSSION = "/subscriber/disconnect";
     /**
-     * Wowza response to a request for a validation request
+     * An I/O event from Wowza in response to a request for a validation request
      */
     String SERVER_VALIDATE_OK = "/wowza/validate";
     /**
-     * Request for an Action
+     * An I/O event. Request for an Action
      */
     String REQUEST_ACTION = "/request/action";
     /**
-     * A request for Action. This path is used by tan Envelope
+     * An I/O event. A request for Action. This path is used by an Envelope
      */
     String MESSAGE_ACTION = "/message/action";
     /**
-     * Retrieve the publisher
+     * A Message to retrieve the publisher
      */
     String RETRIEVE_PUBLISHER = "/publisher/retrieve";
     /**
-     * Retrieve the subscriber
+     * A Message to retrieve the subscriber
      */
     String RETRIEVE_SUBSCRIBER = "/subscriber/retrieve";
     /**
@@ -163,7 +155,6 @@ public interface Paths {
      * A message from a Publisher rejecting an Action
      */
     String ACTION_ACCEPT_REFUSED = "/action/actionRefused";
-
     /**
      * Join an existing Publisher Session
      */
@@ -176,7 +167,6 @@ public interface Paths {
      * Fired when an Action is completed.
      */
     String STREAMING_COMPLETE_ACTION = "/streaming/completeAction";
-
     /**
      * An I/O event received when a publisher accept an Action
      */
@@ -213,8 +203,6 @@ public interface Paths {
      * A message sent to the BroadcasterService asking to associate a subscriber with a publisher's session
      */
     String BROADCASTER_TRACK = "/broadcaster/track";
-
-    String BROADCASTER_DISPATCH = "/broadcaster/dispatch";
     /**
      * Broadcast a message to all chat room
      */
@@ -227,5 +215,7 @@ public interface Paths {
      * A Message for initiating publisher/subscriber state in the database/remote webservice
      */
     String DISCONNECTED_RESOURCE = "/db/disconnected";
+
+    String BROADCASTER_DISPATCH = "/broadcaster/dispatch";
 
 }
