@@ -18,6 +18,9 @@ package org.zodiark.service.wowza;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * An object used as {@link org.zodiark.service.chat.Message#message} used to exchange data with a remote Wowza {@link org.zodiark.service.Endpoint}
+ */
 public class WowzaMessage {
 
     public enum TYPE { OBFUSCATE, LIVE }

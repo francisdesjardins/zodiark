@@ -20,9 +20,25 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.service.Service;
 
+/**
+ * A Service for handling the interaction with remote Wowza {@link org.zodiark.service.Endpoint}
+ */
 public interface WowzaService extends Service {
 
+    /**
+     * Process a Wowza remote endpoint connection.
+     *
+     * @param e the {@link Envelope} sent by the remote endpoint
+     * @param r {@link AtmosphereResource} the underlying connection.
+     */
     void connected(Envelope e, AtmosphereResource r);
 
+    /**
+     * Prepare and send the {@link Envelope} back to remote Wowza endpoint
+     *
+     * @param e the {@link Envelope} to send to the remote endpoint
+     * @param r {@link AtmosphereResource} the underlying connection.
+     * @param m a {@link Message}
+     */
     void response(Envelope e, AtmosphereResource r, Message m);
 }

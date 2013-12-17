@@ -18,28 +18,50 @@ package org.zodiark.service.wowza;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-// TODO: Allow Injection of this guy
+/**
+ * Instance of this class will be managed by the {@link org.zodiark.server.ZodiarkObjectFactory} and represent the
+ * list of available Wowza remote endpoint.
+ */
 public class WowzaEndpointManagerImpl implements WowzaEndpointManager {
 
     private final Queue<WowzaEndpoint> endpoints = new ConcurrentLinkedQueue<WowzaEndpoint>();
 
+    /**
+     * Return the list of {@link WowzaEndpoint}
+     * @return list of {@link WowzaEndpoint}
+     */
     @Override
     public Queue<WowzaEndpoint> endpoints() {
         return endpoints;
     }
 
+    /**
+     * Bind/add a {@link WowzaEndpoint}
+     * @param endpoint {@link WowzaEndpoint}
+     * @return this
+     */
     @Override
     public WowzaEndpointManager bind(WowzaEndpoint endpoint) {
         endpoints.offer(endpoint);
         return this;
     }
 
+    /**
+     * Unbind/remove a {@link WowzaEndpoint}
+     * @param endpoint {@link WowzaEndpoint}
+     * @return this
+     */
     @Override
     public WowzaEndpointManager unbind(WowzaEndpoint endpoint) {
         endpoints.remove(endpoint);
         return this;
     }
 
+    /**
+     * Lookup a {@link WowzaEndpoint} based on a name
+     * @param wowzaName the endpoint's name
+     * @return {@link WowzaEndpoint}
+     */
     @Override
     public WowzaEndpoint lookup(String wowzaName) {
         for (WowzaEndpoint e : endpoints) {

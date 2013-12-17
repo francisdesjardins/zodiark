@@ -18,15 +18,15 @@ package org.zodiark.service.publisher;
 import org.zodiark.service.Results;
 
 /**
- * A simple object used as an Enveloppe's {@link org.zodiark.protocol.Message} to send some state information to remote endpoint like
- * {@link PublisherEndpoint}, {@link org.zodiark.service.config.SubscriberConfig} or {@link org.zodiark.service.wowza.WowzaEndpoint}.
+ * A Result simple JSON POJO for exchanging {@link org.zodiark.service.chat.Message} with {@link PublisherEndpoint}
  */
 public class PublisherResults implements Results {
 
     private String results;
     private String uuid;
 
-    public PublisherResults() {}
+    public PublisherResults() {
+    }
 
     public PublisherResults(String results) {
         this.results = results;
@@ -37,18 +37,34 @@ public class PublisherResults implements Results {
         this.uuid = uuid;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setResults(String results) {
         this.results = results;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getResults() {
         return results;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getUuid() {
         return uuid;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }

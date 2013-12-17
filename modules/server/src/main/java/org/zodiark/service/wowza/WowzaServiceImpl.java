@@ -43,6 +43,9 @@ import static org.zodiark.protocol.Paths.WOWZA_DEOBFUSCATE_OK;
 import static org.zodiark.protocol.Paths.WOWZA_OBFUSCATE;
 import static org.zodiark.protocol.Paths.WOWZA_OBFUSCATE_OK;
 
+/**
+ * A Service responsible for reacting to Wowza's messages and I/O Events.
+ */
 @On("/wowza")
 public class WowzaServiceImpl implements WowzaService {
     private final Logger logger = LoggerFactory.getLogger(WowzaServiceImpl.class);
@@ -107,7 +110,7 @@ public class WowzaServiceImpl implements WowzaService {
         }
     }
 
-    // Will be called when the Publisher is ready to start a streaming show
+
     @Override
     public void reactTo(String path, Object message, Reply reply) {
 
@@ -146,6 +149,9 @@ public class WowzaServiceImpl implements WowzaService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void connected(Envelope e, AtmosphereResource r) {
 
@@ -164,6 +170,9 @@ public class WowzaServiceImpl implements WowzaService {
         response(e, r, responseMessage);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void response(Envelope e, AtmosphereResource r, Message m) {
         Envelope newResponse = Envelope.newServerReply(e, m);

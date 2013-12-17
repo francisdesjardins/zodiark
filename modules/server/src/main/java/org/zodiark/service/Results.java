@@ -19,4 +19,11 @@ package org.zodiark.service;
  * Simple marker interface for {@link org.zodiark.service.chat.Message#message} sent from to {@link Endpoint}
  */
 public interface Results {
+    public void setResults(String results);
+
+    public String getResults();
+
+    public String getUuid();
+
+    public void setUuid(String uuid) ;
 }

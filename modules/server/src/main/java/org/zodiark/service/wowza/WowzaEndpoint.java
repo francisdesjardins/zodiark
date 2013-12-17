@@ -52,21 +52,32 @@ public class WowzaEndpoint implements Endpoint {
     public WowzaEndpoint() {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public TYPE type() {
         return TYPE.WOWZA;
     }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void terminate() {
-
+        // TODO: Not Implemented
     }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String uuid() {
         return uuid;
     }
 
+    /**
+     * TODO: For later use
+     * @return
+     */
     public List<Endpoint> supportedEndpoints() {
         return supportedEndpoints;
     }
@@ -75,9 +86,10 @@ public class WowzaEndpoint implements Endpoint {
      * Send a {@link Paths#SERVER_VALIDATE_OK} to Wowza and listen for the response. The response will be delivered
      * to the {@link org.zodiark.service.publisher.PublisherService}
      * <p/>
-     *     {@link Paths#START_PUBLISHER_STREAMING_SESSION} if the streaming session is accepted.
+     * {@link Paths#START_PUBLISHER_STREAMING_SESSION} if the streaming session is accepted.
      * </p>
-     *     {@link Paths#FAILED_PUBLISHER_STREAMING_SESSION} if the streaming session is not accepted, for whatever reason.
+     * {@link Paths#FAILED_PUBLISHER_STREAMING_SESSION} if the streaming session is not accepted, for whatever reason.
+     *
      * @param p
      * @param l
      */
@@ -96,22 +108,49 @@ public class WowzaEndpoint implements Endpoint {
 
     }
 
+    /**
+     * Set the Wowza UUID
+     *
+     * @param uuid Wowza UUID
+     * @return this
+     */
     public WowzaEndpoint uuid(String uuid) {
         this.uuid = uuid;
         return this;
     }
 
+    /**
+     * Set a {@link Message} who most probably will contains some information like geo localisation.
+     *
+     * @param m a {@link Message
+     * @return this.
+     */
     public WowzaEndpoint message(Message m) {
         this.message = m;
         return this;
     }
 
+    /**
+     * Set the {@link AtmosphereResource} representing the underlying connection.
+     *
+     * @param r {@link AtmosphereResource}
+     * @return this
+     */
     public WowzaEndpoint resource(AtmosphereResource r) {
         this.resource = r;
         return this;
     }
 
-    public void obfuscate(StreamingSession session, Reply l) {
+    /**
+     * Obfuscate {@link SubscriberEndpoint} that are not allowed to participate to a streaming session. This
+     * method will send an {@link Envelope} to the targeted remote Wowza endpoint with a list of {@link SubscriberEndpoint}
+     * 's uuid that must be obfuscated.
+     *
+     * @param session the current {@link StreamingSession}
+     * @param reply   a {@link Reply} in case a failure occurs. If the operation works, an I/O events will be delivered
+     *                and no {@link Reply#ok(Object)} will be called.
+     */
+    public void obfuscate(StreamingSession session, Reply reply) {
         String executorUuid = session.pendingAction().getSubscriberUUID();
         List<String> uuids = new ArrayList<>();
 
@@ -133,12 +172,20 @@ public class WowzaEndpoint implements Endpoint {
             resource.write(mapper.writeValueAsString(e));
         } catch (JsonProcessingException e1) {
             logger.error("", e1);
-            l.fail(session.pendingAction());
+            reply.fail(session.pendingAction());
         }
 
     }
 
-    public void deobfuscate(StreamingSession session, Reply l) {
+    /**
+     * The {@link org.zodiark.service.action.Action} completed, send a message to the remote Wowza with a list
+     * of {@link SubscriberEndpoint} that can now be re-added to a streaming session. If the operation works, an I/O events will be delivered
+     * and no {@link Reply#ok(Object)} will be called.
+     *
+     * @param session {@link StreamingSession}
+     * @param reply   a {@link Reply} in case a failure occurs.
+     */
+    public void deobfuscate(StreamingSession session, Reply reply) {
         String executorUuid = session.pendingAction().getSubscriberUUID();
         List<String> uuids = new ArrayList<>();
 
@@ -160,7 +207,7 @@ public class WowzaEndpoint implements Endpoint {
             resource.write(mapper.writeValueAsString(e));
         } catch (JsonProcessingException e1) {
             logger.error("", e1);
-            l.fail(session.pendingAction());
+            reply.fail(session.pendingAction());
         }
 
     }
