@@ -70,7 +70,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     public Context context;
 
     @Override
-    public void reactTo(Envelope e, AtmosphereResource r) {
+    public void reactTo(Envelope e, AtmosphereResource r, Reply reply) {
         logger.trace("Handling Publisher Envelop {} to Service {}", e, r.uuid());
         switch (e.getMessage().getPath()) {
             case LOAD_PUBLISHER_CONFIG:

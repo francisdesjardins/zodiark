@@ -68,7 +68,7 @@ public class ActionServiceImpl implements ActionService {
     public ScheduledExecutorService timer;
 
     @Override
-    public void reactTo(Envelope e, AtmosphereResource r) {
+    public void reactTo(Envelope e, AtmosphereResource r, Reply reply) {
         switch (e.getMessage().getPath()) {
             case ACTION_ACCEPT_OK:
                 actionAccepted(e);

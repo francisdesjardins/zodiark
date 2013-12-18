@@ -71,7 +71,7 @@ public class DefaultEventBus implements EventBus {
         }
 
         if (s != null) {
-            s.reactTo(e, r);
+            s.reactTo(e, r, reply);
         } else {
             logger.error("No Service available for {}", e);
             Message m = new Message();

@@ -63,7 +63,7 @@ public class WowzaServiceImpl implements WowzaService {
     public ObjectMapper mapper;
 
     @Override
-    public void reactTo(Envelope e, AtmosphereResource r) {
+    public void reactTo(Envelope e, AtmosphereResource r, Reply reply) {
         String uuid = e.getUuid();
         switch (e.getMessage().getPath()) {
             case WOWZA_OBFUSCATE_OK:

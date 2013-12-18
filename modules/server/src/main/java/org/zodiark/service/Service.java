@@ -28,10 +28,11 @@ import org.zodiark.server.Reply;
 public interface Service {
     /**
      * React to I/O events produced by a remote {@link Endpoint} and received via an {@link AtmosphereResource} connection.
-     * @param e an {@link Envelope}
-     * @param r a {@link AtmosphereResource}, representing the connection from the remote {@link Endpoint}
+     * @param e an {@link org.zodiark.protocol.Envelope}
+     * @param r a {@link org.atmosphere.cpr.AtmosphereResource}, representing the connection from the remote {@link org.zodiark.service.Endpoint}
+     * @param reply a {@link Reply}
      */
-    void reactTo(Envelope e, AtmosphereResource r);
+    void reactTo(Envelope e, AtmosphereResource r, Reply reply);
 
     /**
      * React to message produced by other {@link Service}

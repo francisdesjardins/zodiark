@@ -61,7 +61,7 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
     private final ConcurrentHashMap<String, StreamingSession> sessions = new ConcurrentHashMap<>();
 
     @Override
-    public void reactTo(Envelope e, AtmosphereResource r) {
+    public void reactTo(Envelope e, AtmosphereResource r, Reply reply) {
     }
 
     @Override

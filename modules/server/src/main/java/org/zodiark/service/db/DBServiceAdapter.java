@@ -25,7 +25,7 @@ import org.zodiark.server.Reply;
 public class DBServiceAdapter implements DBService {
 
     @Override
-    public void reactTo(Envelope e, AtmosphereResource r) {}
+    public void reactTo(Envelope e, AtmosphereResource r, Reply reply) {}
 
     @Override
     public void reactTo(String path, Object message, Reply reply) {}

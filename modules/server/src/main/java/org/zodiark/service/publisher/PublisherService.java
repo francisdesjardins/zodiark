@@ -28,7 +28,7 @@ public interface PublisherService extends Service {
      * {@inheritDoc}
      */
     @Override
-    public void reactTo(Envelope e, AtmosphereResource r);
+    public void reactTo(Envelope e, AtmosphereResource r, Reply reply);
 
     /**
      * {@inheritDoc}

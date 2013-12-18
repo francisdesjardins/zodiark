@@ -64,7 +64,7 @@ public class BroadcastServiceImpl implements BroadcasterService {
      * {@inheritDoc}
      */
     @Override
-    public void reactTo(Envelope e, AtmosphereResource r) {
+    public void reactTo(Envelope e, AtmosphereResource r, Reply reply) {
         dispatchMessage(e, r);
     }
 

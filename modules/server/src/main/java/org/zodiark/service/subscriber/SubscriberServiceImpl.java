@@ -78,7 +78,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     public StreamingRequest requestClass;
 
     @Override
-    public void reactTo(Envelope e, AtmosphereResource r) {
+    public void reactTo(Envelope e, AtmosphereResource r, Reply reply) {
         logger.trace("Handling Subscriber Envelop {} to Service {}", e, r.uuid());
 
         // TODO: One service per Path instead?

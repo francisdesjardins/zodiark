@@ -23,7 +23,7 @@ import org.zodiark.service.Service;
 public interface DBService extends Service {
 
     @Override
-    public void reactTo(Envelope e, AtmosphereResource r) ;
+    public void reactTo(Envelope e, AtmosphereResource r, Reply reply) ;
 
     @Override
     public void reactTo(String path, Object message, Reply reply);
