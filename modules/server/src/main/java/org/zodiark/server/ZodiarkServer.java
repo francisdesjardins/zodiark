@@ -102,7 +102,7 @@ public class ZodiarkServer {
             String[] values = s.value();
             for (String v : values) {
                 try {
-                    EventBusFactory.getDefault().eventBus().on(v, server.framework().newClassInstance(annotatedClass));
+                    EventBusFactory.getDefault().eventBus().on(v, server.framework().newClassInstance(Service.class, annotatedClass));
                 } catch (Exception e) {
                     logger.error("Unable to create Service {}", annotatedClass, e);
                 }

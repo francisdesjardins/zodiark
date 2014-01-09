@@ -132,8 +132,7 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
     }
 
     @Override
-    public <T> T newClassInstance(final AtmosphereFramework framework, Class<T> tClass) throws InstantiationException, IllegalAccessException {
-
+    public <T, U extends T> T newClassInstance(final AtmosphereFramework framework, Class<T> classType, Class<U> tClass) throws InstantiationException, IllegalAccessException {
         logger.debug("About to create {}", tClass.getName());
         if (!added.getAndSet(true)) {
             framework.getAtmosphereConfig().shutdownHook(new AtmosphereConfig.ShutdownHook() {
@@ -144,15 +143,9 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
             });
         }
 
-        if (tClass.isAssignableFrom(AuthConfig.class)) {
-            return (T) newClassInstance(framework, implement(AuthConfig.class));
-        } else if (tClass.isAssignableFrom(PublisherConfig.class)) {
-            return (T) newClassInstance(framework, implement(PublisherConfig.class));
-        } else if (tClass.isAssignableFrom(SubscriberConfig.class)) {
-            return (T) newClassInstance(framework, implement(SubscriberConfig.class));
-        }
+        Class<? extends T> impl = implement(classType);
 
-        T instance = tClass.newInstance();
+        T instance = impl != null ? impl.newInstance() : tClass.newInstance();
 
         Field[] fields = tClass.getDeclaredFields();
         for (Field field : fields) {
@@ -162,7 +155,7 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
                 } else if (field.getType().isAssignableFrom(EventBus.class)) {
                     field.set(instance, inject(EventBus.class));
                 } else if (field.getType().isAssignableFrom(RESTService.class)) {
-                    field.set(instance, newClassInstance(framework, implement(RESTService.class)));
+                    field.set(instance, newClassInstance(framework, RESTService.class, implement(RESTService.class)));
                 } else if (field.getType().isAssignableFrom(WowzaEndpointManager.class)) {
                     field.set(instance, inject(WowzaEndpointManager.class));
                 } else if (field.getType().isAssignableFrom(Context.class)) {
@@ -171,18 +164,18 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
                         @Override
                         public <T> T newInstance(Class<T> t) {
                             try {
-                                return newClassInstance(framework, t);
+                                return newClassInstance(framework, t, t);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
                         }
                     });
                 } else if (field.getType().isAssignableFrom(AuthConfig.class)) {
-                    field.set(instance, newClassInstance(framework, implement(AuthConfig.class)));
+                    field.set(instance, newClassInstance(framework, AuthConfig.class, implement(AuthConfig.class)));
                 } else if (field.getType().isAssignableFrom(PublisherConfig.class)) {
-                    field.set(instance, newClassInstance(framework, implement(PublisherConfig.class)));
+                    field.set(instance, newClassInstance(framework, PublisherConfig.class, implement(PublisherConfig.class)));
                 } else if (field.getType().isAssignableFrom(SubscriberConfig.class)) {
-                    field.set(instance, newClassInstance(framework, implement(SubscriberConfig.class)));
+                    field.set(instance, newClassInstance(framework, SubscriberConfig.class, implement(SubscriberConfig.class)));
                 } else if (field.getType().isAssignableFrom(StreamingRequest.class)) {
                     field.set(instance, inject(StreamingRequest.class));
                 } else if (field.getType().isAssignableFrom(ScheduledExecutorService.class)) {
