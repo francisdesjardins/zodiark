@@ -312,7 +312,7 @@ zodiark = (function () {
 
 function loadAtmosphere() {
 
-    var version = "2.1.1-javascript",
+    var version = "2.1.4-javascript",
         atmosphere = {},
         guid,
         requests = [],
@@ -342,7 +342,7 @@ function loadAtmosphere() {
         },
         onFailureToReconnect: function (request, response) {
         },
-        onClientTimeout: function (request) {
+        onClientTimeout: function(request){
         },
 
         AtmosphereRequest: function (options) {
@@ -412,7 +412,7 @@ function loadAtmosphere() {
                 },
                 onFailureToReconnect: function (request, response) {
                 },
-                onClientTimeout: function (request) {
+                onClientTimeout: function(request){
                 }
             };
 
@@ -611,6 +611,7 @@ function loadAtmosphere() {
             function _close() {
                 if (_request.reconnectId) {
                     clearTimeout(_request.reconnectId);
+                    delete _request.reconnectId;
                 }
                 _request.reconnect = false;
                 _abordingConnection = true;
@@ -744,7 +745,11 @@ function loadAtmosphere() {
                 _request.firstMessage = uuid == 0 ? true : false;
                 _request.isOpen = false;
                 _request.ctime = atmosphere.util.now();
-                _request.uuid = uuid;
+
+                // We carry any UUID set by the user or from a previous connection.
+                if (_request.uuid === 0) {
+                    _request.uuid = uuid;
+                }
                 _response.closedByClientTimeout = false;
 
                 if (_request.transport !== 'websocket' && _request.transport !== 'sse') {
@@ -1213,7 +1218,7 @@ function loadAtmosphere() {
                                 if (rq.reconnect && _requestCount++ < rq.maxReconnectOnClose) {
                                     _open('re-connecting', rq.transport, rq);
                                     _reconnect(_jqxhr, rq, request.reconnectInterval);
-                                    rq.openId = setTimeout(function () {
+                                    rq.openId = setTimeout(function() {
                                         _triggerOpen(rq);
                                     }, rq.reconnectInterval + 1000);
                                 } else {
@@ -1369,7 +1374,11 @@ function loadAtmosphere() {
                         } else {
                             _open('re-opening', "sse", _request);
                         }
+                    } else if (_request.isReopen) {
+                        _request.isReopen = false;
+                        _open('re-opening', _request.transport, _request);
                     }
+
                     sseOpened = true;
 
                     if (_request.method === 'POST') {
@@ -1394,10 +1403,10 @@ function loadAtmosphere() {
 
                     // https://github.com/remy/polyfills/blob/master/EventSource.js
                     // Since we polling.
-                    /* if (_sse.URL) {
-                     _sse.interval = 100;
-                     _sse.URL = _buildSSEUrl();
-                     } */
+                   /* if (_sse.URL) {
+                        _sse.interval = 100;
+                        _sse.URL = _buildSSEUrl();
+                    } */
 
                     if (!skipCallbackInvocation) {
                         _invokeCallback();
@@ -1501,7 +1510,7 @@ function loadAtmosphere() {
                     var reopening = webSocketOpened;
 
                     webSocketOpened = true;
-                    if (_websocket != null) {
+                    if(_websocket != null) {
                         _websocket.webSocketOpened = webSocketOpened;
                     }
 
@@ -1825,7 +1834,8 @@ function loadAtmosphere() {
                 }
 
                 if (rq.contentType !== '') {
-                    url += "&Content-Type=" + encodeURIComponent(rq.contentType);
+                    //Eurk!
+                    url += "&Content-Type=" + (rq.transport === 'websocket' ? rq.contentType : encodeURIComponent(rq.contentType));
                 }
 
                 if (rq.enableProtocol) {
@@ -1873,7 +1883,7 @@ function loadAtmosphere() {
                     return;
                 }
 
-                if (atmosphere.util.browser.msie && atmosphere.util.browser.version < 10) {
+                if (atmosphere.util.browser.msie && +atmosphere.util.browser.version.split(".")[0] < 10) {
                     if ((rq.transport === 'streaming')) {
                         if (rq.enableXDR && window.XDomainRequest) {
                             _ieXDR(rq);
@@ -1990,7 +2000,7 @@ function loadAtmosphere() {
                             if (atmosphere.util.trim(responseText).length === 0 && rq.transport === 'long-polling') {
                                 // For browser that aren't support onabort
                                 if (!ajaxRequest.hasData) {
-                                    reconnectF();
+                                    _reconnect(ajaxRequest, rq, 0);
                                 } else {
                                     ajaxRequest.hasData = false;
                                 }
@@ -2163,6 +2173,7 @@ function loadAtmosphere() {
                     clearTimeout(request.id);
                     if (request.reconnectId) {
                         clearTimeout(request.reconnectId);
+                        delete request.reconnectId;
                     }
 
                     if (reconnectInterval > 0) {
@@ -2667,23 +2678,25 @@ function loadAtmosphere() {
             }
 
             function _readHeaders(xdr, request) {
-                if (!request.readResponsesHeaders && !request.enableProtocol) {
-                    request.lastTimestamp = atmosphere.util.now();
-                    request.uuid = guid;
-                    return;
+                if (!request.readResponsesHeaders) {
+                    if (!request.enableProtocol) {
+                        request.lastTimestamp = atmosphere.util.now();
+                        request.uuid = guid;
+                    }
                 }
+                else {
+                    try {
+                        var tempDate = xdr.getResponseHeader('X-Cache-Date');
+                        if (tempDate && tempDate != null && tempDate.length > 0) {
+                            request.lastTimestamp = tempDate.split(" ").pop();
+                        }
 
-                try {
-                    var tempDate = xdr.getResponseHeader('X-Cache-Date');
-                    if (tempDate && tempDate != null && tempDate.length > 0) {
-                        request.lastTimestamp = tempDate.split(" ").pop();
+                        var tempUUID = xdr.getResponseHeader('X-Atmosphere-tracking-id');
+                        if (tempUUID && tempUUID != null) {
+                            request.uuid = tempUUID.split(" ").pop();
+                        }
+                    } catch (e) {
                     }
-
-                    var tempUUID = xdr.getResponseHeader('X-Atmosphere-tracking-id');
-                    if (tempUUID && tempUUID != null) {
-                        request.uuid = tempUUID.split(" ").pop();
-                    }
-                } catch (e) {
                 }
             }
 
@@ -2719,7 +2732,7 @@ function loadAtmosphere() {
                         break;
                     case "closedByClient":
                         if (typeof (f.onClientTimeout) !== 'undefined')
-                            f.onClientTimeout(_request);
+                           f.onClientTimeout(_request);
                         break;
                     case "re-opening":
                         delete _request.closed;
@@ -2865,6 +2878,9 @@ function loadAtmosphere() {
         if (typeof (callback) === 'function') {
             atmosphere.addCallback(callback);
         }
+
+        // https://github.com/Atmosphere/atmosphere-javascript/issues/58
+        uuid = 0;
 
         if (typeof (url) !== "string") {
             request = url;
@@ -3274,11 +3290,18 @@ function loadAtmosphere() {
                 /(webkit)[ \/]([\w.]+)/.exec(ua) ||
                 /(opera)(?:.*version|)[ \/]([\w.]+)/.exec(ua) ||
                 /(msie) ([\w.]+)/.exec(ua) ||
+                /(trident)(?:.*? rv:([\w.]+)|)/.exec(ua) ||
                 ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua) ||
                 [];
 
         atmosphere.util.browser[match[1] || ""] = true;
         atmosphere.util.browser.version = match[2] || "0";
+
+        // Trident is the layout engine of the Internet Explorer
+        // IE 11 has no "MSIE: 11.0" token
+        if (atmosphere.util.browser.trident) {
+            atmosphere.util.browser.msie = true;
+        }
 
         // The storage event of Internet Explorer and Firefox 3 works strangely
         if (atmosphere.util.browser.msie || (atmosphere.util.browser.mozilla && atmosphere.util.browser.version.split(".")[0] === "1")) {
@@ -3291,9 +3314,13 @@ function loadAtmosphere() {
     });
 
     // Pressing ESC key in Firefox kills the connection
+    // for your information, this is fixed in Firefox 20
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=614304
     atmosphere.util.on(window, "keypress", function (event) {
-        if (event.which === 27) {
-            event.preventDefault();
+        if (event.charCode === 27 || event.keyCode === 27) {
+            if (event.preventDefault) {
+                event.preventDefault();
+            }
         }
     });
 
