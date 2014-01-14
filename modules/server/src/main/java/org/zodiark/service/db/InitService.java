@@ -20,18 +20,21 @@ import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
-import org.zodiark.service.config.AuthConfig;
 import org.zodiark.service.EndpointAdapter;
+import org.zodiark.service.config.AuthConfig;
 import org.zodiark.service.util.RESTService;
+
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SESSION_CREATE;
 
 /**
  * Initialize a remove session in a Database/Web Service for an {@link org.zodiark.service.Endpoint}. This class
  * use the injected {@link RESTService} to communicate with the remote endpoint.
  */
-@On("/db/init")
+@On(DB_PUBLISHER_SESSION_CREATE)
 public class InitService extends DBServiceAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(InitService.class);
+    private final static String DB_CALL = "/v1/publisher/@uuid/session/create";
 
     @Inject
     public RESTService restService;
@@ -41,7 +44,7 @@ public class InitService extends DBServiceAdapter {
         logger.trace("Servicing {}", path);
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             EndpointAdapter p = EndpointAdapter.class.cast(message);
-            AuthConfig config = restService.post("/init/" + p.uuid(), p.message(), AuthConfig.class);
+            AuthConfig config = restService.post(DB_CALL.replace("@uuid",p.uuid()), p.message(), AuthConfig.class);
 
             if (config.isAuthenticated()) {
                 reply.ok(p);

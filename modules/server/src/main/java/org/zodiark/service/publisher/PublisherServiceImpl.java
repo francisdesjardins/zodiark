@@ -40,7 +40,7 @@ import static org.zodiark.protocol.Paths.BEGIN_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCASTER_CREATE;
 import static org.zodiark.protocol.Paths.CREATE_PUBLISHER_SESSION;
 import static org.zodiark.protocol.Paths.DB_CONFIG;
-import static org.zodiark.protocol.Paths.DB_INIT;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.FAILED_PUBLISHER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.LOAD_PUBLISHER_CONFIG;
@@ -274,7 +274,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             p.uuid(uuid).message(e.getMessage()).resource(resource);
 
             endpoints.put(uuid, p);
-            eventBus.message(DB_INIT, p, new Reply<PublisherEndpoint>() {
+            eventBus.message(DB_PUBLISHER_SESSION_CREATE, p, new Reply<PublisherEndpoint>() {
                 @Override
                 public void ok(PublisherEndpoint p) {
                     lookupConfig(e, p);

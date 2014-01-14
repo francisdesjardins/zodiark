@@ -94,7 +94,7 @@ public interface Paths {
     /**
      * A message to Initialize an Endpoint Session within the remote database/web service endpoint.
      */
-    String DB_INIT = "/db/init";
+    String DB_PUBLISHER_SESSION_CREATE = "/db/publisher/session/create";
     /**
      * A Message to retrieve the list of banned word for a Streaming Session Chat.
      */

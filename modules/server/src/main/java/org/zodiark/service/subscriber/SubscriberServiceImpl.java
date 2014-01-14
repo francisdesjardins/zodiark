@@ -41,7 +41,7 @@ import static org.zodiark.protocol.Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCASTER_TRACK;
 import static org.zodiark.protocol.Paths.CREATE_SUBSCRIBER_SESSION;
 import static org.zodiark.protocol.Paths.DB_CONFIG;
-import static org.zodiark.protocol.Paths.DB_INIT;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.JOIN_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.LOAD_PUBLISHER_CONFIG;
@@ -266,7 +266,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         if (s == null || !s.isAuthenticated()) {
             s = createEndpoint(resource, e.getMessage());
             endpoints.put(uuid, s);
-            eventBus.message(DB_INIT, s, new Reply<SubscriberEndpoint>() {
+            eventBus.message(DB_PUBLISHER_SESSION_CREATE, s, new Reply<SubscriberEndpoint>() {
                 @Override
                 public void ok(SubscriberEndpoint s) {
                     s.isAuthenticated(true);
