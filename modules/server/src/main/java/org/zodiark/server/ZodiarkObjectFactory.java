@@ -28,7 +28,7 @@ import org.zodiark.service.config.SubscriberConfig;
 import org.zodiark.service.publisher.PublisherConfigImpl;
 import org.zodiark.service.session.StreamingRequest;
 import org.zodiark.service.subscriber.SubscriberConfigImpl;
-import org.zodiark.service.util.RESTService;
+import org.zodiark.service.util.RestService;
 import org.zodiark.service.util.StreamingRequestImpl;
 import org.zodiark.service.util.mock.OKAuthConfig;
 import org.zodiark.service.util.mock.OKRestService;
@@ -51,7 +51,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *  {@link EventBus}, {@link ObjectMapper}, {@link WowzaEndpointManager}, {@link StreamingRequest}
  * <p/>
  * Extendable classes are
- *  {@link AuthConfig}, {@link PublisherConfig}, {@link SubscriberConfig}, {@link RESTService}
+ *  {@link AuthConfig}, {@link PublisherConfig}, {@link SubscriberConfig}, {@link org.zodiark.service.util.RestService}
  * <p/>
  * Injectable and Extendable can be replaced.
  * <p/>
@@ -123,9 +123,9 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
             }
         });
 
-        extendable(RESTService.class, new Extendable<RESTService>() {
+        extendable(RestService.class, new Extendable<RestService>() {
             @Override
-            public Class<OKRestService> extend(Class<RESTService> t) {
+            public Class<OKRestService> extend(Class<RestService> t) {
                 return OKRestService.class;
             }
         });
@@ -134,7 +134,7 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
     @Override
     public <T, U extends T> T newClassInstance(final AtmosphereFramework framework, Class<T> classType, Class<U> tClass) throws InstantiationException, IllegalAccessException {
         logger.debug("About to create {}", tClass.getName());
-        if (!added.getAndSet(true)) {
+        if (!added.getAndSet(true) && framework !=null) {
             framework.getAtmosphereConfig().shutdownHook(new AtmosphereConfig.ShutdownHook() {
                 @Override
                 public void shutdown() {
@@ -154,8 +154,8 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
                     field.set(instance, inject(ObjectMapper.class));
                 } else if (field.getType().isAssignableFrom(EventBus.class)) {
                     field.set(instance, inject(EventBus.class));
-                } else if (field.getType().isAssignableFrom(RESTService.class)) {
-                    field.set(instance, newClassInstance(framework, RESTService.class, implement(RESTService.class)));
+                } else if (field.getType().isAssignableFrom(RestService.class)) {
+                    field.set(instance, newClassInstance(framework, RestService.class, implement(RestService.class)));
                 } else if (field.getType().isAssignableFrom(WowzaEndpointManager.class)) {
                     field.set(instance, inject(WowzaEndpointManager.class));
                 } else if (field.getType().isAssignableFrom(Context.class)) {

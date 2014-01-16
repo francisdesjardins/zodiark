@@ -36,4 +36,12 @@ public interface PublisherConfig extends DBResult {
      * @return this
      */
     PublisherConfig sessionType(StreamingSession.TYPE streamingSessionType);
+
+    /**
+     * Populate the config from the server.
+     * TODO: Replace String with proper object
+     * @param content
+     * @return
+     */
+    void setConfig(String content);
 }

@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
+import org.zodiark.protocol.Paths;
 import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
@@ -46,7 +47,7 @@ import static org.zodiark.protocol.Paths.WOWZA_OBFUSCATE_OK;
 /**
  * A Service responsible for reacting to Wowza's messages and I/O Events.
  */
-@On("/wowza")
+@On(Paths.SERVICE_WOWZA)
 public class WowzaServiceImpl implements WowzaService {
     private final Logger logger = LoggerFactory.getLogger(WowzaServiceImpl.class);
 

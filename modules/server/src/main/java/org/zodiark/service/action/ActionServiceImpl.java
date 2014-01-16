@@ -45,13 +45,14 @@ import static org.zodiark.protocol.Paths.ACTION_COMPLETED;
 import static org.zodiark.protocol.Paths.ACTION_START_OK;
 import static org.zodiark.protocol.Paths.ACTION_TIMER;
 import static org.zodiark.protocol.Paths.ACTION_VALIDATE;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_VALIDATE_STATE;
 import static org.zodiark.protocol.Paths.RETRIEVE_PUBLISHER;
 import static org.zodiark.protocol.Paths.RETRIEVE_SUBSCRIBER;
+import static org.zodiark.protocol.Paths.SERVICE_ACTION;
 import static org.zodiark.protocol.Paths.STREAMING_COMPLETE_ACTION;
 import static org.zodiark.protocol.Paths.STREAMING_EXECUTE_ACTION;
-import static org.zodiark.protocol.Paths.SUBSCRIBER_VALIDATE_STATE;
 
-@On("/action")
+@On(SERVICE_ACTION)
 public class ActionServiceImpl implements ActionService {
 
     private final Logger logger = LoggerFactory.getLogger(ActionServiceImpl.class);
@@ -189,7 +190,7 @@ public class ActionServiceImpl implements ActionService {
         }
         p.action(action);
 
-        eventBus.message(SUBSCRIBER_VALIDATE_STATE, s, new Reply<SubscriberEndpoint>() {
+        eventBus.message(DB_SUBSCRIBER_VALIDATE_STATE, s, new Reply<SubscriberEndpoint>() {
             @Override
             public void ok(SubscriberEndpoint s) {
                 logger.trace("Action {} succeeded. Sending request to publisher {}", action, s);

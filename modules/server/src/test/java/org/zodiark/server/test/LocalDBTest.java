@@ -13,30 +13,25 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.db;
+package org.zodiark.server.test;
 
-public class RestMessage {
+import org.testng.annotations.Test;
+import org.zodiark.service.util.mock.LocalDatabase;
 
-    private String code;
-    private String json;
+import static org.testng.Assert.assertNotNull;
 
-    public RestMessage(String code) {
-        this.code = code;
+public class LocalDBTest {
+
+
+    @Test
+    public void basicPass() {
+        LocalDatabase localDb = new LocalDatabase();
+
+        String s = localDb.serve("/v1/publisher/{guid}/session/create", "{\"username\": \"foo\", \"password\":\"12345\", \"ip\": \"127.0.0.1\", \"referrer\":\"zzzz\"}", LocalDatabase.RESULT.PASS);
+
+        assertNotNull(s);
+
     }
 
-    public String getCode() {
-        return code;
-    }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getJson() {
-        return json;
-    }
-
-    public void setJson(String json) {
-        this.json = json;
-    }
 }

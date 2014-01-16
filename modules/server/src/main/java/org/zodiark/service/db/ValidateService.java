@@ -22,21 +22,23 @@ import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.config.SubscriberConfig;
-import org.zodiark.service.util.RESTService;
+import org.zodiark.service.util.RestService;
 
-@On("/db/validate")
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_VALIDATE_STATE;
+
+@On(DB_SUBSCRIBER_VALIDATE_STATE)
 public class ValidateService extends DBServiceAdapter {
     private final Logger logger = LoggerFactory.getLogger(ValidateService.class);
 
     @Inject
-    public RESTService restService;
+    public RestService restService;
 
     @Override
     public void reactTo(String path, Object message, Reply reply) {
         logger.trace("Servicing {}", path);
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             EndpointAdapter p = EndpointAdapter.class.cast(message);
-            SubscriberConfig config = restService.post("/validate/" + p.uuid(), p.message(), SubscriberConfig.class);
+            SubscriberConfig config = restService.post(DB_SUBSCRIBER_VALIDATE_STATE.replace("@uuid", p.uuid()), p.message(), SubscriberConfig.class);
 
             if (config.isStateValid()) {
                 reply.ok(p);

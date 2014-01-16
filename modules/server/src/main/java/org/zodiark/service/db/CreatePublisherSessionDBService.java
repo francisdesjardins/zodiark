@@ -21,30 +21,35 @@ import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
-import org.zodiark.service.config.PublisherConfig;
-import org.zodiark.service.util.RESTService;
+import org.zodiark.service.config.AuthConfig;
+import org.zodiark.service.util.RestService;
+
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SESSION_CREATE;
 
 /**
- * Construct the {@link PublisherConfig} based on {@link org.zodiark.service.publisher.PublisherEndpoint#uuid} from the
- * remote database/web service.
+ * Initialize a remove session in a Database/Web Service for an {@link org.zodiark.service.Endpoint}. This class
+ * use the injected {@link org.zodiark.service.util.RestService} to communicate with the remote endpoint.
  */
-@On("/db/config")
-public class ConfigService extends DBServiceAdapter {
+@On(DB_PUBLISHER_SESSION_CREATE)
+public class CreatePublisherSessionDBService extends DBServiceAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigService.class);
+    private final Logger logger = LoggerFactory.getLogger(CreatePublisherSessionDBService.class);
 
     @Inject
-    public RESTService restService;
+    public RestService restService;
 
     @Override
     public void reactTo(String path, Object message, Reply reply) {
         logger.trace("Servicing {}", path);
-
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             EndpointAdapter p = EndpointAdapter.class.cast(message);
-            PublisherConfig config = restService.get("/config/" + p.uuid(), PublisherConfig.class);
-            p.config(config);
-            reply.ok(p);
+            AuthConfig config = restService.post(path.replace("@uuid",p.uuid()), p.message(), AuthConfig.class);
+
+            if (config.isAuthenticated()) {
+                reply.ok(p);
+            } else {
+                reply.fail(p);
+            }
         }
     }
 }

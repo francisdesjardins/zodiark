@@ -21,7 +21,7 @@
             if (keyc == 13 || keyc == 10) {
 
                 var e = new zodiark.Envelope();
-                e.to("server").message(new zodiark.Message().path("/echo").data("test"));
+                e.to("server").data(new zodiark.Message().path("/echo").data("test"));
 
                 socket.send(e);
 
@@ -33,7 +33,7 @@
 
         getElementById('send_message').onclick = function(event) {
             var e = new zodiark.Envelope();
-            e.to("server").message(new zodiark.Message().path("/echo").data("test"));
+            e.to("server").data(new zodiark.Message().path("/echo").data("test"));
 
             socket.send(e);
 

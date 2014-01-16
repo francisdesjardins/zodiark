@@ -21,7 +21,7 @@ import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
-import org.zodiark.service.util.RESTService;
+import org.zodiark.service.util.RestService;
 
 /**
  * Disconnect the {@link org.zodiark.service.Endpoint} by calling the remote Database/Web Service.
@@ -32,7 +32,7 @@ public class DisconnectedEndpointService extends DBServiceAdapter {
     private final Logger logger = LoggerFactory.getLogger(DisconnectedEndpointService.class);
 
     @Inject
-    public RESTService restService;
+    public RestService restService;
 
     @Override
     public void reactTo(String path, Object message, Reply reply) {

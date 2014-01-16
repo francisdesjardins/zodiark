@@ -44,4 +44,12 @@ public interface SubscriberConfig extends DBResult {
      * @return true is valid
      */
     boolean isStateValid();
+
+    /**
+     * Populate the config from the server.
+     * TODO: Replace String with proper object
+     * @param content
+     * @return
+     */
+    void setConfig(String content);
 }

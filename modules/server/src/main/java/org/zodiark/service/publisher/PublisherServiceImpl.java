@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
+import org.zodiark.protocol.Paths;
 import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
@@ -39,7 +40,7 @@ import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnDiscon
 import static org.zodiark.protocol.Paths.BEGIN_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCASTER_CREATE;
 import static org.zodiark.protocol.Paths.CREATE_PUBLISHER_SESSION;
-import static org.zodiark.protocol.Paths.DB_CONFIG;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.FAILED_PUBLISHER_STREAMING_SESSION;
@@ -54,7 +55,7 @@ import static org.zodiark.protocol.Paths.WOWZA_CONNECT;
 /**
  * The Publisher's application logic for validating, creating and starting a {@link org.zodiark.service.session.StreamingSession}
  */
-@On("/publisher")
+@On(Paths.SERVICE_PUBLISHER)
 public class PublisherServiceImpl implements PublisherService, Session<PublisherEndpoint> {
 
     private final ConcurrentHashMap<String, PublisherEndpoint> endpoints = new ConcurrentHashMap<>();
@@ -318,7 +319,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     }
 
     private void lookupConfig(final Envelope e, PublisherEndpoint p) {
-        eventBus.message(DB_CONFIG, p, new Reply<PublisherEndpoint>() {
+        eventBus.message(DB_PUBLISHER_CONFIG, p, new Reply<PublisherEndpoint>() {
             @Override
             public void ok(PublisherEndpoint p) {
                 response(e, p, constructMessage(CREATE_PUBLISHER_SESSION, "OK"));

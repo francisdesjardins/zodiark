@@ -39,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.zodiark.protocol.Paths.BEGIN_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCAST_TO_ALL;
+import static org.zodiark.protocol.Paths.SERVICE_STREAMING;
 import static org.zodiark.protocol.Paths.STREAMING_COMPLETE_ACTION;
 import static org.zodiark.protocol.Paths.STREAMING_EXECUTE_ACTION;
 import static org.zodiark.protocol.Paths.WOWZA_DEOBFUSCATE;
@@ -47,7 +48,7 @@ import static org.zodiark.protocol.Paths.WOWZA_OBFUSCATE;
 /**
  * The Default StreamingService implementation.
  */
-@On("/streaming")
+@On(SERVICE_STREAMING)
 public class StreamingSessionServiceImpl implements StreamingSessionService {
 
     private final Logger logger = LoggerFactory.getLogger(StreamingSessionServiceImpl.class);

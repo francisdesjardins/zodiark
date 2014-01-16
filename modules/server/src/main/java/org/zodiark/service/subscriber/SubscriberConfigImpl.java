@@ -24,6 +24,7 @@ import org.zodiark.service.session.StreamingSession;
 public class SubscriberConfigImpl implements SubscriberConfig {
 
     private StreamingSession.TYPE sessionType;
+    private String content;
 
     /**
      * {@inheritDoc}
@@ -50,11 +51,9 @@ public class SubscriberConfigImpl implements SubscriberConfig {
         return true;
     }
 
-    /**
-     * Populate the state of this instance representing the remote {@link SubscriberEndpoint}
-     * @param state
-     */
-    public void populate(String state) {
-        // TODO: Receive the state from the database.
+    @Override
+    public void setConfig(String content) {
+        this.content = content;
+       // return this;
     }
 }

@@ -30,11 +30,12 @@ import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnDiscon
 import static org.zodiark.protocol.Paths.DISCONNECTED_RESOURCE;
 import static org.zodiark.protocol.Paths.MONITOR_RESOURCE;
 import static org.zodiark.protocol.Paths.RETRIEVE_PUBLISHER;
+import static org.zodiark.protocol.Paths.SERVICE_MONITORING;
 
 /**
  * Monitor {@link org.zodiark.service.Endpoint} disconnect.
  */
-@On("/monitor")
+@On(SERVICE_MONITORING)
 public class MonitoringServiceImpl implements MonitoringService {
 
     private final Logger logger = LoggerFactory.getLogger(MonitoringServiceImpl.class);

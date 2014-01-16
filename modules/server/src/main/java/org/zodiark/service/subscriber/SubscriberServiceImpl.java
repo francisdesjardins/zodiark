@@ -40,26 +40,27 @@ import static org.zodiark.protocol.Paths.ACTION_VALIDATE;
 import static org.zodiark.protocol.Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCASTER_TRACK;
 import static org.zodiark.protocol.Paths.CREATE_SUBSCRIBER_SESSION;
-import static org.zodiark.protocol.Paths.DB_CONFIG;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.FAILED_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.JOIN_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.LOAD_PUBLISHER_CONFIG;
 import static org.zodiark.protocol.Paths.MONITOR_RESOURCE;
 import static org.zodiark.protocol.Paths.RETRIEVE_PUBLISHER;
 import static org.zodiark.protocol.Paths.RETRIEVE_SUBSCRIBER;
+import static org.zodiark.protocol.Paths.SERVICE_SUBSCRIBER;
 import static org.zodiark.protocol.Paths.SUBSCRIBER_ACTION;
 import static org.zodiark.protocol.Paths.SUBSCRIBER_BROWSER_HANDSHAKE;
 import static org.zodiark.protocol.Paths.SUBSCRIBER_BROWSER_HANDSHAKE_OK;
 import static org.zodiark.protocol.Paths.TERMINATE_SUBSCRIBER_STREAMING_SESSSION;
 import static org.zodiark.protocol.Paths.VALIDATE_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.WOWZA_CONNECT;
-import static org.zodiark.protocol.Paths.FAILED_SUBSCRIBER_STREAMING_SESSION;
 
 /**
  * A Service responsible for managing {@link SubscriberEndpoint}
  */
-@On("/subscriber")
+@On(SERVICE_SUBSCRIBER)
 public class SubscriberServiceImpl implements SubscriberService, Session<SubscriberEndpoint> {
 
     private final ConcurrentHashMap<String, SubscriberEndpoint> endpoints = new ConcurrentHashMap<>();
@@ -299,7 +300,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     private void lookupConfig(final Envelope e, SubscriberEndpoint p) {
-        eventBus.message(DB_CONFIG, p, new Reply<SubscriberEndpoint>() {
+        eventBus.message(DB_PUBLISHER_CONFIG, p, new Reply<SubscriberEndpoint>() {
             @Override
             public void ok(SubscriberEndpoint p) {
                 response(e, p, constructMessage(CREATE_SUBSCRIBER_SESSION, "OK"));

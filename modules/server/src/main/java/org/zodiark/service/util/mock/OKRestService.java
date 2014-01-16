@@ -15,17 +15,28 @@
  */
 package org.zodiark.service.util.mock;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zodiark.server.Context;
 import org.zodiark.server.annotation.Inject;
-import org.zodiark.service.util.RESTService;
+import org.zodiark.service.db.Result;
+import org.zodiark.service.util.RestService;
 
 /**
  * Mock class for testing purpose only. This class does nothing.
  */
-public class OKRestService implements RESTService {
+public class OKRestService implements RestService {
+
+    private final Logger logger = LoggerFactory.getLogger(OKRestService.class);
 
     @Inject
     public Context context;
+
+    @Inject
+    public ObjectMapper mapper;
+
+    protected final LocalDatabase db = new LocalDatabase();
 
     @Override
     public <T> T get(String uri, Class<T> c) {
@@ -40,8 +51,18 @@ public class OKRestService implements RESTService {
     @Override
     public <T> T post(String uri, Object o, Class<T> result) {
         try {
-            return context.newInstance(result);
+
+            String restResponse = db.serve(uri, o.toString(), LocalDatabase.RESULT.PASS);
+                        // Normally, we would use AHC to call the REST client
+
+            if (restResponse != null) {
+                Result r = mapper.readerForUpdating(context.newInstance(Result.class)).readValue(restResponse);
+                return r.transform(result);
+            }
+
+            return null;
         } catch (Exception e) {
+            logger.error("", e);
             throw new RuntimeException(e);
         }
     }

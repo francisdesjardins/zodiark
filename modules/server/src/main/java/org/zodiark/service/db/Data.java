@@ -15,45 +15,33 @@
  */
 package org.zodiark.service.db;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.zodiark.server.annotation.Inject;
-
-import java.io.IOException;
-
-public class RestResult {
-    
-    @Inject
-    public ObjectMapper mapper;
+public class Data {
 
     private String status;
-    private RestMessage message;
+    private String content;
 
-    public RestResult(String status, RestMessage message) {
+    public Data(){}
+
+    public Data(String status, String content) {
         this.status = status;
-        this.message = message;
+        this.content = content;
     }
 
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public Data setStatus(String status) {
         this.status = status;
+        return this;
     }
 
-    public RestMessage getMessage() {
-        return message;
+    public String getContent() {
+        return content;
     }
 
-    public void setMessage(RestMessage message) {
-        this.message = message;
+    public Data setContent(String content) {
+        this.content = content;
+        return this;
     }
-    
-    public <T> T transform(Class<T> transform) {
-        try {
-            return mapper.readValue(message.getJson(), transform);
-        } catch (IOException e) {
-            throw new RuntimeException(e.getCause());
-        }
-    }   
 }

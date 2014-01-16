@@ -90,11 +90,11 @@ public interface Paths {
     /**
      * A message to retrieve the data from an Endpoint
      */
-    String DB_CONFIG = "/db/config";
+    String DB_PUBLISHER_CONFIG = "/v1/publisher/@uuid/session/config";
     /**
      * A message to Initialize an Endpoint Session within the remote database/web service endpoint.
      */
-    String DB_PUBLISHER_SESSION_CREATE = "/db/publisher/session/create";
+    String DB_PUBLISHER_SESSION_CREATE = "/v1/publisher/@uuid/session/create";
     /**
      * A Message to retrieve the list of banned word for a Streaming Session Chat.
      */
@@ -102,7 +102,7 @@ public interface Paths {
     /**
      * a Message to validate the state of a Subscriber
      */
-    String SUBSCRIBER_VALIDATE_STATE = "/db/validate";
+    String DB_SUBSCRIBER_VALIDATE_STATE = "/v1/subscriber/@uuid/session/validate";
     /**
      * An I/O event to leave the current Publisher Streaming Session
      */
@@ -218,4 +218,17 @@ public interface Paths {
 
     String BROADCASTER_DISPATCH = "/broadcaster/dispatch";
 
+    // ===== Service Mapping
+
+    String SERVICE_ACTION = "/action";
+
+    String SERVICE_PUBLISHER = "/publisher";
+
+    String SERVICE_MONITORING = "/monitor";
+
+    String SERVICE_STREAMING = "/streaming";
+
+    String SERVICE_SUBSCRIBER = "/subscriber";
+
+    String SERVICE_WOWZA = "/wowza";
 }

@@ -21,36 +21,32 @@ import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
-import org.zodiark.service.config.AuthConfig;
-import org.zodiark.service.util.RESTService;
+import org.zodiark.service.config.PublisherConfig;
+import org.zodiark.service.util.RestService;
 
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SESSION_CREATE;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG;
 
 /**
- * Initialize a remove session in a Database/Web Service for an {@link org.zodiark.service.Endpoint}. This class
- * use the injected {@link RESTService} to communicate with the remote endpoint.
+ * Construct the {@link PublisherConfig} based on {@link org.zodiark.service.publisher.PublisherEndpoint#uuid} from the
+ * remote database/web service.
  */
-@On(DB_PUBLISHER_SESSION_CREATE)
-public class InitService extends DBServiceAdapter {
+@On(DB_PUBLISHER_CONFIG)
+public class LoadPublisherConfigService extends DBServiceAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(InitService.class);
-    private final static String DB_CALL = "/v1/publisher/@uuid/session/create";
+    private final Logger logger = LoggerFactory.getLogger(LoadPublisherConfigService.class);
 
     @Inject
-    public RESTService restService;
+    public RestService restService;
 
     @Override
     public void reactTo(String path, Object message, Reply reply) {
         logger.trace("Servicing {}", path);
+
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             EndpointAdapter p = EndpointAdapter.class.cast(message);
-            AuthConfig config = restService.post(DB_CALL.replace("@uuid",p.uuid()), p.message(), AuthConfig.class);
-
-            if (config.isAuthenticated()) {
-                reply.ok(p);
-            } else {
-                reply.fail(p);
-            }
+            PublisherConfig config = restService.get(path.replace("@uuid",p.uuid()), PublisherConfig.class);
+            p.config(config);
+            reply.ok(p);
         }
     }
 }
