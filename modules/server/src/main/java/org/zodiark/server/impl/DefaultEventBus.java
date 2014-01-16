@@ -62,24 +62,33 @@ public class DefaultEventBus implements EventBus {
      */
     @Override
     public EventBus ioEvent(Envelope e, AtmosphereResource r, Reply reply) {
-        Service s = mapper.map(e.getMessage().getPath(), services);
+        try {
+            Service s = mapper.map(e.getMessage().getPath(), services);
 
-        logger.debug("Dispatching Envelop {} to Service {}", e, s);
+            logger.debug("Dispatching Envelop {} to Service {}", e, s);
 
-        if (e.getUuid().isEmpty() || e.getUuid().equals("0")) {
-            e.setUuid(r.uuid());
-        }
+            if (e.getUuid().isEmpty() || e.getUuid().equals("0")) {
+                e.setUuid(r.uuid());
+            }
 
-        if (s != null) {
-            s.reactTo(e, r, reply);
-        } else {
-            logger.error("No Service available for {}", e);
-            Message m = new Message();
-            m.setPath("/error");
-            Envelope error = Envelope.newServerReply(e, m);
-            ioEvent(error, r);
+            if (s != null) {
+                s.reactTo(e, r, reply);
+            } else {
+                logger.error("No Service available for {}", e);
+                sendError(e, r);
+            }
+        } catch (Throwable t) {
+            logger.error("Error on {}", e, t);
+            sendError(e, r);
         }
         return this;
+    }
+
+    private void sendError(Envelope e, AtmosphereResource r){
+        Message m = new Message();
+        m.setPath("/error");
+        Envelope error = Envelope.newServerReply(e, m);
+        ioEvent(error, r);
     }
 
     /**
@@ -87,14 +96,18 @@ public class DefaultEventBus implements EventBus {
      */
     @Override
     public EventBus message(String path, Object message, Reply reply) {
-        Service s = mapper.map(path, services);
+        try {
+            Service s = mapper.map(path, services);
 
-        logger.debug("Dispatching Message {} to {}", path, s);
+            logger.debug("Dispatching Message {} to {}", path, s);
 
-        if (s != null) {
-            s.reactTo(path, message, reply);
-        } else {
-            logger.error("No Service available for {}", path);
+            if (s != null) {
+                s.reactTo(path, message, reply);
+            } else {
+                logger.error("No Service available for {}", path);
+            }
+        } catch (Throwable t) {
+            logger.error("Error on {}", path, t);
         }
         return this;
     }

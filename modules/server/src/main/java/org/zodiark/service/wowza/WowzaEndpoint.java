@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.zodiark.protocol.Paths.*;
+
 /**
  * Represent a Wowza endpoint.
  */
@@ -95,11 +97,11 @@ public class WowzaEndpoint implements Endpoint {
      */
     public void isEndpointConnected(Endpoint p, Reply l) {
         Message m = new Message();
-        m.setPath(Paths.SERVER_VALIDATE_OK);
+        m.setPath(SERVER_VALIDATE_OK);
         try {
             m.setData(mapper.writeValueAsString(new UUID(p.uuid())));
 
-            Envelope e = Envelope.newServerRequest(Paths.REQUEST_ACTION, uuid, m);
+            Envelope e = Envelope.newServerRequest(REQUEST_ACTION, uuid, m);
             resource.write(mapper.writeValueAsString(e));
         } catch (Exception e) {
             logger.error("", e);
@@ -164,11 +166,11 @@ public class WowzaEndpoint implements Endpoint {
         w.setPublisherUUID(session.publisher().uuid());
         Message m = new Message();
 
-        m.setPath(Paths.WOWZA_OBFUSCATE);
+        m.setPath(WOWZA_OBFUSCATE);
         try {
             m.setData(mapper.writeValueAsString(w));
 
-            Envelope e = Envelope.newServerRequest(Paths.REQUEST_ACTION, uuid, m);
+            Envelope e = Envelope.newServerRequest(REQUEST_ACTION, uuid, m);
             resource.write(mapper.writeValueAsString(e));
         } catch (JsonProcessingException e1) {
             logger.error("", e1);
@@ -199,11 +201,11 @@ public class WowzaEndpoint implements Endpoint {
         w.setPublisherUUID(session.publisher().uuid());
         Message m = new Message();
 
-        m.setPath(Paths.WOWZA_DEOBFUSCATE);
+        m.setPath(WOWZA_DEOBFUSCATE);
         try {
             m.setData(mapper.writeValueAsString(w));
 
-            Envelope e = Envelope.newServerRequest(Paths.MESSAGE_ACTION, uuid, m);
+            Envelope e = Envelope.newServerRequest(MESSAGE_ACTION, uuid, m);
             resource.write(mapper.writeValueAsString(e));
         } catch (JsonProcessingException e1) {
             logger.error("", e1);
