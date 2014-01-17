@@ -40,6 +40,7 @@ import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnDiscon
 import static org.zodiark.protocol.Paths.BEGIN_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCASTER_CREATE;
 import static org.zodiark.protocol.Paths.CREATE_PUBLISHER_SESSION;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_ANNOUNCE_SESSION;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
@@ -278,7 +279,8 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             eventBus.message(DB_PUBLISHER_SESSION_CREATE, p, new Reply<PublisherEndpoint>() {
                 @Override
                 public void ok(PublisherEndpoint p) {
-                    lookupConfig(e, p);
+                    // TODO: Wrong
+                   lookupConfig(e, p);
                 }
 
                 @Override
@@ -296,6 +298,23 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             }
         });
         return p;
+    }
+
+    protected void annonceSession(final Envelope e, PublisherEndpoint p) {
+        eventBus.message(DB_PUBLISHER_ANNOUNCE_SESSION, p, new Reply<PublisherEndpoint>() {
+            @Override
+            public void ok(PublisherEndpoint p) {
+                // Nothing to do, the endpoint has been configured
+                logger.trace("Publisher ready {}", p);
+            }
+
+            @Override
+            public void fail(PublisherEndpoint p) {
+                // TODO: Wrong error message
+                error(e, p, constructMessage(VALIDATE_PUBLISHER_STREAMING_SESSION, "error"));
+            }
+        });
+
     }
 
     /**
@@ -323,6 +342,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             @Override
             public void ok(PublisherEndpoint p) {
                 response(e, p, constructMessage(CREATE_PUBLISHER_SESSION, "OK"));
+                annonceSession(e, p);
             }
 
             @Override

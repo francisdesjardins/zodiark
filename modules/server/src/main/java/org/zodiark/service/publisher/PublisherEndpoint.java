@@ -17,6 +17,7 @@ package org.zodiark.service.publisher;
 
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.action.Action;
+import org.zodiark.service.db.ShowId;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -29,6 +30,7 @@ public class PublisherEndpoint extends EndpointAdapter<PublisherEndpoint> {
 
     private final AtomicBoolean actionInProgress = new AtomicBoolean();
     private Action action;
+    private ShowId showId = new ShowId().showId(-1);
 
     public PublisherEndpoint() {
         super();
@@ -56,5 +58,14 @@ public class PublisherEndpoint extends EndpointAdapter<PublisherEndpoint> {
     @Override
     public TYPE type() {
         return TYPE.PUBLISHER;
+    }
+
+    public PublisherEndpoint showId(ShowId showId) {
+        this.showId = showId;
+        return this;
+    }
+
+    public int showId() {
+        return showId.showId();
     }
 }

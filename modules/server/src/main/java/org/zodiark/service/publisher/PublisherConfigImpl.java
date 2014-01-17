@@ -23,7 +23,7 @@ import org.zodiark.service.session.StreamingSession;
  */
 public class PublisherConfigImpl implements PublisherConfig {
     private StreamingSession.TYPE streamingSessionType;
-    private String content;
+    private String configuration;
 
     public PublisherConfigImpl() {
         sessionType(StreamingSession.TYPE.PRIVATE);
@@ -38,9 +38,14 @@ public class PublisherConfigImpl implements PublisherConfig {
     }
 
     @Override
-    public void setConfig(String content) {
-        this.content = content;
-       // return this;
+    public PublisherConfig configuration(String configuration) {
+        this.configuration = configuration;
+        return this;
+    }
+
+    @Override
+    public String configuration() {
+        return configuration;
     }
 
     /**
@@ -49,4 +54,6 @@ public class PublisherConfigImpl implements PublisherConfig {
     public StreamingSession.TYPE sessionType() {
         return streamingSessionType;
     }
+
+
 }

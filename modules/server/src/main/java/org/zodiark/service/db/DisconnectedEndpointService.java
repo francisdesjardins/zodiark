@@ -39,7 +39,7 @@ public class DisconnectedEndpointService extends DBServiceAdapter {
         logger.trace("Servicing {}", path);
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             EndpointAdapter p = EndpointAdapter.class.cast(message);
-            restService.delete("/disconnect/" + p.uuid(), p.message(), DBResult.class);
+            //restService.delete("/disconnect/" + p.uuid(), p.message(), Result.class);
         }
     }
 }

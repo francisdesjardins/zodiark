@@ -21,8 +21,20 @@ import org.zodiark.service.config.AuthConfig;
  * Mock class for testing purpose only.
  */
 public class OKAuthConfig implements AuthConfig {
+    private String status;
+
     @Override
     public boolean isAuthenticated() {
         return true;
+    }
+
+    @Override
+    public void status(String status) {
+        this.status = status;
+    }
+
+    @Override
+    public String status() {
+        return status;
     }
 }

@@ -15,16 +15,21 @@
  */
 package org.zodiark.service.config;
 
-import org.zodiark.service.db.DBResult;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.zodiark.service.db.Result;
 
 /**
  * A class for representing the publisher/subscriber authorization token.
  */
-public interface AuthConfig extends DBResult {
+public interface AuthConfig extends Result {
     /**
      * Is the {@link org.zodiark.service.publisher.PublisherEndpoint
      * @return true if authenticated
      */
     boolean isAuthenticated();
 
+    @JsonProperty("status")
+    void status(String status);
+
+    String status();
 }

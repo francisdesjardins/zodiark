@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 High-Level Technologies
+ * Copyright 2014 Jeanfrancois Arcand
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -21,14 +21,15 @@ import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
-import org.zodiark.service.config.SubscriberConfig;
+import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.util.RestService;
 
-import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_VALIDATE_STATE;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_ANNOUNCE_SESSION;
 
-@On(DB_SUBSCRIBER_VALIDATE_STATE)
-public class ValidateService extends DBServiceAdapter {
-    private final Logger logger = LoggerFactory.getLogger(ValidateService.class);
+@On(DB_PUBLISHER_ANNOUNCE_SESSION)
+public class AnnouncePublisherSessionService extends DBServiceAdapter {
+
+    private final Logger logger = LoggerFactory.getLogger(AnnouncePublisherSessionService.class);
 
     @Inject
     public RestService restService;
@@ -37,16 +38,12 @@ public class ValidateService extends DBServiceAdapter {
     public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
-            final EndpointAdapter p = EndpointAdapter.class.cast(message);
-            restService.post(DB_SUBSCRIBER_VALIDATE_STATE.replace("@uuid", p.uuid()), p.message(), new RestService.Reply<SubscriberConfig, DBError>() {
-
+            final PublisherEndpoint p = PublisherEndpoint.class.cast(message);
+            restService.post(DB_PUBLISHER_ANNOUNCE_SESSION.replace("@uuid",p.uuid()),
+                    p.message(), new RestService.Reply<ShowId, DBError>() {
                 @Override
-                public void success(SubscriberConfig config) {
-                    if (config.isStateValid()) {
-                        reply.ok(p);
-                    } else {
-                        reply.fail(p);
-                    }
+                public void success(ShowId success) {
+                    reply.ok(p.showId(success));
                 }
 
                 @Override
@@ -56,9 +53,11 @@ public class ValidateService extends DBServiceAdapter {
 
                 @Override
                 public void exception(Exception exception) {
-                    logger.error("", exception);
+                    logger.trace("", exception);
+                    reply.fail(p);
                 }
             });
+
         }
     }
 }

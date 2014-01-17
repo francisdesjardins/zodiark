@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 High-Level Technologies
+ * Copyright 2014 Jeanfrancois Arcand
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,9 +15,18 @@
  */
 package org.zodiark.service.db;
 
-/**
- * A marker for all Web Service/Database data holder.
- */
-public interface DBResult {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+public class ShowId {
+    private int showId;
+
+    @JsonProperty
+    public ShowId showId(int showId) {
+        this.showId = showId;
+        return this;
+    }
+
+    public int showId() {
+        return showId;
+    }
 }

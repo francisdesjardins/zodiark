@@ -15,6 +15,7 @@
  */
 package org.zodiark.service.subscriber;
 
+import org.zodiark.service.config.PublisherConfig;
 import org.zodiark.service.config.SubscriberConfig;
 import org.zodiark.service.session.StreamingSession;
 
@@ -24,7 +25,7 @@ import org.zodiark.service.session.StreamingSession;
 public class SubscriberConfigImpl implements SubscriberConfig {
 
     private StreamingSession.TYPE sessionType;
-    private String content;
+    private String configuration;
 
     /**
      * {@inheritDoc}
@@ -52,8 +53,13 @@ public class SubscriberConfigImpl implements SubscriberConfig {
     }
 
     @Override
-    public void setConfig(String content) {
-        this.content = content;
-       // return this;
+    public SubscriberConfig configuration(String configuration) {
+        this.configuration = configuration;
+        return this;
+    }
+
+    @Override
+    public String configuration() {
+        return configuration;
     }
 }

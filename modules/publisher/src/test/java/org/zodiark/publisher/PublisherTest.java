@@ -24,10 +24,9 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.From;
 import org.zodiark.protocol.Message;
 import org.zodiark.protocol.Path;
-import org.zodiark.protocol.Paths;
 import org.zodiark.server.ZodiarkServer;
-import org.zodiark.service.util.UUID;
 import org.zodiark.service.publisher.PublisherResults;
+import org.zodiark.service.util.UUID;
 import org.zodiark.service.wowza.WowzaUUID;
 import org.zodiark.wowza.OnEnvelopHandler;
 import org.zodiark.wowza.ZodiarkClient;
@@ -39,6 +38,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.testng.AssertJUnit.assertEquals;
+import static org.zodiark.protocol.Paths.CREATE_PUBLISHER_SESSION;
+import static org.zodiark.protocol.Paths.FAILED_PUBLISHER_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.SERVER_VALIDATE_OK;
+import static org.zodiark.protocol.Paths.START_PUBLISHER_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.VALIDATE_PUBLISHER_STREAMING_SESSION;
+import static org.zodiark.protocol.Paths.WOWZA_CONNECT;
 
 public class PublisherTest {
 
@@ -94,7 +99,7 @@ public class PublisherTest {
         }).open();
 
         Envelope createSessionMessage = Envelope.newClientToServerRequest(
-                new Message(new Path(Paths.CREATE_PUBLISHER_SESSION), mapper.writeValueAsString(new UserPassword("foo", "bar"))));
+                new Message(new Path(CREATE_PUBLISHER_SESSION), mapper.writeValueAsString(new UserPassword("foo", "bar"))));
         createSessionMessage.setFrom(new From(ActorValue.PUBLISHER));
         publisherClient.send(createSessionMessage);
         latch.await();
@@ -114,13 +119,13 @@ public class PublisherTest {
 
                 Message m = e.getMessage();
                 switch(m.getPath()) {
-                    case Paths.WOWZA_CONNECT:
+                    case WOWZA_CONNECT:
                         // Connected. Listen
                         uuid.set(e.getUuid());
                         break;
-                    case Paths.SERVER_VALIDATE_OK:
+                    case SERVER_VALIDATE_OK:
                         Envelope publisherOk = Envelope.newClientToServerRequest(
-                                new Message(new Path(Paths.START_PUBLISHER_STREAMING_SESSION), e.getMessage().getData()));
+                                new Message(new Path(START_PUBLISHER_STREAMING_SESSION), e.getMessage().getData()));
                         wowzaClient.send(publisherOk);
                         break;
                     default:
@@ -133,7 +138,7 @@ public class PublisherTest {
         }).open();
 
         Envelope wowzaConnect = Envelope.newClientToServerRequest(
-                new Message(new Path(Paths.WOWZA_CONNECT), mapper.writeValueAsString(new UserPassword("wowza", "bar"))));
+                new Message(new Path(WOWZA_CONNECT), mapper.writeValueAsString(new UserPassword("wowza", "bar"))));
         wowzaClient.send(wowzaConnect);
         connected.await();
 
@@ -151,7 +156,7 @@ public class PublisherTest {
         }).open();
 
         Envelope createSessionMessage = Envelope.newClientToServerRequest(
-                new Message(new Path(Paths.CREATE_PUBLISHER_SESSION), mapper.writeValueAsString(new UserPassword("publisherex", "bar"))));
+                new Message(new Path(CREATE_PUBLISHER_SESSION), mapper.writeValueAsString(new UserPassword("publisherex", "bar"))));
         createSessionMessage.setFrom(new From(ActorValue.PUBLISHER));
         publisherClient.send(createSessionMessage);
         latch.await();
@@ -169,7 +174,7 @@ public class PublisherTest {
         });
 
         Envelope startStreamingSession = Envelope.newClientToServerRequest(
-                new Message(new Path(Paths.VALIDATE_PUBLISHER_STREAMING_SESSION), mapper.writeValueAsString(new WowzaUUID(uuid.get()))));
+                new Message(new Path(VALIDATE_PUBLISHER_STREAMING_SESSION), mapper.writeValueAsString(new WowzaUUID(uuid.get()))));
         createSessionMessage.setFrom(new From(ActorValue.PUBLISHER));
         publisherClient.send(startStreamingSession);
 
@@ -192,16 +197,16 @@ public class PublisherTest {
 
                 Message m = e.getMessage();
                 switch(m.getPath()) {
-                    case Paths.WOWZA_CONNECT:
+                    case WOWZA_CONNECT:
                         // Connected. Listen
                         uuid.set(e.getUuid());
                         break;
-                    case Paths.SERVER_VALIDATE_OK:
+                    case SERVER_VALIDATE_OK:
                         UUID uuid = mapper.readValue(e.getMessage().getData(), UUID.class);
                         PublisherResults result = new PublisherResults("error");
                         result.setUuid(uuid.getUuid());
                         Envelope publisherOk = Envelope.newClientToServerRequest(
-                                new Message(new Path(Paths.FAILED_PUBLISHER_STREAMING_SESSION), mapper.writeValueAsString(result)));
+                                new Message(new Path(FAILED_PUBLISHER_STREAMING_SESSION), mapper.writeValueAsString(result)));
                         wowzaClient.send(publisherOk);
                         break;
                     default:
@@ -213,8 +218,9 @@ public class PublisherTest {
             }
         }).open();
 
-        Envelope wowzaConnect = Envelope.newClientToServerRequest(
-                new Message(new Path(Paths.WOWZA_CONNECT), mapper.writeValueAsString(new UserPassword("wowza", "bar"))));
+        Envelope wowzaConnect;
+        wowzaConnect = Envelope.newClientToServerRequest(
+                new Message(new Path(WOWZA_CONNECT), mapper.writeValueAsString(new UserPassword("wowza", "bar"))));
         wowzaClient.send(wowzaConnect);
         connected.await();
 
@@ -232,7 +238,7 @@ public class PublisherTest {
         }).open();
 
         Envelope createSessionMessage = Envelope.newClientToServerRequest(
-                new Message(new Path(Paths.CREATE_PUBLISHER_SESSION), mapper.writeValueAsString(new UserPassword("publisherex", "bar"))));
+                new Message(new Path(CREATE_PUBLISHER_SESSION), mapper.writeValueAsString(new UserPassword("publisherex", "bar"))));
         createSessionMessage.setFrom(new From(ActorValue.PUBLISHER));
         publisherClient.send(createSessionMessage);
         latch.await();
@@ -251,7 +257,7 @@ public class PublisherTest {
         });
 
         Envelope startStreamingSession = Envelope.newClientToServerRequest(
-                new Message(new Path(Paths.VALIDATE_PUBLISHER_STREAMING_SESSION), mapper.writeValueAsString(new WowzaUUID(uuid.get()))));
+                new Message(new Path(VALIDATE_PUBLISHER_STREAMING_SESSION), mapper.writeValueAsString(new WowzaUUID(uuid.get()))));
         createSessionMessage.setFrom(new From(ActorValue.PUBLISHER));
         publisherClient.send(startStreamingSession);
 

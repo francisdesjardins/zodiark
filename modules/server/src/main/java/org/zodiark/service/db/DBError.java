@@ -15,33 +15,5 @@
  */
 package org.zodiark.service.db;
 
-public class Data {
-
-    private String status;
-    private String content;
-
-    public Data(){}
-
-    public Data(String status, String content) {
-        this.status = status;
-        this.content = content;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public Data setStatus(String status) {
-        this.status = status;
-        return this;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public Data setContent(String content) {
-        this.content = content;
-        return this;
-    }
+public class DBError {
 }

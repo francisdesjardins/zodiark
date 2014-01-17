@@ -39,17 +39,27 @@ public class CreatePublisherSessionDBService extends DBServiceAdapter {
     public RestService restService;
 
     @Override
-    public void reactTo(String path, Object message, Reply reply) {
+    public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
-            EndpointAdapter p = EndpointAdapter.class.cast(message);
-            AuthConfig config = restService.post(path.replace("@uuid",p.uuid()), p.message(), AuthConfig.class);
+            final EndpointAdapter p = EndpointAdapter.class.cast(message);
+            restService.post(path.replace("@uuid", p.uuid()), p.message(), new RestService.Reply<AuthConfig, DBError>() {
 
-            if (config.isAuthenticated()) {
-                reply.ok(p);
-            } else {
-                reply.fail(p);
-            }
+                @Override
+                public void success(AuthConfig success) {
+                    reply.ok(p);
+                }
+
+                @Override
+                public void failure(DBError failure) {
+                    reply.fail(p);
+                }
+
+                @Override
+                public void exception(Exception exception) {
+                    logger.error("", exception);
+                }
+            });
         }
     }
 }

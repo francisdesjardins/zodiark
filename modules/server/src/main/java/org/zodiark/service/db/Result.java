@@ -15,61 +15,6 @@
  */
 package org.zodiark.service.db;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.zodiark.server.Context;
-import org.zodiark.server.annotation.Inject;
+public interface Result {
 
-import java.io.IOException;
-
-public class Result {
-
-    @JsonIgnore
-    @Inject
-    public Context context;
-
-    @JsonIgnore
-    @Inject
-    public ObjectMapper mapper;
-
-    private String result;
-    private Data data;
-
-    public Result() {
-    }
-
-    public Result(String result, Data data) {
-        this.result = result;
-        this.data = data;
-    }
-
-    public String getResult() {
-        return result;
-    }
-
-    public Result setResult(String result) {
-        this.result = result;
-        return this;
-    }
-
-    public Data getData() {
-        return data;
-    }
-
-    public Result setData(Data data) {
-        this.data = data;
-        return this;
-    }
-
-    public <T> T transform(Class<T> transform) {
-        if (data.getContent() != null && !data.getContent().equals("null")) {
-            try {
-                return mapper.readerForUpdating(context.newInstance(transform)).readValue(data.getContent());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return context.newInstance(transform);
-        }
-    }
 }

@@ -21,13 +21,23 @@ package org.zodiark.service.util;
  */
 public interface RestService {
 
-    <T> T get(String uri, Class<T> c);
+    void get(String uri, Reply r);
 
-    <T> T put(String uri, Object o, Class<T> result);
+    void put(String uri, Object o, Reply r);
 
-    <T> T post(String uri, Object o, Class<T> result);
+    void post(String uri, Object o, Reply r);
 
-    <T> T delete(String uri, Object o, Class<T> result);
+    void delete(String uri, Object o, Reply r);
+
+    public static interface Reply<T,U> {
+
+        void success(T success);
+
+        void failure(U failure);
+
+        void exception(Exception exception);
+    }
 
 }
+
 

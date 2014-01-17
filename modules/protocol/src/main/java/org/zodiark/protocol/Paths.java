@@ -68,6 +68,10 @@ public interface Paths {
      */
     String BEGIN_STREAMING_SESSION = "/streaming/begin/publisher";
     /**
+     * Annonce the session
+     */
+    String DB_PUBLISHER_ANNOUNCE_SESSION = "/v1/publisher/@guid/show/start";
+    /**
      * An I/O event. Send a request to Wowza asking for a Streaming Session Approval
      */
     String WOWZA_CONNECT = "/wowza/connect";

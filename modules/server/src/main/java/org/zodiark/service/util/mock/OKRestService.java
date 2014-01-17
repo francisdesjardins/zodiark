@@ -20,8 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Context;
 import org.zodiark.server.annotation.Inject;
-import org.zodiark.service.db.Result;
 import org.zodiark.service.util.RestService;
+
+import java.lang.reflect.Method;
 
 /**
  * Mock class for testing purpose only. This class does nothing.
@@ -38,37 +39,54 @@ public class OKRestService implements RestService {
 
     protected final LocalDatabase db = new LocalDatabase();
 
+
     @Override
-    public <T> T get(String uri, Class<T> c) {
-        return post(uri, "", c);
+    public void get(String uri, Reply r) {
+        post(uri, null, r);
     }
 
     @Override
-    public <T> T put(String uri, Object o, Class<T> result) {
-        return post(uri, "", result);
+    public void put(String uri, Object o, Reply r) {
+        post(uri, o, r);
     }
 
     @Override
-    public <T> T post(String uri, Object o, Class<T> result) {
+    public void post(String uri, Object o, Reply r) {
         try {
-
-            String restResponse = db.serve(uri, o.toString(), LocalDatabase.RESULT.PASS);
-                        // Normally, we would use AHC to call the REST client
-
-            if (restResponse != null) {
-                Result r = mapper.readerForUpdating(context.newInstance(Result.class)).readValue(restResponse);
-                return r.transform(result);
+            Class<?> success = null;
+            Class<?> failure = null;
+            for (Method m : r.getClass().getMethods()) {
+                switch(m.getName()) {
+                    case "success" :
+                        if (!((Class)m.getGenericParameterTypes()[0]).getName().equals(Object.class.getName())) {
+                            success = (Class) m.getGenericParameterTypes()[0];
+                        }
+                        break;
+                    case "failure" :
+                        if (!((Class)m.getGenericParameterTypes()[0]).getName().equals(Object.class.getName())) {
+                            failure = (Class) m.getGenericParameterTypes()[0];
+                        }
+                        break;
+                    case "exception" :
+                        break;
+                }
             }
 
-            return null;
+            String restResponse = db.serve(uri, mapper.writeValueAsString(o), LocalDatabase.RESULT.PASS);
+
+            try {
+                r.success(mapper.readerForUpdating(context.newInstance(success)).readValue(restResponse));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                r.failure(mapper.readerForUpdating(context.newInstance(failure)).readValue(restResponse));
+            }
         } catch (Exception e) {
-            logger.error("", e);
-            throw new RuntimeException(e);
+            r.exception(e);
         }
     }
 
     @Override
-    public <T> T delete(String uri, Object o, Class<T> result) {
-        return post(uri, "", result);
+    public void delete(String uri, Object o, Reply r) {
+        post(uri, o, r);
     }
 }

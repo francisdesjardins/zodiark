@@ -15,18 +15,21 @@
  */
 package org.zodiark.service.config;
 
-import org.zodiark.service.db.DBResult;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.zodiark.service.db.Result;
 import org.zodiark.service.session.StreamingSession;
 
 /**
  * The data associated with a {@link org.zodiark.service.publisher.PublisherEndpoint}
  */
-public interface PublisherConfig extends DBResult {
+public interface PublisherConfig extends Result {
     /**
      * The current {@link org.zodiark.service.session.StreamingSession#type()}
      *
      * @return the {@link org.zodiark.service.session.StreamingSession#type()}
      */
+    @JsonIgnore
     StreamingSession.TYPE sessionType();
 
     /**
@@ -35,13 +38,12 @@ public interface PublisherConfig extends DBResult {
      * @param streamingSessionType {@link org.zodiark.service.session.StreamingSession#type()}
      * @return this
      */
+    @JsonIgnore
     PublisherConfig sessionType(StreamingSession.TYPE streamingSessionType);
 
-    /**
-     * Populate the config from the server.
-     * TODO: Replace String with proper object
-     * @param content
-     * @return
-     */
-    void setConfig(String content);
+    @JsonProperty("configuration")
+    PublisherConfig configuration(String configuration);
+
+    String configuration();
+
 }

@@ -21,7 +21,6 @@ import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
-import org.zodiark.service.broadcaster.BroadcasterDBResult;
 import org.zodiark.service.util.RestService;
 
 /**
@@ -38,7 +37,7 @@ public class WordService extends DBServiceAdapter {
     public void reactTo(String path, Object message, Reply reply) {
         logger.trace("Servicing {}", path);
         EndpointAdapter p = EndpointAdapter.class.cast(message);
-        BroadcasterDBResult dbResult = restService.post("/banned/word" + p.uuid(), p.message(), BroadcasterDBResult.class);
-        reply.ok(dbResult);
+//        BroadcasterDBResult dbResult = restService.post("/banned/word" + p.uuid(), p.message(), BroadcasterDBResult.class);
+//        reply.ok(dbResult);
     }
 }
