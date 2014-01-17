@@ -22,13 +22,13 @@ import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.config.AuthConfig;
-import org.zodiark.service.util.RestService;
+import org.zodiark.service.util.RESTService;
 
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SESSION_CREATE;
 
 /**
  * Initialize a remove session in a Database/Web Service for an {@link org.zodiark.service.Endpoint}. This class
- * use the injected {@link org.zodiark.service.util.RestService} to communicate with the remote endpoint.
+ * use the injected {@link org.zodiark.service.util.RESTService} to communicate with the remote endpoint.
  */
 @On(DB_PUBLISHER_SESSION_CREATE)
 public class CreatePublisherSessionDBService extends DBServiceAdapter {
@@ -36,14 +36,14 @@ public class CreatePublisherSessionDBService extends DBServiceAdapter {
     private final Logger logger = LoggerFactory.getLogger(CreatePublisherSessionDBService.class);
 
     @Inject
-    public RestService restService;
+    public RESTService restService;
 
     @Override
     public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             final EndpointAdapter p = EndpointAdapter.class.cast(message);
-            restService.post(path.replace("@uuid", p.uuid()), p.message(), new RestService.Reply<AuthConfig, DBError>() {
+            restService.post(path.replace("@uuid", p.uuid()), p.message(), new RESTService.Reply<AuthConfig, DBError>() {
 
                 @Override
                 public void success(AuthConfig success) {

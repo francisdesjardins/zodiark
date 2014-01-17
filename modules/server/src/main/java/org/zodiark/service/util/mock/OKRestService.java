@@ -20,14 +20,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Context;
 import org.zodiark.server.annotation.Inject;
-import org.zodiark.service.util.RestService;
+import org.zodiark.service.util.RESTService;
 
 import java.lang.reflect.Method;
 
 /**
  * Mock class for testing purpose only. This class does nothing.
  */
-public class OKRestService implements RestService {
+public class OKRestService implements RESTService {
 
     private final Logger logger = LoggerFactory.getLogger(OKRestService.class);
 

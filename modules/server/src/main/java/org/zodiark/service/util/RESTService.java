@@ -19,7 +19,7 @@ package org.zodiark.service.util;
  * The REST API to use for interacting with a remote database/web service. Implementation must follow REST principle.
  * Implementation of this class must have an empty, default constructor so they can be injected by the {@link org.zodiark.server.ZodiarkObjectFactory}
  */
-public interface RestService {
+public interface RESTService {
 
     void get(String uri, Reply r);
 

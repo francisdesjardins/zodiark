@@ -21,7 +21,7 @@ import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
-import org.zodiark.service.util.RestService;
+import org.zodiark.service.util.RESTService;
 
 /**
  * Retrieve the list of banned word for the {@link org.zodiark.service.chat.Chat} Service.
@@ -31,7 +31,7 @@ public class WordService extends DBServiceAdapter {
     private final Logger logger = LoggerFactory.getLogger(WordService.class);
 
     @Inject
-    public RestService restService;
+    public RESTService restService;
 
     @Override
     public void reactTo(String path, Object message, Reply reply) {

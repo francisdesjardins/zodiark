@@ -22,7 +22,7 @@ import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.publisher.PublisherEndpoint;
-import org.zodiark.service.util.RestService;
+import org.zodiark.service.util.RESTService;
 
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_ANNOUNCE_SESSION;
 
@@ -32,7 +32,7 @@ public class AnnouncePublisherSessionService extends DBServiceAdapter {
     private final Logger logger = LoggerFactory.getLogger(AnnouncePublisherSessionService.class);
 
     @Inject
-    public RestService restService;
+    public RESTService restService;
 
     @Override
     public void reactTo(String path, Object message, final Reply reply) {
@@ -40,7 +40,7 @@ public class AnnouncePublisherSessionService extends DBServiceAdapter {
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             final PublisherEndpoint p = PublisherEndpoint.class.cast(message);
             restService.post(DB_PUBLISHER_ANNOUNCE_SESSION.replace("@uuid",p.uuid()),
-                    p.message(), new RestService.Reply<ShowId, DBError>() {
+                    p.message(), new RESTService.Reply<ShowId, DBError>() {
                 @Override
                 public void success(ShowId success) {
                     reply.ok(p.showId(success));
