@@ -22,7 +22,7 @@ import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.config.PublisherConfig;
-import org.zodiark.service.util.RESTService;
+import org.zodiark.service.util.RestService;
 
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG;
 
@@ -36,7 +36,7 @@ public class LoadPublisherConfigService extends DBServiceAdapter {
     private final Logger logger = LoggerFactory.getLogger(LoadPublisherConfigService.class);
 
     @Inject
-    public RESTService restService;
+    public RestService restService;
 
     @Override
     public void reactTo(String path, Object message,final  Reply reply) {
@@ -44,7 +44,7 @@ public class LoadPublisherConfigService extends DBServiceAdapter {
 
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             final EndpointAdapter p = EndpointAdapter.class.cast(message);
-            restService.get(DB_PUBLISHER_CONFIG.replace("@uuid", p.uuid()), new RESTService.Reply<PublisherConfig, DBError>() {
+            restService.get(DB_PUBLISHER_CONFIG.replace("@uuid", p.uuid()), new RestService.Reply<PublisherConfig, DBError>() {
                 @Override
                 public void success(PublisherConfig config) {  p.config(config);
                     reply.ok(p);

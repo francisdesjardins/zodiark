@@ -20,7 +20,7 @@ import org.zodiark.server.ZodiarkObjectFactory;
 import org.zodiark.service.config.AuthConfig;
 import org.zodiark.service.db.DBError;
 import org.zodiark.service.db.ShowId;
-import org.zodiark.service.util.RESTService;
+import org.zodiark.service.util.RestService;
 import org.zodiark.service.util.mock.OKRestService;
 
 import java.util.UUID;
@@ -34,10 +34,10 @@ public class RestServiceTest {
 
     @Test
     public void createPublisherService() throws IllegalAccessException, InstantiationException {
-        RESTService restService = new ZodiarkObjectFactory().newClassInstance(null, RESTService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<AuthConfig> config = new AtomicReference<>();
         restService.post(DB_PUBLISHER_SESSION_CREATE.replace("@uuid", UUID.randomUUID().toString()),
-                "{\"username\": \"foo\", \"password\":\"12345\", \"ip\": \"127.0.0.1\", \"referrer\":\"zzzz\"}", new RESTService.Reply<AuthConfig, DBError>() {
+                "{\"username\": \"foo\", \"password\":\"12345\", \"ip\": \"127.0.0.1\", \"referrer\":\"zzzz\"}", new RestService.Reply<AuthConfig, DBError>() {
             @Override
             public void success(AuthConfig success) {
                 config.set(success);
@@ -59,12 +59,12 @@ public class RestServiceTest {
 
     @Test
     public void watchIdService() throws IllegalAccessException, InstantiationException {
-        RESTService restService = new ZodiarkObjectFactory().newClassInstance(null, RESTService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<ShowId> showId = new AtomicReference<>();
 
         restService.post(DB_PUBLISHER_ANNOUNCE_SESSION.replace("@uuid", UUID.randomUUID().toString()),
                 "{\"cameraWidth\": \"1\", \"cameraWidth\": \"1\", \"cameraFPS\": \"1\", \"cameraQuality\": \"1\", \"bandwidthOut\": \"1\", \"bandwidthIn\": \"1\"}" +
-                        "", new RESTService.Reply<ShowId, DBError>() {
+                        "", new RestService.Reply<ShowId, DBError>() {
             @Override
             public void success(ShowId success) {
                 showId.set(success);
