@@ -17,6 +17,7 @@ package org.zodiark.service.util.mock;
 
 import org.atmosphere.util.DefaultEndpointMapper;
 import org.atmosphere.util.EndpointMapper;
+import org.zodiark.protocol.Paths;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +25,7 @@ import java.util.Map;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_ANNOUNCE_SESSION;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SESSION_CREATE;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_JOIN_SESSION;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_VALIDATE_STATE;
 
 public class LocalDatabase {
@@ -41,6 +43,8 @@ public class LocalDatabase {
         fakePassDatabase.put(DB_PUBLISHER_CONFIG.replace("@uuid","{guid}"), " {\"configuration\": \"bla bla bla\"}");
         fakePassDatabase.put(DB_SUBSCRIBER_VALIDATE_STATE.replace("@uuid","{guid}"), " {\"configuration\": \"null\"}");
         fakePassDatabase.put(DB_PUBLISHER_ANNOUNCE_SESSION.replace("@uuid","{guid}"), " {\"showId\": \"123234\"}");
+        fakePassDatabase.put(DB_SUBSCRIBER_JOIN_SESSION.replace("@uuid","{guid}"), " {\"watchId\": \"123234\"}");
+
 
         fakeFailDatabase.put("/v1/publisher/{guid}/session/create", " {\"result\": \"ko\", \"data\":{\"status\":500, \"content\": \"null\"}}");
     }

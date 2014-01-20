@@ -16,10 +16,12 @@
 package org.zodiark.server.test;
 
 import org.testng.annotations.Test;
+import org.zodiark.protocol.Paths;
 import org.zodiark.server.ZodiarkObjectFactory;
 import org.zodiark.service.config.AuthConfig;
 import org.zodiark.service.db.DBError;
 import org.zodiark.service.db.ShowId;
+import org.zodiark.service.db.WatchId;
 import org.zodiark.service.util.RestService;
 import org.zodiark.service.util.mock.OKRestService;
 
@@ -29,6 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.testng.Assert.assertNotNull;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_ANNOUNCE_SESSION;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SESSION_CREATE;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_JOIN_SESSION;
 
 public class RestServiceTest {
 
@@ -58,7 +61,7 @@ public class RestServiceTest {
     }
 
     @Test
-    public void watchIdService() throws IllegalAccessException, InstantiationException {
+    public void showIdTest() throws IllegalAccessException, InstantiationException {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<ShowId> showId = new AtomicReference<>();
 
@@ -83,5 +86,29 @@ public class RestServiceTest {
 
     }
 
+    @Test
+    public void watchIdService() throws IllegalAccessException, InstantiationException {
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        final AtomicReference<WatchId> watchId = new AtomicReference<>();
 
+        restService.post(DB_SUBSCRIBER_JOIN_SESSION.replace("@uuid", UUID.randomUUID().toString()),
+                "{\"modeId\": \"12345\"}" +
+                        "", new RestService.Reply<WatchId, DBError>() {
+            @Override
+            public void success(WatchId success) {
+                watchId.set(success);
+            }
+
+            @Override
+            public void failure(DBError failure) {
+            }
+
+            @Override
+            public void exception(Exception exception) {
+                exception.printStackTrace();
+            }
+        });
+        assertNotNull(watchId.get());
+
+    }
 }

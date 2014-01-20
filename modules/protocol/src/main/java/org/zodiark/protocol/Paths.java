@@ -71,6 +71,9 @@ public interface Paths {
      * Annonce the session
      */
     String DB_PUBLISHER_ANNOUNCE_SESSION = "/v1/publisher/@guid/show/start";
+
+
+    String DB_SUBSCRIBER_JOIN_SESSION = "/v1/subscriber/@guid/watch/start";
     /**
      * An I/O event. Send a request to Wowza asking for a Streaming Session Approval
      */
