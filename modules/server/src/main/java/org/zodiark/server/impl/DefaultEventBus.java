@@ -87,6 +87,7 @@ public class DefaultEventBus implements EventBus {
     private void sendError(Envelope e, AtmosphereResource r){
         Message m = new Message();
         m.setPath("/error");
+        m.setUUID(e.getMessage().getUUID());
         Envelope error = Envelope.newServerReply(e, m);
         ioEvent(error, r);
     }
