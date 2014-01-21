@@ -40,9 +40,9 @@ import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnDiscon
 import static org.zodiark.protocol.Paths.BEGIN_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCASTER_CREATE;
 import static org.zodiark.protocol.Paths.CREATE_PUBLISHER_SESSION;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_ANNOUNCE_SESSION;
+import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SHOW_START;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SESSION_CREATE;
+import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.FAILED_PUBLISHER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.LOAD_PUBLISHER_CONFIG;
@@ -276,7 +276,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             p.uuid(uuid).message(e.getMessage()).resource(resource);
 
             endpoints.put(uuid, p);
-            eventBus.message(DB_PUBLISHER_SESSION_CREATE, p, new Reply<PublisherEndpoint>() {
+            eventBus.message(DB_POST_PUBLISHER_SESSION_CREATE, p, new Reply<PublisherEndpoint>() {
                 @Override
                 public void ok(PublisherEndpoint p) {
                     // TODO: Wrong
@@ -301,7 +301,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     }
 
     protected void annonceSession(final Envelope e, PublisherEndpoint p) {
-        eventBus.message(DB_PUBLISHER_ANNOUNCE_SESSION, p, new Reply<PublisherEndpoint>() {
+        eventBus.message(DB_POST_PUBLISHER_SHOW_START, p, new Reply<PublisherEndpoint>() {
             @Override
             public void ok(PublisherEndpoint p) {
                 // Nothing to do, the endpoint has been configured

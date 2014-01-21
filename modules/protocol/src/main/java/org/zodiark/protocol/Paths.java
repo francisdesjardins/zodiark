@@ -68,13 +68,6 @@ public interface Paths {
      */
     String BEGIN_STREAMING_SESSION = "/streaming/begin/publisher";
     /**
-     * Annonce the session
-     */
-    String DB_PUBLISHER_ANNOUNCE_SESSION = "/v1/publisher/@guid/show/start";
-
-
-    String DB_SUBSCRIBER_JOIN_SESSION = "/v1/subscriber/@guid/watch/start";
-    /**
      * An I/O event. Send a request to Wowza asking for a Streaming Session Approval
      */
     String WOWZA_CONNECT = "/wowza/connect";
@@ -94,22 +87,6 @@ public interface Paths {
      * An I/O event Received from a Wowxa endpoint when the deobfuscation process is completed and the normal behavior
      */
     String WOWZA_DEOBFUSCATE_OK = "/wowza/deobfuscate/ok";
-    /**
-     * A message to retrieve the data from an Endpoint
-     */
-    String DB_PUBLISHER_CONFIG = "/v1/publisher/@uuid/session/config";
-    /**
-     * A message to Initialize an Endpoint Session within the remote database/web service endpoint.
-     */
-    String DB_PUBLISHER_SESSION_CREATE = "/v1/publisher/@uuid/session/create";
-    /**
-     * A Message to retrieve the list of banned word for a Streaming Session Chat.
-     */
-    String DB_WORD = "/db/word";
-    /**
-     * a Message to validate the state of a Subscriber
-     */
-    String DB_SUBSCRIBER_VALIDATE_STATE = "/v1/subscriber/@uuid/session/validate";
     /**
      * An I/O event to leave the current Publisher Streaming Session
      */
@@ -238,4 +215,71 @@ public interface Paths {
     String SERVICE_SUBSCRIBER = "/subscriber";
 
     String SERVICE_WOWZA = "/wowza";
+
+
+    // DB-Mapping
+    /**
+     * A message to retrieve the data from an Endpoint
+     */
+    String DB_PUBLISHER_CONFIG = "/v1/publisher/@uuid/session/config";
+    /**
+     * A message to Initialize an Endpoint Session within the remote database/web service endpoint.
+     */
+    String DB_POST_PUBLISHER_SESSION_CREATE = "/v1/publisher/@uuid/session/create";
+    /**
+     * A Message to retrieve the list of banned word for a Streaming Session Chat.
+     */
+    String DB_GET_WORD = "/v1/publisher/@guid/motd";
+    /**
+     * a Message to validate the state of a Subscriber
+     */
+    String DB_SUBSCRIBER_VALIDATE_STATE = "/v1/subscriber/@uuid/session/validate";
+    /**
+     * Start Show
+     */
+    String DB_POST_PUBLISHER_SHOW_START = "/v1/publisher/@guid/show/start";
+    /**
+     * End Show
+     */
+    String DB_POST_PUBLISHER_SHOW_END = "/v1/publisher/@guid/show/@showId/end";
+    /**
+     *
+     */
+    String DB_POST_SUBSCRIBER_JOIN_SESSION = "/v1/subscriber/@guid/watch/start";
+
+    /**
+     *
+     */
+    String DB_POST_SUBSCRIBER_CHARGE_START = "/v1/subscriber/@guid/watch/@id/charge";
+    /**
+     *
+     */
+    String DB_POST_SUBSCRIBER_CHARGE_END = "/v1/subscriber/@guid/watch/@id/end";
+    /**
+     *
+     */
+    String DB_POST_PUBLISHER_ONDEMAND_START = "/v1/publisher/@guid/ondemand/start";
+
+    String DB_POST_PUBLISHER_ONDEMAND_KEEPALIVE = "/v1/publisher/@guid/ondemand/keepalive";
+
+    String DB_POST_PUBLISHER_ONDEMAND_END = "/v1/publisher/@guid/ondemand/end";
+    /**
+     * First this to send to the Publisher as soon as the subscriber join.
+     */
+    String DB_GET_SUBSCRIBER_STATUS_TO_PUBLISHER_PASSTHROUGHT = "/v1/subscriber/@guid/profile";
+    /**
+     * Start the shared private show
+     */
+    String DB_PUBLISHER_SHARED_PRIVATE_START = "/v1/publisher/@guid/shared/start";
+
+    String DB_PUBLISHER_SHARED_PRIVATE_END = "/v1/publisher/@guid/shared/end";
+
+    String DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT = "/v1/subscriber/@guid/actions";
+
+    String DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT = "/v1/publisher/@guid/actions";
+    String DB_SUBSCRIBER_REQUEST_ACTION = "/v1/subscriber/@guid/action/transaction/request";
+    String DB_SUBSCRIBER_JOIN_ACTION = "/v1/subscriber/@guid/action/transaction/@id/join";
+    String DB_SUBSCRIBER_CHARGE_ACTION = "/v1/subscriber/@guid/action/transaction/@id/charge";
+    String DB_SUBSCRIBER_BLOCK = "/v1/subscriber/@guid/block";
+    String DB_SUBSCRIBER_EJECT = "/v1/subscriber/@guid/eject";
 }

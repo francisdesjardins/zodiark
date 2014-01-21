@@ -22,10 +22,14 @@ import org.zodiark.protocol.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_ANNOUNCE_SESSION;
+import static org.zodiark.protocol.Paths.DB_GET_WORD;
+import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
+import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SHOW_END;
+import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SHOW_START;
+import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_CHARGE_END;
+import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_CHARGE_START;
+import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_JOIN_SESSION;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SESSION_CREATE;
-import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_JOIN_SESSION;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_VALIDATE_STATE;
 
 public class LocalDatabase {
@@ -39,17 +43,51 @@ public class LocalDatabase {
 
 
     public LocalDatabase() {
-        fakePassDatabase.put(DB_PUBLISHER_SESSION_CREATE.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
+        fakePassDatabase.put(DB_POST_PUBLISHER_SESSION_CREATE.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
         fakePassDatabase.put(DB_PUBLISHER_CONFIG.replace("@uuid","{guid}"), " {\"configuration\": \"bla bla bla\"}");
         fakePassDatabase.put(DB_SUBSCRIBER_VALIDATE_STATE.replace("@uuid","{guid}"), " {\"configuration\": \"null\"}");
-        fakePassDatabase.put(DB_PUBLISHER_ANNOUNCE_SESSION.replace("@uuid","{guid}"), " {\"showId\": \"123234\"}");
-        fakePassDatabase.put(DB_SUBSCRIBER_JOIN_SESSION.replace("@uuid","{guid}"), " {\"watchId\": \"123234\"}");
+        fakePassDatabase.put(DB_POST_PUBLISHER_SHOW_START.replace("@uuid","{guid}"), " {\"showId\": \"123234\"}");
+        fakePassDatabase.put(DB_POST_PUBLISHER_SHOW_END.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
+
+        fakePassDatabase.put(DB_POST_SUBSCRIBER_JOIN_SESSION.replace("@uuid","{guid}"), " {\"watchId\": \"123234\"}");
+
+        fakePassDatabase.put(DB_GET_WORD.replace("@uuid","{guid}"),"{\"motds\": [{\"motdId\": 1, \"title\": \"foo\", \"message\": \"blabla\", \"createdOn\":\"20140125\", \"expiresOn\":\"20140125\", " +
+                "\"expired\": true}]}");
+
+        fakePassDatabase.put(DB_POST_SUBSCRIBER_CHARGE_START.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
+        fakePassDatabase.put(DB_POST_SUBSCRIBER_CHARGE_END.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
+
+        fakePassDatabase.put(Paths.DB_POST_PUBLISHER_ONDEMAND_START.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
+        fakePassDatabase.put(Paths.DB_POST_PUBLISHER_ONDEMAND_KEEPALIVE.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
+        fakePassDatabase.put(Paths.DB_POST_PUBLISHER_ONDEMAND_END.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
+
+        fakePassDatabase.put(Paths.DB_GET_SUBSCRIBER_STATUS_TO_PUBLISHER_PASSTHROUGHT.replace("@uuid","{guid}"), " {\"no_need_to_parse\": \"_something_\"}");
+
+
+        fakePassDatabase.put(Paths.DB_PUBLISHER_SHARED_PRIVATE_START.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
+        fakePassDatabase.put(Paths.DB_PUBLISHER_SHARED_PRIVATE_END.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
+
+        fakePassDatabase.put(Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT.replace("@uuid","{guid}"), " {\"no_need_to_parse\": \"_something_\"}");
+        fakePassDatabase.put(Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT.replace("@uuid","{guid}"), " {\"no_need_to_parse\": \"_something_\"}");
+
+
+        fakePassDatabase.put(Paths.DB_SUBSCRIBER_REQUEST_ACTION.replace("@uuid","{guid}"), "{\"transactionId\": \"1\",\"clear\":\"true\"," +
+                "\"joinDurationInSeconds\":30," +
+                "\"minimumDurationInSeconds\":30," +
+                "\"maximumDurationsInSeconds\":30," +
+                "\"cooldownDurationInSeconds\":30}");
+
+        fakePassDatabase.put(Paths.DB_SUBSCRIBER_JOIN_ACTION.replace("@uuid","{guid}"), "{\"transactionId\":1234}");
+
+        fakePassDatabase.put(Paths.DB_SUBSCRIBER_CHARGE_ACTION.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
+        fakePassDatabase.put(Paths.DB_SUBSCRIBER_BLOCK.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
+        fakePassDatabase.put(Paths.DB_SUBSCRIBER_EJECT.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
 
 
         fakeFailDatabase.put("/v1/publisher/{guid}/session/create", " {\"result\": \"ko\", \"data\":{\"status\":500, \"content\": \"null\"}}");
     }
 
-    public String serve(String url, String body, RESULT passOrFail) {
+    public String serve(OKRestService.METHOD m, String url, String body, RESULT passOrFail) {
         String bdResult;
         if (RESULT.PASS.equals(passOrFail)) {
             bdResult = mapper.map(url, fakePassDatabase);

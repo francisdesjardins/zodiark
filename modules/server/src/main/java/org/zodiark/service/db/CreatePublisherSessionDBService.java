@@ -24,13 +24,13 @@ import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.config.AuthConfig;
 import org.zodiark.service.util.RestService;
 
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SESSION_CREATE;
+import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
 
 /**
  * Initialize a remove session in a Database/Web Service for an {@link org.zodiark.service.Endpoint}. This class
  * use the injected {@link org.zodiark.service.util.RestService} to communicate with the remote endpoint.
  */
-@On(DB_PUBLISHER_SESSION_CREATE)
+@On(DB_POST_PUBLISHER_SESSION_CREATE)
 public class CreatePublisherSessionDBService extends DBServiceAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(CreatePublisherSessionDBService.class);

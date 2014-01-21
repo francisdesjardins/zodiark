@@ -24,12 +24,19 @@ import org.zodiark.service.util.RestService;
 
 import java.lang.reflect.Method;
 
+import static org.zodiark.service.util.mock.OKRestService.METHOD.DELETE;
+import static org.zodiark.service.util.mock.OKRestService.METHOD.GET;
+import static org.zodiark.service.util.mock.OKRestService.METHOD.POST;
+import static org.zodiark.service.util.mock.OKRestService.METHOD.PUT;
+
 /**
  * Mock class for testing purpose only. This class does nothing.
  */
 public class OKRestService implements RestService {
 
     private final Logger logger = LoggerFactory.getLogger(OKRestService.class);
+
+    public enum METHOD {GET, PUT, POST, DELETE}
 
     @Inject
     public Context context;
@@ -39,46 +46,51 @@ public class OKRestService implements RestService {
 
     protected final LocalDatabase db = new LocalDatabase();
 
-
     @Override
     public void get(String uri, Reply r) {
-        post(uri, null, r);
+        send(GET, uri, null, r);
     }
 
     @Override
     public void put(String uri, Object o, Reply r) {
-        post(uri, o, r);
+        send(PUT, uri, o, r);
     }
 
     @Override
     public void post(String uri, Object o, Reply r) {
+        send(POST, uri, o, r);
+    }
+
+    protected void send(METHOD method, String uri, Object o, Reply r) {
         try {
             Class<?> success = null;
             Class<?> failure = null;
             for (Method m : r.getClass().getMethods()) {
-                switch(m.getName()) {
-                    case "success" :
-                        if (!((Class)m.getGenericParameterTypes()[0]).getName().equals(Object.class.getName())) {
+                switch (m.getName()) {
+                    case "success":
+                        if (!((Class) m.getGenericParameterTypes()[0]).getName().equals(Object.class.getName())) {
                             success = (Class) m.getGenericParameterTypes()[0];
                         }
                         break;
-                    case "failure" :
-                        if (!((Class)m.getGenericParameterTypes()[0]).getName().equals(Object.class.getName())) {
+                    case "failure":
+                        if (!((Class) m.getGenericParameterTypes()[0]).getName().equals(Object.class.getName())) {
                             failure = (Class) m.getGenericParameterTypes()[0];
                         }
                         break;
-                    case "exception" :
+                    case "exception":
                         break;
                 }
             }
 
-            String restResponse = db.serve(uri, mapper.writeValueAsString(o), LocalDatabase.RESULT.PASS);
+            String restResponse = db.serve(method, uri, mapper.writeValueAsString(o), LocalDatabase.RESULT.PASS);
 
             try {
-                r.success(mapper.readerForUpdating(context.newInstance(success)).readValue(restResponse));
+                Object object = context.newInstance(success);
+                r.success(String.class.isAssignableFrom(success) ? object : mapper.readerForUpdating(object).readValue(restResponse));
             } catch (Exception ex) {
                 ex.printStackTrace();
-                r.failure(mapper.readerForUpdating(context.newInstance(failure)).readValue(restResponse));
+                Object object = context.newInstance(failure);
+                r.failure(String.class.isAssignableFrom(failure) ? object : mapper.readerForUpdating(object).readValue(restResponse));
             }
         } catch (Exception e) {
             r.exception(e);
@@ -87,6 +99,6 @@ public class OKRestService implements RestService {
 
     @Override
     public void delete(String uri, Object o, Reply r) {
-        post(uri, o, r);
+        send(DELETE, uri, o, r);
     }
 }

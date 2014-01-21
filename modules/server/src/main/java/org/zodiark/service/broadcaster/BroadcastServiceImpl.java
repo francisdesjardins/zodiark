@@ -43,7 +43,7 @@ import static org.atmosphere.cpr.ApplicationConfig.SUSPENDED_ATMOSPHERE_RESOURCE
 import static org.zodiark.protocol.Paths.BROADCASTER_CREATE;
 import static org.zodiark.protocol.Paths.BROADCASTER_TRACK;
 import static org.zodiark.protocol.Paths.BROADCAST_TO_ALL;
-import static org.zodiark.protocol.Paths.DB_WORD;
+import static org.zodiark.protocol.Paths.DB_GET_WORD;
 
 /**
  * Create {@link Broadcaster}, or channel, used by {@link PublisherEndpoint} and {@link SubscriberEndpoint} to communicate.
@@ -135,7 +135,7 @@ public class BroadcastServiceImpl implements BroadcasterService {
         AtmosphereFramework f = r.getAtmosphereConfig().framework();
         final Broadcaster b = f.getBroadcasterFactory().lookup("/chat/" + uuid, true);
 
-        eventBus.message(DB_WORD, p, new Reply<BroadcasterDBResult>() {
+        eventBus.message(DB_GET_WORD, p, new Reply<BroadcasterDBResult>() {
 
             @Override
             public void ok(BroadcasterDBResult result) {
