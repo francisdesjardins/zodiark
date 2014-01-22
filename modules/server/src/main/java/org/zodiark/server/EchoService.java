@@ -13,16 +13,15 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.wowza;
+package org.zodiark.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
-import org.zodiark.server.Reply;
-import org.zodiark.service.Service;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
+import org.zodiark.service.Service;
 
 @On("/echo")
 public class EchoService implements Service {

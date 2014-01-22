@@ -21,6 +21,7 @@ import org.testng.annotations.Test;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.protocol.Path;
+import org.zodiark.server.EchoService;
 import org.zodiark.server.ZodiarkServer;
 
 import java.io.IOException;
