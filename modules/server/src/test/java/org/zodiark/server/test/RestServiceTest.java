@@ -534,4 +534,303 @@ public class RestServiceTest {
         assertNotNull(result.get());
 
     }
+
+    @Test
+    public void endSubscriberFromPublisher() throws IllegalAccessException, InstantiationException {
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        final AtomicReference<Status> result = new AtomicReference<>();
+
+        restService.post(Paths.DB_SUBSCRIBER_END.replace("@uuid", UUID.randomUUID().toString()), "", new RestService.Reply<Status, DBError>() {
+            @Override
+            public void success(Status success) {
+                result.set(success);
+            }
+
+            @Override
+            public void failure(DBError failure) {
+            }
+
+            @Override
+            public void exception(Exception exception) {
+                exception.printStackTrace();
+            }
+        });
+        assertNotNull(result.get());
+
+    }
+
+    @Test
+    public void loadPublisherConfig() throws IllegalAccessException, InstantiationException {
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        final AtomicReference<String> result = new AtomicReference<>();
+
+        restService.get(Paths.DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT.replace("@uuid", UUID.randomUUID().toString()), new RestService.Reply<String, DBError>() {
+            @Override
+            public void success(String success) {
+                result.set(success);
+            }
+
+            @Override
+            public void failure(DBError failure) {
+            }
+
+            @Override
+            public void exception(Exception exception) {
+                exception.printStackTrace();
+            }
+        });
+        assertNotNull(result.get());
+
+    }
+
+    @Test
+    public void putPublisherConfig() throws IllegalAccessException, InstantiationException {
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        final AtomicReference<Status> result = new AtomicReference<>();
+
+        restService.put(Paths.DB_PUBLISHER_SAVE_CONFIG.replace("@uuid", UUID.randomUUID().toString()),
+                "{\"colorPerformer\":\"xxx\",\"colorClient\":\"xxx\",\"colorAdmin\":\"xxx\",\"colorSystem\":\"xxx\",\"colorVip\":\"xxx\",\"fontSizeChat\":\"xxx\",\"fontSizeMenu\":\"xxx\",\"shortcut1\":\"xxx\",\"shortcut2\":\"xxx\",\"shortcut3\":\"xxx\",\"shortcut4\":\"xxx\",\"shortcut5\":\"xxx\",\"shortcut6\":\"xxx\",\"shortcut7\":\"xxx\",\"shortcut8\":\"xxx\",\"shortcut9\":\"xxx\",\"shortcut10\":\"xxx\",\"welcomeMessage\":\"xxx\"}\n",
+                new RestService.Reply<Status, DBError>() {
+                    @Override
+                    public void success(Status success) {
+                        result.set(success);
+                    }
+
+                    @Override
+                    public void failure(DBError failure) {
+                    }
+
+                    @Override
+                    public void exception(Exception exception) {
+                        exception.printStackTrace();
+                    }
+                });
+        assertNotNull(result.get());
+
+    }
+
+    @Test
+    public void errorPublisherConfig() throws IllegalAccessException, InstantiationException {
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        final AtomicReference<Status> result = new AtomicReference<>();
+
+        restService.get(Paths.DB_PUBLISHER_CONFIG_ERROR_PASSTHROUGHT.replace("@uuid", UUID.randomUUID().toString()),
+                new RestService.Reply<Status, DBError>() {
+                    @Override
+                    public void success(Status success) {
+                        result.set(success);
+                    }
+
+                    @Override
+                    public void failure(DBError failure) {
+                    }
+
+                    @Override
+                    public void exception(Exception exception) {
+                        exception.printStackTrace();
+                    }
+                });
+        assertNotNull(result.get());
+
+    }
+
+    @Test
+    public void showPublisherConfig() throws IllegalAccessException, InstantiationException {
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        final AtomicReference<String> result = new AtomicReference<>();
+
+        restService.get(Paths.DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT.replace("@uuid", UUID.randomUUID().toString()),
+                new RestService.Reply<String, DBError>() {
+                    @Override
+                    public void success(String success) {
+                        result.set(success);
+                    }
+
+                    @Override
+                    public void failure(DBError failure) {
+                    }
+
+                    @Override
+                    public void exception(Exception exception) {
+                        exception.printStackTrace();
+                    }
+                });
+        assertNotNull(result.get());
+
+    }
+
+    @Test
+    public void putPublisherShow() throws IllegalAccessException, InstantiationException {
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        final AtomicReference<Status> result = new AtomicReference<>();
+
+        restService.put(Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW.replace("@uuid", UUID.randomUUID().toString()), "",
+                new RestService.Reply<Status, DBError>() {
+                    @Override
+                    public void success(Status success) {
+                        result.set(success);
+                    }
+
+                    @Override
+                    public void failure(DBError failure) {
+                    }
+
+                    @Override
+                    public void exception(Exception exception) {
+                        exception.printStackTrace();
+                    }
+                });
+        assertNotNull(result.get());
+
+    }
+
+    @Test
+    public void putPublisherPublicShow() throws IllegalAccessException, InstantiationException {
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        final AtomicReference<Status> result = new AtomicReference<>();
+
+        restService.put(Paths.DB_PUBLISHER_PUBLIC_MODE.replace("@uuid", UUID.randomUUID().toString()), "",
+                new RestService.Reply<Status, DBError>() {
+                    @Override
+                    public void success(Status success) {
+                        result.set(success);
+                    }
+
+                    @Override
+                    public void failure(DBError failure) {
+                    }
+
+                    @Override
+                    public void exception(Exception exception) {
+                        exception.printStackTrace();
+                    }
+                });
+        assertNotNull(result.get());
+
+    }
+
+    @Test
+    public void deletePublisherPublicShow() throws IllegalAccessException, InstantiationException {
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        final AtomicReference<Status> result = new AtomicReference<>();
+
+        restService.delete(Paths.DB_PUBLISHER_PUBLIC_MODE.replace("@uuid", UUID.randomUUID().toString()), "",
+                new RestService.Reply<Status, DBError>() {
+                    @Override
+                    public void success(Status success) {
+                        result.set(success);
+                    }
+
+                    @Override
+                    public void failure(DBError failure) {
+                    }
+
+                    @Override
+                    public void exception(Exception exception) {
+                        exception.printStackTrace();
+                    }
+                });
+        assertNotNull(result.get());
+
+    }
+
+    @Test
+    public void reportPublishErrorTest() throws IllegalAccessException, InstantiationException {
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        final AtomicReference<Status> result = new AtomicReference<>();
+
+        restService.post(Paths.DB_PUBLISHER_ERROR_REPORT.replace("@uuid", UUID.randomUUID().toString()), "{\"source\":\"xxx\",\"error\":\"xxx\",\"info\":\"xxx\"}",
+                new RestService.Reply<Status, DBError>() {
+                    @Override
+                    public void success(Status success) {
+                        result.set(success);
+                    }
+
+                    @Override
+                    public void failure(DBError failure) {
+                    }
+
+                    @Override
+                    public void exception(Exception exception) {
+                        exception.printStackTrace();
+                    }
+                });
+        assertNotNull(result.get());
+
+    }
+
+    @Test
+    public void publisherSubscriberProfile() throws IllegalAccessException, InstantiationException {
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        final AtomicReference<Status> result = new AtomicReference<>();
+
+        restService.put(Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE.replace("@uuid", UUID.randomUUID().toString()), "{\"profileFullname\":\"xxx\",\"profileAge\":\"xxx\",\"profileGender\":\"xxx\",\"profileNote\":\"xxx\"}",
+                new RestService.Reply<Status, DBError>() {
+                    @Override
+                    public void success(Status success) {
+                        result.set(success);
+                    }
+
+                    @Override
+                    public void failure(DBError failure) {
+                    }
+
+                    @Override
+                    public void exception(Exception exception) {
+                        exception.printStackTrace();
+                    }
+                });
+        assertNotNull(result.get());
+
+    }
+
+    @Test
+    public void subscriberExtra() throws IllegalAccessException, InstantiationException {
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        final AtomicReference<TransactionId> result = new AtomicReference<>();
+
+        restService.put(Paths.DB_SUBSCRIBER_EXTRA.replace("@uuid", UUID.randomUUID().toString()), "", new RestService.Reply<TransactionId, DBError>() {
+            @Override
+            public void success(TransactionId success) {
+                result.set(success);
+            }
+
+            @Override
+            public void failure(DBError failure) {
+            }
+
+            @Override
+            public void exception(Exception exception) {
+                exception.printStackTrace();
+            }
+        });
+        assertNotNull(result.get());
+
+    }
+
+    @Test
+    public void subscriberConfig() throws IllegalAccessException, InstantiationException {
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        final AtomicReference<String> result = new AtomicReference<>();
+
+        restService.put(Paths.DB_SUBSCRIBER_CONFIG_PASSTHROUGHT.replace("@uuid", UUID.randomUUID().toString()), "", new RestService.Reply<String, DBError>() {
+            @Override
+            public void success(String success) {
+                result.set(success);
+            }
+
+            @Override
+            public void failure(DBError failure) {
+            }
+
+            @Override
+            public void exception(Exception exception) {
+                exception.printStackTrace();
+            }
+        });
+        assertNotNull(result.get());
+
+    }
 }
+
+

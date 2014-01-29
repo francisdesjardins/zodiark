@@ -36,6 +36,11 @@ public class LocalDatabase {
 
     public enum RESULT {PASS, FAIL}
 
+    public final static String PASSTHROUGH = "{\"no_need_to_parse\": \"_something_\"}\"";
+    public final static String STATUS_OK = " {\"status\": \"OK\"}";
+    public final static String TRANSACTION_ID = "{\"transactionId\":1234}";
+
+
     EndpointMapper<String> mapper = new DefaultEndpointMapper<>();
 
     private final Map<String, String> fakePassDatabase = new HashMap<>();
@@ -43,32 +48,32 @@ public class LocalDatabase {
 
 
     public LocalDatabase() {
-        fakePassDatabase.put(DB_POST_PUBLISHER_SESSION_CREATE.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
+        fakePassDatabase.put(DB_POST_PUBLISHER_SESSION_CREATE.replace("@uuid","{guid}"), STATUS_OK);
         fakePassDatabase.put(DB_PUBLISHER_CONFIG.replace("@uuid","{guid}"), " {\"configuration\": \"bla bla bla\"}");
         fakePassDatabase.put(DB_SUBSCRIBER_VALIDATE_STATE.replace("@uuid","{guid}"), " {\"configuration\": \"null\"}");
         fakePassDatabase.put(DB_POST_PUBLISHER_SHOW_START.replace("@uuid","{guid}"), " {\"showId\": \"123234\"}");
-        fakePassDatabase.put(DB_POST_PUBLISHER_SHOW_END.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
+        fakePassDatabase.put(DB_POST_PUBLISHER_SHOW_END.replace("@uuid","{guid}"), STATUS_OK);
 
         fakePassDatabase.put(DB_POST_SUBSCRIBER_JOIN_SESSION.replace("@uuid","{guid}"), " {\"watchId\": \"123234\"}");
 
         fakePassDatabase.put(DB_GET_WORD.replace("@uuid","{guid}"),"{\"motds\": [{\"motdId\": 1, \"title\": \"foo\", \"message\": \"blabla\", \"createdOn\":\"20140125\", \"expiresOn\":\"20140125\", " +
                 "\"expired\": true}]}");
 
-        fakePassDatabase.put(DB_POST_SUBSCRIBER_CHARGE_START.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
-        fakePassDatabase.put(DB_POST_SUBSCRIBER_CHARGE_END.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
+        fakePassDatabase.put(DB_POST_SUBSCRIBER_CHARGE_START.replace("@uuid","{guid}"), STATUS_OK);
+        fakePassDatabase.put(DB_POST_SUBSCRIBER_CHARGE_END.replace("@uuid","{guid}"), STATUS_OK);
 
-        fakePassDatabase.put(Paths.DB_POST_PUBLISHER_ONDEMAND_START.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
-        fakePassDatabase.put(Paths.DB_POST_PUBLISHER_ONDEMAND_KEEPALIVE.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
-        fakePassDatabase.put(Paths.DB_POST_PUBLISHER_ONDEMAND_END.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
+        fakePassDatabase.put(Paths.DB_POST_PUBLISHER_ONDEMAND_START.replace("@uuid","{guid}"), STATUS_OK);
+        fakePassDatabase.put(Paths.DB_POST_PUBLISHER_ONDEMAND_KEEPALIVE.replace("@uuid","{guid}"), STATUS_OK);
+        fakePassDatabase.put(Paths.DB_POST_PUBLISHER_ONDEMAND_END.replace("@uuid","{guid}"), STATUS_OK);
 
-        fakePassDatabase.put(Paths.DB_GET_SUBSCRIBER_STATUS_TO_PUBLISHER_PASSTHROUGHT.replace("@uuid","{guid}"), " {\"no_need_to_parse\": \"_something_\"}");
+        fakePassDatabase.put(Paths.DB_GET_SUBSCRIBER_STATUS_TO_PUBLISHER_PASSTHROUGHT.replace("@uuid","{guid}"), PASSTHROUGH);
 
 
-        fakePassDatabase.put(Paths.DB_PUBLISHER_SHARED_PRIVATE_START.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
-        fakePassDatabase.put(Paths.DB_PUBLISHER_SHARED_PRIVATE_END.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
+        fakePassDatabase.put(Paths.DB_PUBLISHER_SHARED_PRIVATE_START.replace("@uuid","{guid}"), STATUS_OK);
+        fakePassDatabase.put(Paths.DB_PUBLISHER_SHARED_PRIVATE_END.replace("@uuid","{guid}"), STATUS_OK);
 
-        fakePassDatabase.put(Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT.replace("@uuid","{guid}"), " {\"no_need_to_parse\": \"_something_\"}");
-        fakePassDatabase.put(Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT.replace("@uuid","{guid}"), " {\"no_need_to_parse\": \"_something_\"}");
+        fakePassDatabase.put(Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT.replace("@uuid","{guid}"), PASSTHROUGH);
+        fakePassDatabase.put(Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT.replace("@uuid","{guid}"), PASSTHROUGH);
 
 
         fakePassDatabase.put(Paths.DB_SUBSCRIBER_REQUEST_ACTION.replace("@uuid","{guid}"), "{\"transactionId\": \"1\",\"clear\":\"true\"," +
@@ -77,11 +82,38 @@ public class LocalDatabase {
                 "\"maximumDurationsInSeconds\":30," +
                 "\"cooldownDurationInSeconds\":30}");
 
-        fakePassDatabase.put(Paths.DB_SUBSCRIBER_JOIN_ACTION.replace("@uuid","{guid}"), "{\"transactionId\":1234}");
+        fakePassDatabase.put(Paths.DB_SUBSCRIBER_JOIN_ACTION.replace("@uuid","{guid}"), TRANSACTION_ID);
 
-        fakePassDatabase.put(Paths.DB_SUBSCRIBER_CHARGE_ACTION.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
-        fakePassDatabase.put(Paths.DB_SUBSCRIBER_BLOCK.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
-        fakePassDatabase.put(Paths.DB_SUBSCRIBER_EJECT.replace("@uuid","{guid}"), " {\"status\": \"OK\"}");
+        fakePassDatabase.put(Paths.DB_SUBSCRIBER_CHARGE_ACTION.replace("@uuid","{guid}"), STATUS_OK);
+        fakePassDatabase.put(Paths.DB_SUBSCRIBER_BLOCK.replace("@uuid","{guid}"), STATUS_OK);
+        fakePassDatabase.put(Paths.DB_SUBSCRIBER_EJECT.replace("@uuid","{guid}"), STATUS_OK);
+        fakePassDatabase.put(Paths.DB_SUBSCRIBER_END.replace("@uuid","{guid}"), STATUS_OK);
+        fakePassDatabase.put(Paths.DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT.replace("@uuid","{guid}"), PASSTHROUGH);
+        fakePassDatabase.put(Paths.DB_PUBLISHER_SAVE_CONFIG.replace("@uuid", "{guid}"), STATUS_OK);
+
+        fakePassDatabase.put(Paths.DB_PUBLISHER_CONFIG_ERROR_PASSTHROUGHT.replace("@uuid", "{guid}"), PASSTHROUGH);
+
+        fakePassDatabase.put(Paths.DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT.replace("@uuid", "{guid}"), PASSTHROUGH);
+
+        fakePassDatabase.put(Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW.replace("@uuid", "{guid}"), STATUS_OK);
+
+        fakePassDatabase.put(Paths.DB_PUBLISHER_PUBLIC_MODE.replace("@uuid", "{guid}"), STATUS_OK);
+
+        fakePassDatabase.put(Paths.DB_PUBLISHER_PUBLIC_MODE_END.replace("@uuid", "{guid}"), STATUS_OK);
+        fakePassDatabase.put(Paths.DB_PUBLISHER_ERROR_REPORT.replace("@uuid", "{guid}"), STATUS_OK);
+
+        fakePassDatabase.put(Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE.replace("@uuid", "{guid}"), STATUS_OK);
+
+        fakePassDatabase.put(Paths.DB_PUBLISHER_ACTIONS.replace("@uuid", "{guid}"), STATUS_OK);
+
+        fakePassDatabase.put(Paths.DB_SUBSCRIBER_EXTRA.replace("@uuid", "{guid}"), TRANSACTION_ID);
+
+        fakePassDatabase.put(Paths.DB_ENDPOINT_STATE.replace("@uuid", "{guid}"), TRANSACTION_ID);
+
+        fakePassDatabase.put(Paths.DB_SUBSCRIBER_CONFIG_PASSTHROUGHT.replace("@uuid", "{guid}"), PASSTHROUGH);
+
+
+
 
 
         fakeFailDatabase.put("/v1/publisher/{guid}/session/create", " {\"result\": \"ko\", \"data\":{\"status\":500, \"content\": \"null\"}}");

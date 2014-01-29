@@ -280,6 +280,25 @@ public interface Paths {
     String DB_SUBSCRIBER_REQUEST_ACTION = "/v1/subscriber/@guid/action/transaction/request";
     String DB_SUBSCRIBER_JOIN_ACTION = "/v1/subscriber/@guid/action/transaction/@id/join";
     String DB_SUBSCRIBER_CHARGE_ACTION = "/v1/subscriber/@guid/action/transaction/@id/charge";
-    String DB_SUBSCRIBER_BLOCK = "/v1/subscriber/@guid/block";
-    String DB_SUBSCRIBER_EJECT = "/v1/subscriber/@guid/eject";
+    String DB_SUBSCRIBER_BLOCK = "/v1/publisher/@guid/subscriber/@guid/block";
+    String DB_SUBSCRIBER_EJECT = "/v1/publisher/@guid/subscriber/@guid/eject";
+    String DB_SUBSCRIBER_END = "/v1/subscriber/@guid/favorite/@id/end";
+
+    // TODO: LoadConfig
+    String DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT = "/v1/publisher/@guid/settings/ui";
+
+    String DB_PUBLISHER_SAVE_CONFIG = "/v1/publisher/@guid/settings/ui";
+
+    String DB_PUBLISHER_CONFIG_ERROR_PASSTHROUGHT = "/v1/publisher/@guid/settings/errors";
+    String DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT = "/v1/publisher/@guid/settings/shows";
+    String DB_PUBLISHER_SAVE_CONFIG_SHOW = "/v1/publisher/@guid/settings/shows/@id";
+    String DB_PUBLISHER_PUBLIC_MODE = "/v1/publisher/@guid/settings/public/start";
+    String DB_PUBLISHER_PUBLIC_MODE_END = "/v1/publisher/@guid/settings/public/end";
+    String DB_PUBLISHER_ERROR_REPORT = "/v1/publisher/@guid/error/report";
+    String DB_PUBLISHER_SUBSCRIBER_PROFILE = "/v1/publisher/@guid/subscriber/@guid/profile";
+    String DB_PUBLISHER_ACTIONS = "/v1/publisher/@guid/actions";
+    String DB_SUBSCRIBER_EXTRA = "/v1/subscriber/@guid/tip/transaction/request";
+    String DB_ENDPOINT_STATE = "/v1/zodiark/session/@guid";
+
+    String DB_SUBSCRIBER_CONFIG_PASSTHROUGHT = "/v1/subscriber/@guid/settings/ui";
 }
