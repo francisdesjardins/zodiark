@@ -612,12 +612,12 @@ public class RestServiceTest {
     @Test
     public void errorPublisherConfig() throws IllegalAccessException, InstantiationException {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
-        final AtomicReference<Status> result = new AtomicReference<>();
+        final AtomicReference<String> result = new AtomicReference<>();
 
         restService.get(Paths.DB_PUBLISHER_CONFIG_ERROR_PASSTHROUGHT.replace("@uuid", UUID.randomUUID().toString()),
-                new RestService.Reply<Status, DBError>() {
+                new RestService.Reply<String, DBError>() {
                     @Override
-                    public void success(Status success) {
+                    public void success(String success) {
                         result.set(success);
                     }
 
