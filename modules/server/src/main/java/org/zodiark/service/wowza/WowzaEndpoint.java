@@ -101,7 +101,7 @@ public class WowzaEndpoint implements Endpoint {
         try {
             m.setData(mapper.writeValueAsString(new UUID(p.uuid())));
 
-            Envelope e = Envelope.newServerRequest(REQUEST_ACTION, uuid, m);
+            Envelope e = Envelope.newStreamToServerRequest(REQUEST_ACTION, uuid, m);
             resource.write(mapper.writeValueAsString(e));
         } catch (Exception e) {
             logger.error("", e);
@@ -170,7 +170,7 @@ public class WowzaEndpoint implements Endpoint {
         try {
             m.setData(mapper.writeValueAsString(w));
 
-            Envelope e = Envelope.newServerRequest(REQUEST_ACTION, uuid, m);
+            Envelope e = Envelope.newStreamToServerRequest(REQUEST_ACTION, uuid, m);
             resource.write(mapper.writeValueAsString(e));
         } catch (JsonProcessingException e1) {
             logger.error("", e1);
@@ -205,7 +205,7 @@ public class WowzaEndpoint implements Endpoint {
         try {
             m.setData(mapper.writeValueAsString(w));
 
-            Envelope e = Envelope.newServerRequest(MESSAGE_ACTION, uuid, m);
+            Envelope e = Envelope.newStreamToServerRequest(MESSAGE_ACTION, uuid, m);
             resource.write(mapper.writeValueAsString(e));
         } catch (JsonProcessingException e1) {
             logger.error("", e1);

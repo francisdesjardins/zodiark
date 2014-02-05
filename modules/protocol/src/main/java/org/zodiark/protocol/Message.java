@@ -35,24 +35,27 @@ public class Message {
         return path;
     }
 
-    public void setPath(String path) {
+    public Message setPath(String path) {
         this.path = path;
+        return this;
     }
 
     public String getData() {
         return data;
     }
 
-    public void setData(String data) {
+    public Message setData(String data) {
         this.data = data;
+        return this;
     }
 
     public String getUUID() {
         return uuid;
     }
 
-    public void setUUID(String uuid) {
+    public Message setUUID(String uuid) {
         this.uuid = uuid;
+        return this;
     }
 
     @Override

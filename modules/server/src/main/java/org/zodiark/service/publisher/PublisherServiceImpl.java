@@ -30,6 +30,7 @@ import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.Session;
+import org.zodiark.service.db.Passthrough;
 import org.zodiark.service.util.UUID;
 import org.zodiark.service.wowza.WowzaUUID;
 
@@ -37,18 +38,16 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnDisconnect;
-import static org.zodiark.protocol.Paths.BEGIN_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCASTER_CREATE;
-import static org.zodiark.protocol.Paths.CREATE_PUBLISHER_SESSION;
-import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SHOW_START;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
+import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SHOW_START;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.FAILED_PUBLISHER_STREAMING_SESSION;
-import static org.zodiark.protocol.Paths.LOAD_PUBLISHER_CONFIG;
 import static org.zodiark.protocol.Paths.PUBLISHER_ABOUT_READY;
 import static org.zodiark.protocol.Paths.RETRIEVE_PUBLISHER;
-import static org.zodiark.protocol.Paths.START_PUBLISHER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.TERMINATE_STREAMING_SESSSION;
 import static org.zodiark.protocol.Paths.VALIDATE_PUBLISHER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.WOWZA_CONNECT;
@@ -75,15 +74,14 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     public void reactTo(Envelope e, AtmosphereResource r, Reply reply) {
         logger.trace("Handling Publisher Envelop {} to Service {}", e, r.uuid());
         switch (e.getMessage().getPath()) {
-            case LOAD_PUBLISHER_CONFIG:
-            case CREATE_PUBLISHER_SESSION:
+            case DB_POST_PUBLISHER_SESSION_CREATE:
                 createSession(e, r);
                 break;
             case VALIDATE_PUBLISHER_STREAMING_SESSION:
                 createOrJoinStreamingSession(e);
                 break;
-            case START_PUBLISHER_STREAMING_SESSION:
-                startStreamingSession(e);
+            case DB_POST_PUBLISHER_SHOW_START:
+                startStreamingSession(e, r);
                 break;
             case FAILED_PUBLISHER_STREAMING_SESSION:
                 errorStreamingSession(e);
@@ -174,7 +172,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
      * {@inheritDoc}
      */
     @Override
-    public void startStreamingSession(final Envelope e) {
+    public void startStreamingSession(final Envelope e, AtmosphereResource r) {
         UUID uuid = null;
         try {
             uuid = mapper.readValue(e.getMessage().getData(), UUID.class);
@@ -183,15 +181,21 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         }
 
         PublisherEndpoint p = retrieve(uuid.getUuid());
-        eventBus.message(BEGIN_STREAMING_SESSION, p, new Reply<PublisherEndpoint>() {
+        if (p == null) {
+            error(e, r, constructMessage(e.getMessage().getPath(), writeAsString(new Error().error("Unauthorized"))));
+        }
+
+        eventBus.message(DB_POST_PUBLISHER_SHOW_START, p, new Reply<PublisherEndpoint>() {
             @Override
             public void ok(PublisherEndpoint p) {
-                response(e, p, constructMessage(BEGIN_STREAMING_SESSION, "OK"));
+                logger.trace("Publisher ready {}", p);
+                response(e, p, constructMessage(DB_POST_PUBLISHER_SHOW_START, writeAsString(p.showId())));
             }
 
             @Override
             public void fail(PublisherEndpoint p) {
-                error(e, p, constructMessage(BEGIN_STREAMING_SESSION, "error"));
+                // TODO: Wrong error message
+                error(e, p, constructMessage(DB_POST_PUBLISHER_SHOW_START, writeAsString(new Error().error("Unauthorized"))));
             }
         }).message(BROADCASTER_CREATE, p);
     }
@@ -199,11 +203,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     Message constructMessage(String path, String status) {
         Message m = new Message();
         m.setPath(path);
-        try {
-            m.setData(mapper.writeValueAsString(new PublisherResults(status)));
-        } catch (JsonProcessingException e1) {
-            logger.warn("{}", e1);
-        }
+        m.setData(status);
         return m;
     }
 
@@ -278,14 +278,49 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             endpoints.put(uuid, p);
             eventBus.message(DB_POST_PUBLISHER_SESSION_CREATE, p, new Reply<PublisherEndpoint>() {
                 @Override
-                public void ok(PublisherEndpoint p) {
-                    // TODO: Wrong
-                   lookupConfig(e, p);
+                public void ok(final PublisherEndpoint p) {
+                    logger.trace("{} succeed for {}", DB_POST_PUBLISHER_SESSION_CREATE, p);
+
+                    eventBus.message(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, p, new Reply<Passthrough>() {
+                        @Override
+                        public void ok(Passthrough passthrough) {
+                            succesPassThrough(e, p, DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, passthrough);
+
+                            eventBus.message(DB_PUBLISHER_LOAD_CONFIG, p, new Reply<Passthrough>() {
+                                @Override
+                                public void ok(Passthrough passthrough) {
+                                    succesPassThrough(e, p, DB_PUBLISHER_LOAD_CONFIG, passthrough);
+
+                                    eventBus.message(DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT, p, new Reply<Passthrough>() {
+                                        @Override
+                                        public void ok(Passthrough passthrough) {
+                                            succesPassThrough(e, p, DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT, passthrough);
+                                        }
+
+                                        @Override
+                                        public void fail(Passthrough passthrough) {
+                                            failPassThrough(e, p, passthrough);
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void fail(Passthrough passthrough) {
+                                    failPassThrough(e, p, passthrough);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void fail(Passthrough passthrough) {
+                            failPassThrough(e, p, passthrough);
+                        }
+                    });
                 }
 
                 @Override
                 public void fail(PublisherEndpoint p) {
-                    error(e, p, constructMessage(VALIDATE_PUBLISHER_STREAMING_SESSION, "error"));
+                    error(e, p, constructMessage(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, "error"));
                 }
             });
         }
@@ -300,21 +335,14 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         return p;
     }
 
-    protected void annonceSession(final Envelope e, PublisherEndpoint p) {
-        eventBus.message(DB_POST_PUBLISHER_SHOW_START, p, new Reply<PublisherEndpoint>() {
-            @Override
-            public void ok(PublisherEndpoint p) {
-                // Nothing to do, the endpoint has been configured
-                logger.trace("Publisher ready {}", p);
-            }
+    private void succesPassThrough(Envelope e, PublisherEndpoint p, String path, Passthrough passthrough) {
+        logger.trace("Passthrough succeed {}", passthrough);
+        response(e, p, constructMessage(path, passthrough.response()));
+    }
 
-            @Override
-            public void fail(PublisherEndpoint p) {
-                // TODO: Wrong error message
-                error(e, p, constructMessage(VALIDATE_PUBLISHER_STREAMING_SESSION, "error"));
-            }
-        });
-
+    private void failPassThrough(Envelope e, PublisherEndpoint p, Passthrough passthrough) {
+        logger.trace("Passthrough failed {}", passthrough);
+        error(e, p, constructMessage(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, passthrough.exception().getMessage()));
     }
 
     /**
@@ -323,32 +351,23 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     @Override
     public void error(Envelope e, PublisherEndpoint endpoint, Message m) {
         AtmosphereResource r = endpoint.resource();
-        Envelope error = Envelope.newServerReply(e, m);
-        eventBus.ioEvent(error, r);
+        error(e, r, m);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PublisherEndpoint config(Envelope e) {
-        PublisherEndpoint p = endpoints.get(e.getUuid());
-        lookupConfig(e, p);
-        return p;
+    public void error(Envelope e, AtmosphereResource r, Message m) {
+        Envelope error = Envelope.newServerReply(e, m);
+        eventBus.ioEvent(error, r);
     }
 
-    private void lookupConfig(final Envelope e, PublisherEndpoint p) {
-        eventBus.message(DB_PUBLISHER_CONFIG, p, new Reply<PublisherEndpoint>() {
-            @Override
-            public void ok(PublisherEndpoint p) {
-                response(e, p, constructMessage(CREATE_PUBLISHER_SESSION, "OK"));
-                annonceSession(e, p);
-            }
-
-            @Override
-            public void fail(PublisherEndpoint p) {
-                error(e, p, constructMessage(VALIDATE_PUBLISHER_STREAMING_SESSION, "error"));
-            }
-        });
+    private String writeAsString(Object o) {
+        try {
+            return mapper.writeValueAsString(o);
+        } catch (JsonProcessingException e) {
+            return "{\"error\":\"" + e.getMessage() + "\"}";
+        }
     }
 }

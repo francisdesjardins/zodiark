@@ -21,26 +21,13 @@ package org.zodiark.protocol;
 public interface Paths {
 
     /**
-     * An I/O event to start the Publisher Streaming Session
-     */
-    String START_PUBLISHER_STREAMING_SESSION = "/publisher/startStreamingSession";
-    /**
      * An I/O event to join an existing Publisher streaming Session
      */
     String JOIN_SUBSCRIBER_STREAMING_SESSION = "/subscriber/joinStreamingSession";
     /**
-     * An I/O event to create the PublisherEndpoint's Session
-     */
-    String CREATE_PUBLISHER_SESSION = "/publisher/createUserSession";
-    /**
      * An I/O event sent Create the SubscriberEndpoint's Session
      */
     String CREATE_SUBSCRIBER_SESSION = "/subscriber/createUserSession";
-
-    /**
-     * A Message tolLoad the Publisher Session
-     */
-    String LOAD_PUBLISHER_CONFIG = "/publisher/loadConfig";
     /**
      * An I/O event to create or prepare the Streaming Session by load the data from the dabatase/web service, and by requesting
      * access to a remote Wowza Endpoint.
@@ -204,28 +191,28 @@ public interface Paths {
 
     // ===== Service Mapping
 
-    String SERVICE_ACTION = "/action";
+    String SERVICE_ACTION = "/v1/action";
 
-    String SERVICE_PUBLISHER = "/publisher";
+    String SERVICE_PUBLISHER = "/v1/publisher";
 
-    String SERVICE_MONITORING = "/monitor";
+    String SERVICE_MONITORING = "/v1/monitor";
 
-    String SERVICE_STREAMING = "/streaming";
+    String SERVICE_STREAMING = "/v1/streaming";
 
-    String SERVICE_SUBSCRIBER = "/subscriber";
+    String SERVICE_SUBSCRIBER = "/v1/subscriber";
 
-    String SERVICE_WOWZA = "/wowza";
+    String SERVICE_WOWZA = "/v1/wowza";
 
 
     // DB-Mapping
     /**
      * A message to retrieve the data from an Endpoint
      */
-    String DB_PUBLISHER_CONFIG = "/v1/publisher/@uuid/session/config";
+    String DB_PUBLISHER_CONFIG = "/v1/publisher/@guid/session/config";
     /**
      * A message to Initialize an Endpoint Session within the remote database/web service endpoint.
      */
-    String DB_POST_PUBLISHER_SESSION_CREATE = "/v1/publisher/@uuid/session/create";
+    String DB_POST_PUBLISHER_SESSION_CREATE = "/v1/publisher/@guid/session/create";
     /**
      * A Message to retrieve the list of banned word for a Streaming Session Chat.
      */
@@ -233,7 +220,7 @@ public interface Paths {
     /**
      * a Message to validate the state of a Subscriber
      */
-    String DB_SUBSCRIBER_VALIDATE_STATE = "/v1/subscriber/@uuid/session/validate";
+    String DB_SUBSCRIBER_VALIDATE_STATE = "/v1/subscriber/@guid/session/validate";
     /**
      * Start Show
      */
@@ -288,8 +275,10 @@ public interface Paths {
     String DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT = "/v1/publisher/@guid/settings/ui";
 
     String DB_PUBLISHER_SAVE_CONFIG = "/v1/publisher/@guid/settings/ui";
+    String DB_PUBLISHER_LOAD_CONFIG = "/v1/publisher/@guid/settings/ui";
 
-    String DB_PUBLISHER_CONFIG_ERROR_PASSTHROUGHT = "/v1/publisher/@guid/settings/errors";
+
+    String DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT = "/v1/publisher/@guid/settings/errors";
     String DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT = "/v1/publisher/@guid/settings/shows";
     String DB_PUBLISHER_SAVE_CONFIG_SHOW = "/v1/publisher/@guid/settings/shows/@id";
     String DB_PUBLISHER_PUBLIC_MODE = "/v1/publisher/@guid/settings/public/start";

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 High-Level Technologies
+ * Copyright 2013 Jeanfrancois Arcand
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -21,23 +21,23 @@ import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.Retrieve;
 import org.zodiark.service.EndpointAdapter;
+import org.zodiark.service.db.util.StatusReply;
 import org.zodiark.service.util.RestService;
 
-/**
- * Retrieve the list of banned word for the {@link org.zodiark.service.chat.Chat} Service.
- */
-@Retrieve("/db/words")
-public class WordService extends DBServiceAdapter {
-    private final Logger logger = LoggerFactory.getLogger(WordService.class);
+@Retrieve()
+public class GetStatusService extends DBServiceAdapter {
+
+    private final Logger logger = LoggerFactory.getLogger(PostStatusService.class);
 
     @Inject
     public RestService restService;
 
     @Override
-    public void reactTo(String path, Object message, Reply reply) {
+    public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
-        EndpointAdapter p = EndpointAdapter.class.cast(message);
-//        BroadcasterDBResult dbResult = restService.post("/banned/word" + p.uuid(), p.message(), BroadcasterDBResult.class);
-//        reply.ok(dbResult);
+        if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
+            final EndpointAdapter p = EndpointAdapter.class.cast(message);
+            restService.post(path.replace("@guid", p.uuid()), p.message(), new StatusReply<EndpointAdapter>(reply, p));
+        }
     }
 }

@@ -30,12 +30,12 @@ import org.zodiark.server.annotation.On;
  * managed by the Atmosphere's Annotation Processor.
  */
 @AtmosphereAnnotation(On.class)
-public class EventBusAnnotationProcessor implements Processor<Service> {
+public class OnAnnotationProcessor implements Processor<Service> {
 
     private final EventBus eventBus;
-    private Logger logger = LoggerFactory.getLogger(EventBusAnnotationProcessor.class);
+    private Logger logger = LoggerFactory.getLogger(OnAnnotationProcessor.class);
 
-    public EventBusAnnotationProcessor() {
+    public OnAnnotationProcessor() {
         eventBus = EventBusFactory.getDefault().eventBus();
     }
 
@@ -48,7 +48,7 @@ public class EventBusAnnotationProcessor implements Processor<Service> {
             logger.info("Registering @On annotation {}", annotatedClass.getName());
             String[] values = s.value();
             for (String v : values) {
-                eventBus.on(v, framework.newClassInstance(Service.class, annotatedClass));
+                eventBus.onIOEvent(v, framework.newClassInstance(Service.class, annotatedClass));
             }
         } catch (Exception e) {
             logger.error("Unable to register {}", annotatedClass, e);

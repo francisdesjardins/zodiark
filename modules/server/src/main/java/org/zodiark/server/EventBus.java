@@ -27,7 +27,7 @@ import org.zodiark.service.Service;
  * {@link #ioEvent(org.zodiark.protocol.Envelope, org.atmosphere.cpr.AtmosphereResource, Reply)} are used to publish I/O events to {@link Service}
  * tha require the manipulation of {@link AtmosphereResource}. {@link #message(String, Object)} and {@link #message(String, Object, Reply)} are used to publish message to other
  * {@link Service}
- *
+ * <p/>
  * {@link Service} are registered against a path, defined using the {@link org.zodiark.server.annotation.On}. There can be multiple Service registered against each path,
  * and a particular Service can be registered against multiple paths. The event bus will route a sent message to all Service which are registered against that path.
  * All messages sent over the bus are transient. On event of failure of all or part of the event bus messages may be lost.
@@ -38,44 +38,64 @@ import org.zodiark.service.Service;
 public interface EventBus {
     /**
      * Deliver an I/O event to the {@link Service} that match the {@link org.zodiark.protocol.Envelope#getMessage()}'s path value.
+     *
      * @param e an {@link Envelope}
      * @param r an {@link AtmosphereResource}
      * @return this
      */
     EventBus ioEvent(Envelope e, AtmosphereResource r);
+
     /**
      * Deliver an I/O events to the {@link Service} that match the {@link org.zodiark.protocol.Envelope#getMessage()}'s path value.
-     * @param e an {@link Envelope}
-     * @param r an {@link AtmosphereResource}
+     *
+     * @param e     an {@link Envelope}
+     * @param r     an {@link AtmosphereResource}
      * @param reply a {@link Reply} for handling the {@link Service}'s success of failure
      * @return this
      */
     EventBus ioEvent(Envelope e, AtmosphereResource r, Reply reply);
+
     /**
      * Deliver a message to the {@link Service} that match the path value.
-     * @param path an {@link Envelope}
+     *
+     * @param path    an {@link Envelope}
      * @param message an {@link AtmosphereResource}
      * @return this
      */
     EventBus message(String path, Object message);
+
     /**
      * Deliver a message to the {@link Service} that match the path value.
-     * @param path an {@link Envelope}
+     *
+     * @param path    an {@link Envelope}
      * @param message an {@link AtmosphereResource}
-     * @param reply a {@link Reply} for handling the {@link Service}'s success of failure
+     * @param reply   a {@link Reply} for handling the {@link Service}'s success of failure
      * @return this
      */
     EventBus message(String path, Object message, Reply reply);
+
     /**
      * Register a path and a {@link org.zodiark.service.Service}. This is the same as doing the {@link org.zodiark.server.annotation.On}
      *
-     * @param path the path that will be used to map {@link Service}
+     * @param path    the path that will be used to map {@link Service}
+     * @param service an instance of {@link Service}
+     * @return this
+     */
+    EventBus onIOEvent(String path, Service service);
+
+
+    /**
+     * Register a path and a {@link org.zodiark.service.Service}. This is the same as doing the {@link org.zodiark.server.annotation.On}
+     *
+     * @param path    the path that will be used to map {@link Service}
      * @param service an instance of {@link Service}
      * @return this
      */
     EventBus on(String path, Service service);
+
     /**
      * Unregister {@link Service}
+     *
      * @param path
      * @return this
      */

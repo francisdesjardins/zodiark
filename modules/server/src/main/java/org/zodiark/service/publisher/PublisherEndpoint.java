@@ -65,7 +65,7 @@ public class PublisherEndpoint extends EndpointAdapter<PublisherEndpoint> {
         return this;
     }
 
-    public int showId() {
-        return showId.showId();
+    public ShowId showId() {
+        return showId;
     }
 }

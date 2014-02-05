@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Jeanfrancois Arcand
+ * Copyright 2013 Jeanfrancois Arcand
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,47 +13,24 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.db;
+package org.zodiark.service.publisher;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class DBError {
-    public enum TYPE {UNEXPECTED, CONNECTION_ERROR, DB_ERROR}
+public class Error {
 
-    private TYPE type;
     private String error;
-    private Exception exception;
 
-    public DBError() {
-        type = TYPE.UNEXPECTED;
+    public Error() {
     }
 
-    public TYPE type() {
-        return type;
-    }
-
-    public DBError type(TYPE type) {
-        this.type = type;
-        return this;
-    }
-
-    @JsonProperty("error")
-    public DBError error(String error) {
+    public Error error(String error) {
         this.error = error;
         return this;
     }
 
+    @JsonProperty("error")
     public String error() {
         return error;
     }
-
-    public DBError exception(Exception exception) {
-        this.exception = exception;
-        return this;
-    }
-
-    public Exception exception() {
-        return exception;
-    }
-
 }

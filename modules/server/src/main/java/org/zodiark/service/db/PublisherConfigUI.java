@@ -19,21 +19,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
-import org.zodiark.server.annotation.On;
+import org.zodiark.server.annotation.Retrieve;
 import org.zodiark.service.EndpointAdapter;
-import org.zodiark.service.config.AuthConfig;
+import org.zodiark.service.db.util.PassthroughReply;
 import org.zodiark.service.util.RestService;
 
-import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG;
 
 /**
- * Initialize a remove session in a Database/Web Service for an {@link org.zodiark.service.Endpoint}. This class
- * use the injected {@link org.zodiark.service.util.RestService} to communicate with the remote endpoint.
+ * Construct the {@link org.zodiark.service.config.PublisherConfig} based on {@link org.zodiark.service.publisher.PublisherEndpoint#uuid} from the
+ * remote database/web service.
  */
-@On(DB_POST_PUBLISHER_SESSION_CREATE)
-public class CreatePublisherSessionDBService extends DBServiceAdapter {
+@Retrieve(DB_PUBLISHER_LOAD_CONFIG)
+public class PublisherConfigUI extends DBServiceAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(CreatePublisherSessionDBService.class);
+    private final Logger logger = LoggerFactory.getLogger(PublisherConfigUI.class);
 
     @Inject
     public RestService restService;
@@ -41,25 +41,10 @@ public class CreatePublisherSessionDBService extends DBServiceAdapter {
     @Override
     public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
+
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             final EndpointAdapter p = EndpointAdapter.class.cast(message);
-            restService.post(path.replace("@uuid", p.uuid()), p.message(), new RestService.Reply<AuthConfig, DBError>() {
-
-                @Override
-                public void success(AuthConfig success) {
-                    reply.ok(p);
-                }
-
-                @Override
-                public void failure(DBError failure) {
-                    reply.fail(p);
-                }
-
-                @Override
-                public void exception(Exception exception) {
-                    logger.error("", exception);
-                }
-            });
+            restService.get(DB_PUBLISHER_LOAD_CONFIG.replace("@guid", p.uuid()), new PassthroughReply(reply));
         }
     }
 }

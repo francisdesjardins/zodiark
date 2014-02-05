@@ -21,6 +21,7 @@ import org.zodiark.protocol.Message;
 
 /**
  * A {@link Endpoint} Session for a Publisher, Susbcriber or Wowza remote client.
+ *
  * @param <T>
  */
 public interface Session<T extends Endpoint> {
@@ -36,14 +37,6 @@ public interface Session<T extends Endpoint> {
     public T createSession(Envelope e, AtmosphereResource resource);
 
     /**
-     * Invoke the remote database/web service and retrieve the data associated with the {@link Endpoint}
-     *
-     * @param e an {@link Envelope} received from a remote {@link Endpoint}
-     * @return the {@link Endpoint}
-     */
-    public T config(Envelope e);
-
-    /**
      * Write an error response back to the remote {@link Endpoint}
      *
      * @param e        an {@link Envelope}
@@ -51,6 +44,15 @@ public interface Session<T extends Endpoint> {
      * @param m        a {@link Message}
      */
     public void error(Envelope e, T endpoint, Message m);
+
+    /**
+     * Write an error response back to the remote {@link Endpoint}
+     *
+     * @param e an {@link Envelope}
+     * @param r a {@link org.atmosphere.cpr.AtmosphereResource}
+     * @param m a {@link Message}
+     */
+    public void error(Envelope e, AtmosphereResource r, Message m);
 
     /**
      * Create or join a Streaming Session. The Session will be created if the {@link Endpoint} is a Publisher, and joined if the
@@ -66,9 +68,10 @@ public interface Session<T extends Endpoint> {
      * {@link #createSession(org.zodiark.protocol.Envelope, org.atmosphere.cpr.AtmosphereResource)}
      * and {@link #createOrJoinStreamingSession(org.zodiark.protocol.Envelope)}
      *
-     * @param e an {@link Envelope} from a remote {@link Endpoint}
+     * @param e an {@link org.zodiark.protocol.Envelope} from a remote {@link org.zodiark.service.Endpoint}
+     * @param r
      */
-    public void startStreamingSession(Envelope e);
+    public void startStreamingSession(Envelope e, AtmosphereResource r);
 
     /**
      * Write a response back to the remote {@link Endpoint}

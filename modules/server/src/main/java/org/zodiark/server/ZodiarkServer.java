@@ -21,7 +21,7 @@ import org.atmosphere.nettosphere.Nettosphere;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.annotation.On;
-import org.zodiark.server.impl.EventBusAnnotationProcessor;
+import org.zodiark.server.impl.OnAnnotationProcessor;
 import org.zodiark.service.Service;
 
 import java.io.BufferedReader;
@@ -45,7 +45,7 @@ public class ZodiarkServer {
 
     public ZodiarkServer() {
         builder.resource(EnvelopeDigester.class)
-                .initParam(ApplicationConfig.CUSTOM_ANNOTATION_PACKAGE, EventBusAnnotationProcessor.class.getPackage().getName())
+                .initParam(ApplicationConfig.CUSTOM_ANNOTATION_PACKAGE, OnAnnotationProcessor.class.getPackage().getName())
                 .initParam(ApplicationConfig.OBJECT_FACTORY, factory);
     }
 
@@ -102,7 +102,7 @@ public class ZodiarkServer {
             String[] values = s.value();
             for (String v : values) {
                 try {
-                    EventBusFactory.getDefault().eventBus().on(v, server.framework().newClassInstance(Service.class, annotatedClass));
+                    EventBusFactory.getDefault().eventBus().onIOEvent(v, server.framework().newClassInstance(Service.class, annotatedClass));
                 } catch (Exception e) {
                     logger.error("Unable to create Service {}", annotatedClass, e);
                 }

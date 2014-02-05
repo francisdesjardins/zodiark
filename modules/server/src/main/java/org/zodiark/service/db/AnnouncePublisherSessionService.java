@@ -19,14 +19,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
-import org.zodiark.server.annotation.On;
+import org.zodiark.server.annotation.Retrieve;
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.util.RestService;
 
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SHOW_START;
 
-@On(DB_POST_PUBLISHER_SHOW_START)
+@Retrieve(DB_POST_PUBLISHER_SHOW_START)
 public class AnnouncePublisherSessionService extends DBServiceAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(AnnouncePublisherSessionService.class);
@@ -39,7 +39,7 @@ public class AnnouncePublisherSessionService extends DBServiceAdapter {
         logger.trace("Servicing {}", path);
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             final PublisherEndpoint p = PublisherEndpoint.class.cast(message);
-            restService.post(DB_POST_PUBLISHER_SHOW_START.replace("@uuid",p.uuid()),
+            restService.post(DB_POST_PUBLISHER_SHOW_START.replace("@guid",p.uuid()),
                     p.message(), new RestService.Reply<ShowId, DBError>() {
                 @Override
                 public void success(ShowId success) {

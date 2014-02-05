@@ -19,14 +19,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
-import org.zodiark.server.annotation.On;
+import org.zodiark.server.annotation.Retrieve;
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.config.SubscriberConfig;
 import org.zodiark.service.util.RestService;
 
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_VALIDATE_STATE;
 
-@On(DB_SUBSCRIBER_VALIDATE_STATE)
+@Retrieve(DB_SUBSCRIBER_VALIDATE_STATE)
 public class ValidateService extends DBServiceAdapter {
     private final Logger logger = LoggerFactory.getLogger(ValidateService.class);
 
@@ -38,7 +38,7 @@ public class ValidateService extends DBServiceAdapter {
         logger.trace("Servicing {}", path);
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             final EndpointAdapter p = EndpointAdapter.class.cast(message);
-            restService.post(DB_SUBSCRIBER_VALIDATE_STATE.replace("@uuid", p.uuid()), p.message(), new RestService.Reply<SubscriberConfig, DBError>() {
+            restService.post(DB_SUBSCRIBER_VALIDATE_STATE.replace("@guid", p.uuid()), p.message(), new RestService.Reply<SubscriberConfig, DBError>() {
 
                 @Override
                 public void success(SubscriberConfig config) {

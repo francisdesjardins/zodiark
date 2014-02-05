@@ -40,12 +40,11 @@ import static org.zodiark.protocol.Paths.ACTION_VALIDATE;
 import static org.zodiark.protocol.Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCASTER_TRACK;
 import static org.zodiark.protocol.Paths.CREATE_SUBSCRIBER_SESSION;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.FAILED_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.JOIN_SUBSCRIBER_STREAMING_SESSION;
-import static org.zodiark.protocol.Paths.LOAD_PUBLISHER_CONFIG;
 import static org.zodiark.protocol.Paths.MONITOR_RESOURCE;
 import static org.zodiark.protocol.Paths.RETRIEVE_PUBLISHER;
 import static org.zodiark.protocol.Paths.RETRIEVE_SUBSCRIBER;
@@ -84,7 +83,6 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
 
         // TODO: One service per Path instead?
         switch (e.getMessage().getPath()) {
-            case LOAD_PUBLISHER_CONFIG:
             case CREATE_SUBSCRIBER_SESSION:
                 createSession(e, r);
                 break;
@@ -92,7 +90,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
                 createOrJoinStreamingSession(e);
                 break;
             case JOIN_SUBSCRIBER_STREAMING_SESSION:
-                startStreamingSession(e);
+                startStreamingSession(e, r);
                 break;
             case FAILED_SUBSCRIBER_STREAMING_SESSION:
                 errorStreamingSession(e);
@@ -203,7 +201,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     @Override
-    public void startStreamingSession(final Envelope e) {
+    public void startStreamingSession(final Envelope e, AtmosphereResource r) {
         UUID uuid = null;
         try {
             uuid = mapper.readValue(e.getMessage().getData(), UUID.class);
@@ -288,15 +286,13 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     @Override
     public void error(Envelope e, SubscriberEndpoint endpoint, Message m) {
         AtmosphereResource r = endpoint.resource();
-        Envelope error = Envelope.newServerReply(e, m);
-        eventBus.ioEvent(error, r);
+        error(e, r, m);
     }
 
     @Override
-    public SubscriberEndpoint config(Envelope e) {
-        SubscriberEndpoint p = endpoints.get(e.getUuid());
-        lookupConfig(e, p);
-        return p;
+    public void error(Envelope e, AtmosphereResource r, Message m) {
+        Envelope error = Envelope.newServerReply(e, m);
+        eventBus.ioEvent(error, r);
     }
 
     private void lookupConfig(final Envelope e, SubscriberEndpoint p) {

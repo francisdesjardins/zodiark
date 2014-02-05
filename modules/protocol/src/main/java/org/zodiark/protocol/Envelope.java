@@ -183,10 +183,21 @@ public class Envelope {
                 .build();
     }
 
-    public final static Envelope newServerRequest(String path, String uuid, Message message) {
+    public final static Envelope newStreamToServerRequest(String path, String uuid, Message message) {
         return new Envelope.Builder()
                 .path(new Path(path))
                 .to(new To(ActorValue.STREAM_SERVER.value()))
+                .from(new From(ActorValue.SERVER.value()))
+                .traceId(new TraceId())
+                .message(message)
+                .uuid(uuid)
+                .build();
+    }
+
+    public final static Envelope newPublisherToServerRequest( String uuid, Message message) {
+        return new Envelope.Builder()
+                .path(new Path("/request/action"))
+                .to(new To(ActorValue.PUBLISHER.value()))
                 .from(new From(ActorValue.SERVER.value()))
                 .traceId(new TraceId())
                 .message(message)

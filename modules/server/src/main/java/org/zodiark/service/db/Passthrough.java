@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Jeanfrancois Arcand
+ * Copyright 2013-2014 High-Level Technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -15,45 +15,27 @@
  */
 package org.zodiark.service.db;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class DBError {
-    public enum TYPE {UNEXPECTED, CONNECTION_ERROR, DB_ERROR}
-
-    private TYPE type;
-    private String error;
+public class Passthrough implements Result {
+    private String passthrough = "";
     private Exception exception;
 
-    public DBError() {
-        type = TYPE.UNEXPECTED;
-    }
+    public Passthrough() {}
 
-    public TYPE type() {
-        return type;
-    }
-
-    public DBError type(TYPE type) {
-        this.type = type;
+    public Passthrough response(String passthrough) {
+        this.passthrough = passthrough;
         return this;
     }
 
-    @JsonProperty("error")
-    public DBError error(String error) {
-        this.error = error;
-        return this;
+    public String response() {
+        return passthrough;
     }
 
-    public String error() {
-        return error;
-    }
-
-    public DBError exception(Exception exception) {
-        this.exception = exception;
-        return this;
-    }
-
-    public Exception exception() {
+    public Exception exception(){
         return exception;
     }
 
+    public Passthrough exception(Exception exception) {
+        this.exception = exception;
+        return this;
+    }
 }

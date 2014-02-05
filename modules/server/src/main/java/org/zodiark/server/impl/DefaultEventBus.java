@@ -36,6 +36,7 @@ public class DefaultEventBus implements EventBus {
     private final Logger logger = LoggerFactory.getLogger(DefaultEventBus.class);
 
     private final EndpointMapper<Service> mapper = new DefaultEndpointMapper<>();
+    private final ConcurrentHashMap<String, Service> ioServices = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Service> services = new ConcurrentHashMap<>();
     private final Reply l = new Reply() {
         @Override
@@ -63,8 +64,7 @@ public class DefaultEventBus implements EventBus {
     @Override
     public EventBus ioEvent(Envelope e, AtmosphereResource r, Reply reply) {
         try {
-            Service s = mapper.map(e.getMessage().getPath(), services);
-
+            Service s = mapper.map(e.getMessage().getPath(), ioServices);
             logger.debug("Dispatching Envelop {} to Service {}", e, s);
 
             if (e.getUuid().isEmpty() || e.getUuid().equals("0")) {
@@ -99,7 +99,9 @@ public class DefaultEventBus implements EventBus {
     public EventBus message(String path, Object message, Reply reply) {
         try {
             Service s = mapper.map(path, services);
-
+            if (s == null) {
+                s = mapper.map(path, ioServices);
+            }
             logger.debug("Dispatching Message {} to {}", path, s);
 
             if (s != null) {
@@ -125,6 +127,13 @@ public class DefaultEventBus implements EventBus {
      * {@inheritDoc}
      */
     @Override
+    public EventBus onIOEvent(String path, Service service) {
+        logger.debug("{} => {}", path, service);
+        ioServices.put(path, service);
+        return this;
+    }
+
+    @Override
     public EventBus on(String path, Service service) {
         logger.debug("{} => {}", path, service);
         services.put(path, service);
@@ -140,7 +149,7 @@ public class DefaultEventBus implements EventBus {
     }
 
     public Service service(Class<? extends Service> clazz) {
-        Collection<Service> i = services.values();
+        Collection<Service> i = ioServices.values();
         for (Service s : i) {
             if (clazz.isAssignableFrom(s.getClass())) {
                 return s;

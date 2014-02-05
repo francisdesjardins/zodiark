@@ -37,5 +37,4 @@ public interface RestService {
 
         void exception(Exception exception);
     }
-
 }

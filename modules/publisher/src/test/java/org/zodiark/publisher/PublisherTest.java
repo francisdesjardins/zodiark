@@ -38,12 +38,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.testng.AssertJUnit.assertEquals;
-import static org.zodiark.protocol.Paths.CREATE_PUBLISHER_SESSION;
-import static org.zodiark.protocol.Paths.FAILED_PUBLISHER_STREAMING_SESSION;
-import static org.zodiark.protocol.Paths.SERVER_VALIDATE_OK;
-import static org.zodiark.protocol.Paths.START_PUBLISHER_STREAMING_SESSION;
-import static org.zodiark.protocol.Paths.VALIDATE_PUBLISHER_STREAMING_SESSION;
-import static org.zodiark.protocol.Paths.WOWZA_CONNECT;
+import static org.zodiark.protocol.Paths.*;
 
 public class PublisherTest {
 
@@ -99,7 +94,7 @@ public class PublisherTest {
         }).open();
 
         Envelope createSessionMessage = Envelope.newClientToServerRequest(
-                new Message(new Path(CREATE_PUBLISHER_SESSION), mapper.writeValueAsString(new UserPassword("foo", "bar"))));
+                new Message(new Path(DB_POST_PUBLISHER_SESSION_CREATE), mapper.writeValueAsString(new UserPassword("foo", "bar"))));
         createSessionMessage.setFrom(new From(ActorValue.PUBLISHER));
         publisherClient.send(createSessionMessage);
         latch.await();
@@ -112,6 +107,8 @@ public class PublisherTest {
         final ZodiarkClient wowzaClient = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
         final CountDownLatch connected = new CountDownLatch(1);
         final AtomicReference<String> uuid = new AtomicReference<>();
+
+        // Fake Wowza Client
 
         wowzaClient.handler(new OnEnvelopHandler() {
             @Override
@@ -142,6 +139,8 @@ public class PublisherTest {
         wowzaClient.send(wowzaConnect);
         connected.await();
 
+        // Publisher
+
         final AtomicReference<PublisherResults> answer = new AtomicReference<>();
         final ZodiarkClient publisherClient = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
         final CountDownLatch latch = new CountDownLatch(1);
@@ -156,7 +155,7 @@ public class PublisherTest {
         }).open();
 
         Envelope createSessionMessage = Envelope.newClientToServerRequest(
-                new Message(new Path(CREATE_PUBLISHER_SESSION), mapper.writeValueAsString(new UserPassword("publisherex", "bar"))));
+                new Message(new Path(DB_POST_PUBLISHER_SESSION_CREATE), mapper.writeValueAsString(new UserPassword("publisherex", "bar"))));
         createSessionMessage.setFrom(new From(ActorValue.PUBLISHER));
         publisherClient.send(createSessionMessage);
         latch.await();
@@ -238,7 +237,7 @@ public class PublisherTest {
         }).open();
 
         Envelope createSessionMessage = Envelope.newClientToServerRequest(
-                new Message(new Path(CREATE_PUBLISHER_SESSION), mapper.writeValueAsString(new UserPassword("publisherex", "bar"))));
+                new Message(new Path(DB_POST_PUBLISHER_SESSION_CREATE), mapper.writeValueAsString(new UserPassword("publisherex", "bar"))));
         createSessionMessage.setFrom(new From(ActorValue.PUBLISHER));
         publisherClient.send(createSessionMessage);
         latch.await();

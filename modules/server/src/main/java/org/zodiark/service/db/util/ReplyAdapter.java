@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 High-Level Technologies
+ * Copyright 2013 Jeanfrancois Arcand
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,22 +13,26 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.db;
+package org.zodiark.service.db.util;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.zodiark.server.Reply;
+import org.zodiark.service.db.DBError;
+import org.zodiark.service.util.RestService;
 
-public class Status implements Result {
-    private String result = "ko";
+public abstract class ReplyAdapter<T, U> implements RestService.Reply<T, U> {
 
-    public Status() {}
+    protected final Reply reply;
 
-    @JsonProperty("result")
-    public Status status(String result) {
-        this.result = result;
-        return this;
+    protected ReplyAdapter(Reply reply) {
+        this.reply = reply;
     }
 
-    public boolean ok() {
-        return result.equalsIgnoreCase("ok");
+    public void fail() {
+        reply.fail(new DBError());
+    }
+
+    public void exception(Exception exception) {
+        reply.fail(new DBError().exception(exception).type(DBError.TYPE.UNEXPECTED));
     }
 }
+
