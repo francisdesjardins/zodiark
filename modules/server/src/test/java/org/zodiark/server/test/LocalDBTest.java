@@ -16,7 +16,7 @@
 package org.zodiark.server.test;
 
 import org.testng.annotations.Test;
-import org.zodiark.service.util.mock.LocalDatabase;
+import org.zodiark.service.util.mock.InMemoryDB;
 import org.zodiark.service.util.mock.OKRestService;
 
 import static org.testng.Assert.assertNotNull;
@@ -26,10 +26,10 @@ public class LocalDBTest {
 
     @Test
     public void basicPass() {
-        LocalDatabase localDb = new LocalDatabase();
+        InMemoryDB localDb = new InMemoryDB();
 
         String s = localDb.serve(OKRestService.METHOD.POST, "/v1/publisher/{guid}/session/create", "{\"username\": \"foo\", \"password\":\"12345\", \"ip\": \"127.0.0.1\", \"referrer\":\"zzzz\"}",
-                LocalDatabase.RESULT.PASS);
+                InMemoryDB.RESULT.PASS);
 
         assertNotNull(s);
 

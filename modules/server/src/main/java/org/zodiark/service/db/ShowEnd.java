@@ -37,7 +37,7 @@ public class ShowEnd extends DBServiceAdapter {
     public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
         final PublisherEndpoint p = PublisherEndpoint.class.cast(message);
-        restService.delete(DB_PUBLISHER_SHOW_END.replace("@guid", p.uuid()),
+        restService.delete(DB_PUBLISHER_SHOW_END.replace("@guid", p.uuid()).replace("@showId", String.valueOf(p.showId().showId())),
                 p.message(), new RestService.Reply<Status, DBError>() {
             @Override
             public void success(Status success) {

@@ -44,7 +44,7 @@ public class OKRestService implements RestService {
     @Inject
     public ObjectMapper mapper;
 
-    protected final LocalDatabase db = new LocalDatabase();
+    protected final InMemoryDB db = new InMemoryDB();
 
     @Override
     public void get(String uri, Reply r) {
@@ -82,7 +82,7 @@ public class OKRestService implements RestService {
                 }
             }
 
-            String restResponse = db.serve(method, uri, mapper.writeValueAsString(o), LocalDatabase.RESULT.PASS);
+            String restResponse = db.serve(method, uri, mapper.writeValueAsString(o), InMemoryDB.RESULT.PASS);
 
             try {
                 Object object = context.newInstance(success);
@@ -93,6 +93,7 @@ public class OKRestService implements RestService {
                 r.failure(String.class.isAssignableFrom(failure) ? restResponse : mapper.readerForUpdating(object).readValue(restResponse));
             }
         } catch (Exception e) {
+            logger.error("", e);
             r.exception(e);
         }
     }

@@ -31,7 +31,7 @@ import org.zodiark.protocol.Message;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusFactory;
 import org.zodiark.server.ZodiarkServer;
-import org.zodiark.service.util.mock.LocalDatabase;
+import org.zodiark.service.util.mock.InMemoryDB;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -109,9 +109,9 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 3);
-        assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -131,10 +131,10 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 4);
-        assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(LocalDatabase.SHOWID, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.SHOWID, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -159,10 +159,10 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 5);
-        assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(LocalDatabase.SHOWID, writer.e.poll().getMessage().getData());
-        assertEquals(LocalDatabase.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.SHOWID, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 }
