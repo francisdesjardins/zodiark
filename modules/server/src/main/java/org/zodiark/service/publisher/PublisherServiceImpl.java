@@ -31,6 +31,7 @@ import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.Session;
 import org.zodiark.service.db.Passthrough;
+import org.zodiark.service.db.Status;
 import org.zodiark.service.wowza.WowzaUUID;
 
 import java.io.IOException;
@@ -39,15 +40,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnDisconnect;
 import static org.zodiark.protocol.Paths.BROADCASTER_CREATE;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
-import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SHOW_START;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.FAILED_PUBLISHER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.PUBLISHER_ABOUT_READY;
 import static org.zodiark.protocol.Paths.RETRIEVE_PUBLISHER;
-import static org.zodiark.protocol.Paths.TERMINATE_STREAMING_SESSSION;
 import static org.zodiark.protocol.Paths.VALIDATE_PUBLISHER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.WOWZA_CONNECT;
 
@@ -79,16 +80,14 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             case VALIDATE_PUBLISHER_STREAMING_SESSION:
                 createOrJoinStreamingSession(e, r);
                 break;
-            case DB_POST_PUBLISHER_SHOW_START:
+            case DB_PUBLISHER_SHOW_START:
                 startStreamingSession(e, r);
                 break;
             case FAILED_PUBLISHER_STREAMING_SESSION:
                 errorStreamingSession(e);
                 break;
-            case TERMINATE_STREAMING_SESSSION:
-                String uuid = e.getMessage().getUUID();
-                PublisherEndpoint p = endpoints.get(uuid);
-                terminateStreamingSession(p, r);
+            case DB_PUBLISHER_SHOW_END:
+                terminateStreamingSession(e, r);
                 break;
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
@@ -133,8 +132,24 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
      * {@inheritDoc}
      */
     @Override
-    public void terminateStreamingSession(PublisherEndpoint endpoint, AtmosphereResource r) {
-        // TODO:
+    public void terminateStreamingSession(final Envelope e, AtmosphereResource r) {
+        String uuid = e.getUuid();
+        final PublisherEndpoint p = endpoints.get(uuid);
+
+        if (!validate(p, e)) return;
+
+        eventBus.message(DB_PUBLISHER_SHOW_END, p, new Reply<Status>() {
+            @Override
+            public void ok(Status status) {
+                logger.trace("Status {}", status);
+                response(e, p, constructMessage(DB_PUBLISHER_SHOW_END, writeAsString(status)));
+            }
+
+            @Override
+            public void fail(Status status) {
+                error(e, p, constructMessage(DB_PUBLISHER_SHOW_END, writeAsString(new Error().error("Unauthorized"))));
+            }
+        });
     }
 
     /**
@@ -145,9 +160,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         String uuid = e.getUuid();
         PublisherEndpoint p = retrieve(uuid);
 
-        if (p == null) {
-            error(e, r, constructMessage(e.getMessage().getPath(), writeAsString(new Error().error("Unauthorized"))));
-        }
+        if (!validate(p, e)) return;
 
         try {
             p.wowzaServerUUID(mapper.readValue(e.getMessage().getData(), WowzaUUID.class).getUuid());
@@ -171,6 +184,14 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         });
     }
 
+    private boolean validate(PublisherEndpoint p, Envelope e) {
+        if (p == null) {
+            error(e, p, constructMessage(e.getMessage().getPath(), writeAsString(new Error().error("Unauthorized"))));
+            return false;
+        }
+        return true;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -179,21 +200,19 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         String uuid = e.getUuid();
 
         PublisherEndpoint p = retrieve(uuid);
-        if (p == null) {
-            error(e, r, constructMessage(e.getMessage().getPath(), writeAsString(new Error().error("Unauthorized"))));
-        }
+        if (!validate(p, e)) return;
 
-        eventBus.message(DB_POST_PUBLISHER_SHOW_START, p, new Reply<PublisherEndpoint>() {
+        eventBus.message(DB_PUBLISHER_SHOW_START, p, new Reply<PublisherEndpoint>() {
             @Override
             public void ok(PublisherEndpoint p) {
                 logger.trace("Publisher ready {}", p);
-                response(e, p, constructMessage(DB_POST_PUBLISHER_SHOW_START, writeAsString(p.showId())));
+                response(e, p, constructMessage(DB_PUBLISHER_SHOW_START, writeAsString(p.showId())));
             }
 
             @Override
             public void fail(PublisherEndpoint p) {
                 // TODO: Wrong error message
-                error(e, p, constructMessage(DB_POST_PUBLISHER_SHOW_START, writeAsString(new Error().error("Unauthorized"))));
+                error(e, p, constructMessage(DB_PUBLISHER_SHOW_START, writeAsString(new Error().error("Unauthorized"))));
             }
         }).message(BROADCASTER_CREATE, p);
     }

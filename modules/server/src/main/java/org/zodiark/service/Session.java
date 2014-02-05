@@ -88,7 +88,7 @@ public interface Session<T extends Endpoint> {
      * @param endpoint The {@link Endpoint}
      * @param r        The associated {@link AtmosphereResource}
      */
-    public void terminateStreamingSession(T endpoint, AtmosphereResource r);
+    public void terminateStreamingSession(Envelope e, AtmosphereResource r);
 
     /**
      * Handle a failed request for opening a streaming session

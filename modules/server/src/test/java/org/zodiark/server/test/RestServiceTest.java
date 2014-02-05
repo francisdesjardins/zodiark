@@ -36,7 +36,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.zodiark.protocol.Paths.DB_GET_WORD;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
-import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SHOW_START;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_CHARGE_END;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_CHARGE_START;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_JOIN_SESSION;
@@ -70,7 +70,7 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<ShowId> showId = new AtomicReference<>();
 
-        restService.post(DB_POST_PUBLISHER_SHOW_START.replace("@guid", UUID.randomUUID().toString()),
+        restService.post(DB_PUBLISHER_SHOW_START.replace("@guid", UUID.randomUUID().toString()),
                 SESSION_CREATE, new RestService.Reply<ShowId, DBError>() {
             @Override
             public void success(ShowId success) {
@@ -174,7 +174,7 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<ShowId> showId = new AtomicReference<>();
 
-        restService.post(DB_POST_PUBLISHER_SHOW_START.replace("@guid", UUID.randomUUID().toString()),
+        restService.post(DB_PUBLISHER_SHOW_START.replace("@guid", UUID.randomUUID().toString()),
                 "{\"cameraWidth\": \"1\", \"cameraWidth\": \"1\", \"cameraFPS\": \"1\", \"cameraQuality\": \"1\", \"bandwidthOut\": \"1\", \"bandwidthIn\": \"1\"}" +
                         "", new RestService.Reply<ShowId, DBError>() {
             @Override

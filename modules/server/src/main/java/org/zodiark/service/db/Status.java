@@ -28,6 +28,11 @@ public class Status implements Result {
         return this;
     }
 
+    @JsonProperty("result")
+    public String status(){
+        return result;
+    }
+
     public boolean ok() {
         return result.equalsIgnoreCase("ok");
     }

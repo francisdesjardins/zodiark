@@ -96,9 +96,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
                 errorStreamingSession(e);
                 break;
             case TERMINATE_SUBSCRIBER_STREAMING_SESSSION:
-                String uuid = e.getMessage().getUUID();
-                SubscriberEndpoint p = endpoints.get(uuid);
-                terminateStreamingSession(p, r);
+                terminateStreamingSession(e, r);
                 break;
             case SUBSCRIBER_ACTION:
                 requestForAction(e, r);
@@ -159,8 +157,9 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     @Override
-    public void terminateStreamingSession(SubscriberEndpoint endpoint, AtmosphereResource r) {
-        // TODO:
+    public void terminateStreamingSession(final Envelope e, AtmosphereResource r) {
+        String uuid = e.getMessage().getUUID();
+        SubscriberEndpoint p = endpoints.get(uuid);
     }
 
     @Override

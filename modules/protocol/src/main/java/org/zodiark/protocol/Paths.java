@@ -224,11 +224,11 @@ public interface Paths {
     /**
      * Start Show
      */
-    String DB_POST_PUBLISHER_SHOW_START = "/v1/publisher/@guid/show/start";
+    String DB_PUBLISHER_SHOW_START = "/v1/publisher/@guid/show/start";
     /**
      * End Show
      */
-    String DB_POST_PUBLISHER_SHOW_END = "/v1/publisher/@guid/show/@showId/end";
+    String DB_PUBLISHER_SHOW_END = "/v1/publisher/@guid/show/@showId/end";
     /**
      *
      */

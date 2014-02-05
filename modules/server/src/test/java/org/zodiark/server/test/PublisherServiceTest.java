@@ -40,7 +40,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNull;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
-import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SHOW_START;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
 
 public class PublisherServiceTest {
 
@@ -86,12 +87,12 @@ public class PublisherServiceTest {
     }
 
     @BeforeMethod
-    public void before(){
-        server= new ZodiarkServer().on();
+    public void before() {
+        server = new ZodiarkServer().on();
     }
 
     @AfterMethod
-    public void after(){
+    public void after() {
         server.off();
     }
 
@@ -125,7 +126,7 @@ public class PublisherServiceTest {
         eventBus.ioEvent(em, RESOURCE);
 
         // (2)
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_PUBLISHER_SHOW_START, RestServiceTest.SESSION_CREATE));
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SHOW_START, RestServiceTest.SESSION_CREATE));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
@@ -134,5 +135,34 @@ public class PublisherServiceTest {
         assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
         assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
         assertEquals(LocalDatabase.SHOWID, writer.e.poll().getMessage().getData());
+    }
+
+    @Test
+    public void uc3Test() throws Exception {
+        EventBus eventBus = EventBusFactory.getDefault().eventBus();
+
+        Writer writer = new Writer();
+        RESOURCE.getRequest().header(HeaderConfig.X_ATMOSPHERE_TRACKING_ID, UUID);
+        RESOURCE.getResponse().asyncIOWriter(writer);
+
+        // uc1
+        Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_PUBLISHER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
+        eventBus.ioEvent(em, RESOURCE);
+
+        // (uc2
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SHOW_START, RestServiceTest.SESSION_CREATE));
+        eventBus.ioEvent(em, RESOURCE);
+
+        // (uc3
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SHOW_END, RestServiceTest.SESSION_CREATE));
+        eventBus.ioEvent(em, RESOURCE);
+
+        assertNull(writer.error.get());
+        assertEquals(writer.e.size(), 5);
+        assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(LocalDatabase.SHOWID, writer.e.poll().getMessage().getData());
+        assertEquals(LocalDatabase.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 }
