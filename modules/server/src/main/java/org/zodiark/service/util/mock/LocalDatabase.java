@@ -37,8 +37,9 @@ public class LocalDatabase {
     public enum RESULT {PASS, FAIL}
 
     public final static String PASSTHROUGH = "{\"no_need_to_parse\": \"_something_\"}\"";
-    public final static String STATUS_OK = " {\"result\": \"OK\"}";
+    public final static String STATUS_OK = "{\"result\": \"OK\"}";
     public final static String TRANSACTION_ID = "{\"transactionId\":1234}";
+    public final static String SHOWID ="{\"showId\":123234}";
 
     EndpointMapper<String> mapper = new DefaultEndpointMapper<>();
 
@@ -54,7 +55,7 @@ public class LocalDatabase {
         post.put(DB_POST_PUBLISHER_SESSION_CREATE.replace("@guid","{guid}"), STATUS_OK);
         get.put(DB_PUBLISHER_CONFIG.replace("@guid","{guid}"), " {\"configuration\": \"bla bla bla\"}");
         get.put(DB_SUBSCRIBER_VALIDATE_STATE.replace("@guid","{guid}"), " {\"configuration\": \"null\"}");
-        post.put(DB_POST_PUBLISHER_SHOW_START.replace("@guid","{guid}"), " {\"showId\": \"123234\"}");
+        post.put(DB_POST_PUBLISHER_SHOW_START.replace("@guid","{guid}"), SHOWID);
         get.put(DB_POST_PUBLISHER_SHOW_END.replace("@guid","{guid}"), STATUS_OK);
 
         post.put(DB_POST_SUBSCRIBER_JOIN_SESSION.replace("@guid","{guid}"), " {\"watchId\": \"123234\"}");

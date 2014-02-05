@@ -22,6 +22,9 @@ import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceFactory;
 import org.atmosphere.cpr.AtmosphereResponse;
+import org.atmosphere.cpr.HeaderConfig;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
@@ -37,13 +40,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNull;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
+import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SHOW_START;
 
 public class PublisherServiceTest {
 
     public final static String UUID = java.util.UUID.randomUUID().toString();
     public final static AtmosphereFramework framework = new AtmosphereFramework().init();
     public final static AtmosphereResource RESOURCE = AtmosphereResourceFactory.getDefault().create(framework.getAtmosphereConfig(), UUID);
-    private ZodiarkServer server = new ZodiarkServer().on();
+    private ZodiarkServer server;
 
     public final static String UC1 = "";
 
@@ -81,6 +85,16 @@ public class PublisherServiceTest {
         }
     }
 
+    @BeforeMethod
+    public void before(){
+        server= new ZodiarkServer().on();
+    }
+
+    @AfterMethod
+    public void after(){
+        server.off();
+    }
+
     @Test
     public void uc1Test() throws Exception {
         EventBus eventBus = EventBusFactory.getDefault().eventBus();
@@ -89,7 +103,7 @@ public class PublisherServiceTest {
         RESOURCE.getResponse().asyncIOWriter(writer);
 
         // (1)
-        Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_PUBLISHER_SESSION_CREATE, RestServiceTest.SESSION_CREATE));
+        Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_PUBLISHER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
@@ -97,8 +111,28 @@ public class PublisherServiceTest {
         assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
         assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
         assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
-
     }
 
+    @Test
+    public void uc2Test() throws Exception {
+        EventBus eventBus = EventBusFactory.getDefault().eventBus();
 
+        Writer writer = new Writer();
+        RESOURCE.getRequest().header(HeaderConfig.X_ATMOSPHERE_TRACKING_ID, UUID);
+        RESOURCE.getResponse().asyncIOWriter(writer);
+
+        Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_PUBLISHER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
+        eventBus.ioEvent(em, RESOURCE);
+
+        // (2)
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_PUBLISHER_SHOW_START, RestServiceTest.SESSION_CREATE));
+        eventBus.ioEvent(em, RESOURCE);
+
+        assertNull(writer.error.get());
+        assertEquals(writer.e.size(), 4);
+        assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(LocalDatabase.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(LocalDatabase.SHOWID, writer.e.poll().getMessage().getData());
+    }
 }

@@ -61,7 +61,7 @@ public interface Session<T extends Endpoint> {
      *
      * @param e an {@link Envelope} from the {@link Endpoint}
      */
-    public void createOrJoinStreamingSession(Envelope e);
+    public void createOrJoinStreamingSession(Envelope e, AtmosphereResource r);
 
     /**
      * Start the streaming session. This method will be called by the remote endpoint upon successful completion of

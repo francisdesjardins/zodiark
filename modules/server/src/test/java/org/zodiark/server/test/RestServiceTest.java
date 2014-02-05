@@ -44,13 +44,13 @@ import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_JOIN_SESSION;
 public class RestServiceTest {
 
     public static final String SESSION_CREATE =  "{\"cameraWidth\": \"1\", \"cameraWidth\": \"1\", \"cameraFPS\": \"1\", \"cameraQuality\": \"1\", \"bandwidthOut\": \"1\", \"bandwidthIn\": \"1\"}";
-
+    public static final String AUTHTOKEN = "{\"username\": \"foo\", \"password\":\"12345\", \"ip\": \"127.0.0.1\", \"referrer\":\"zzzz\"}";
     @Test
     public void createPublisherService() throws IllegalAccessException, InstantiationException {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<Status> config = new AtomicReference<>();
         restService.post(DB_POST_PUBLISHER_SESSION_CREATE.replace("@guid", UUID.randomUUID().toString()),
-                "{\"username\": \"foo\", \"password\":\"12345\", \"ip\": \"127.0.0.1\", \"referrer\":\"zzzz\"}", new ReplyAdapter<Status, DBError>(null) {
+                AUTHTOKEN, new ReplyAdapter<Status, DBError>(null) {
             @Override
             public void success(Status success) {
                 config.set(success);

@@ -87,7 +87,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
                 createSession(e, r);
                 break;
             case VALIDATE_SUBSCRIBER_STREAMING_SESSION:
-                createOrJoinStreamingSession(e);
+                createOrJoinStreamingSession(e, r);
                 break;
             case JOIN_SUBSCRIBER_STREAMING_SESSION:
                 startStreamingSession(e, r);
@@ -164,7 +164,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     @Override
-    public void createOrJoinStreamingSession(final Envelope e) {
+    public void createOrJoinStreamingSession(final Envelope e, AtmosphereResource r) {
         String uuid = e.getUuid();
         try {
             final SubscriberEndpoint s = retrieve(uuid);

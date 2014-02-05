@@ -31,7 +31,6 @@ import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.Session;
 import org.zodiark.service.db.Passthrough;
-import org.zodiark.service.util.UUID;
 import org.zodiark.service.wowza.WowzaUUID;
 
 import java.io.IOException;
@@ -78,7 +77,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                 createSession(e, r);
                 break;
             case VALIDATE_PUBLISHER_STREAMING_SESSION:
-                createOrJoinStreamingSession(e);
+                createOrJoinStreamingSession(e, r);
                 break;
             case DB_POST_PUBLISHER_SHOW_START:
                 startStreamingSession(e, r);
@@ -142,9 +141,13 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
      * {@inheritDoc}
      */
     @Override
-    public void createOrJoinStreamingSession(final Envelope e) {
+    public void createOrJoinStreamingSession(final Envelope e, AtmosphereResource r) {
         String uuid = e.getUuid();
         PublisherEndpoint p = retrieve(uuid);
+
+        if (p == null) {
+            error(e, r, constructMessage(e.getMessage().getPath(), writeAsString(new Error().error("Unauthorized"))));
+        }
 
         try {
             p.wowzaServerUUID(mapper.readValue(e.getMessage().getData(), WowzaUUID.class).getUuid());
@@ -173,14 +176,9 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
      */
     @Override
     public void startStreamingSession(final Envelope e, AtmosphereResource r) {
-        UUID uuid = null;
-        try {
-            uuid = mapper.readValue(e.getMessage().getData(), UUID.class);
-        } catch (IOException e1) {
-            logger.warn("{}", e1);
-        }
+        String uuid = e.getUuid();
 
-        PublisherEndpoint p = retrieve(uuid.getUuid());
+        PublisherEndpoint p = retrieve(uuid);
         if (p == null) {
             error(e, r, constructMessage(e.getMessage().getPath(), writeAsString(new Error().error("Unauthorized"))));
         }
@@ -223,9 +221,6 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 
     PublisherEndpoint retrieve(String uuid) {
         PublisherEndpoint p = endpoints.get(uuid);
-        if (p == null) {
-            throw new IllegalStateException("No Publisher associated with " + uuid);
-        }
         return p;
     }
 

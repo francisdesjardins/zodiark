@@ -20,12 +20,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ShowId {
     private int showId;
 
-    @JsonProperty
+    @JsonProperty("showId")
     public ShowId showId(int showId) {
         this.showId = showId;
         return this;
     }
 
+    @JsonProperty("showId")
     public int showId() {
         return showId;
     }
