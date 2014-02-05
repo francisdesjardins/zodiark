@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.zodiark.protocol.Paths.*;
 
+@Test(enabled = false)
 public class PublisherTest {
 
     private final ObjectMapper mapper = new ObjectMapper();
@@ -78,7 +79,7 @@ public class PublisherTest {
         if (server != null) server.off();
     }
 
-    @Test
+    @Test(enabled = false)
     public void createSessionTest() throws IOException, InterruptedException {
         final AtomicReference<PublisherResults> answer = new AtomicReference<>();
         final ZodiarkClient publisherClient = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
@@ -101,7 +102,7 @@ public class PublisherTest {
         assertEquals("OK", answer.get().getResults());
     }
 
-    @Test
+    @Test(enabled = false)
     public void startStreamingSession() throws IOException, InterruptedException {
 
         final ZodiarkClient wowzaClient = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
@@ -122,7 +123,7 @@ public class PublisherTest {
                         break;
                     case SERVER_VALIDATE_OK:
                         Envelope publisherOk = Envelope.newClientToServerRequest(
-                                new Message(new Path(START_PUBLISHER_STREAMING_SESSION), e.getMessage().getData()));
+                                new Message(new Path(""), e.getMessage().getData()));
                         wowzaClient.send(publisherOk);
                         break;
                     default:
@@ -183,7 +184,7 @@ public class PublisherTest {
 
     }
 
-    @Test
+    @Test(enabled = false)
     public void failedStreamingSession() throws IOException, InterruptedException {
 
         final ZodiarkClient wowzaClient = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();

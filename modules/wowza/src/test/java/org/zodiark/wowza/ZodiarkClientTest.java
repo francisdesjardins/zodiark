@@ -21,6 +21,7 @@ import org.testng.annotations.Test;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.protocol.Path;
+import org.zodiark.protocol.Paths;
 import org.zodiark.server.EchoService;
 import org.zodiark.server.ZodiarkServer;
 
@@ -166,10 +167,10 @@ public class ZodiarkClientTest {
                 latch.countDown();
                 return false;
             }
-        }).open().send(Envelope.newClientToServerRequest(new Message(new Path("/wowza", "/connect"), TEST)));
+        }).open().send(Envelope.newClientToServerRequest(new Message(new Path(Paths.WOWZA_CONNECT), TEST)));
 
         latch.await(60, TimeUnit.SECONDS);
         assertNotNull(answer.get());
-        assertEquals("/wowza/connect", answer.get().getMessage().getPath());
+        assertEquals(answer.get().getMessage().getPath(),Paths.WOWZA_CONNECT );
     }
 }

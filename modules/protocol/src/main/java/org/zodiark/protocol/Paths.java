@@ -57,27 +57,23 @@ public interface Paths {
     /**
      * An I/O event. Send a request to Wowza asking for a Streaming Session Approval
      */
-    String WOWZA_CONNECT = "/wowza/connect";
+    String WOWZA_CONNECT = "/v1/wowza/connect";
     /**
      * A Message to Advise the WowzaService that its needs to start the obfuscation process
      */
-    String WOWZA_OBFUSCATE = "/wowza/obfuscate";
+    String WOWZA_OBFUSCATE = "/v1//wowza/obfuscate";
     /**
      * A Message to advise the WowzaService that its needs to start the deobfuscation process
      */
-    String WOWZA_DEOBFUSCATE = "/wowza/deobfuscate";
+    String WOWZA_DEOBFUSCATE = "/v1//wowza/deobfuscate";
     /**
      * An I/O event received from a Wowxa endpoint when the obfuscation process is completed and the action can start.
      */
-    String WOWZA_OBFUSCATE_OK = "/wowza/obfuscate/ok";
+    String WOWZA_OBFUSCATE_OK = "/v1//wowza/obfuscate/ok";
     /**
      * An I/O event Received from a Wowxa endpoint when the deobfuscation process is completed and the normal behavior
      */
-    String WOWZA_DEOBFUSCATE_OK = "/wowza/deobfuscate/ok";
-    /**
-     * An I/O event to leave the current Publisher Streaming Session
-     */
-    String TERMINATE_STREAMING_SESSSION = "/publisher/disconnect";
+    String WOWZA_DEOBFUSCATE_OK = "/v1//wowza/deobfuscate/ok";
     /**
      * An I/O event to leave the current Streaming Session
      */
@@ -85,7 +81,7 @@ public interface Paths {
     /**
      * An I/O event from Wowza in response to a request for a validation request
      */
-    String SERVER_VALIDATE_OK = "/wowza/validate";
+    String SERVER_VALIDATE_OK = "/v1//wowza/validate";
     /**
      * An I/O event. Request for an Action
      */
