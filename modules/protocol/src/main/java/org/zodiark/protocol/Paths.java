@@ -275,8 +275,8 @@ public interface Paths {
 
 
     String DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT = "/v1/publisher/@guid/settings/errors";
-    String DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT = "/v1/publisher/@guid/settings/shows";
-    String DB_PUBLISHER_SAVE_CONFIG_SHOW = "/v1/publisher/@guid/settings/shows/@showTypeId";
+    String DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT = "/v1/publisher/@guid/settings/show";
+    String DB_PUBLISHER_SAVE_CONFIG_SHOW = "/v1/publisher/@guid/settings/show/@showTypeId";
     String DB_PUBLISHER_PUBLIC_MODE = "/v1/publisher/@guid/settings/public/start";
     String DB_PUBLISHER_PUBLIC_MODE_END = "/v1/publisher/@guid/settings/public/end";
     String DB_PUBLISHER_ERROR_REPORT = "/v1/publisher/@guid/error/report";
