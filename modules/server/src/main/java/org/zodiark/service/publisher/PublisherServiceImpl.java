@@ -41,6 +41,7 @@ import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnDiscon
 import static org.zodiark.protocol.Paths.BROADCASTER_CREATE;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_ERROR_REPORT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
@@ -83,6 +84,9 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             case DB_PUBLISHER_SHOW_START:
                 startStreamingSession(e, r);
                 break;
+            case DB_PUBLISHER_ERROR_REPORT:
+                reportError(e, r);
+                break;
             case FAILED_PUBLISHER_STREAMING_SESSION:
                 errorStreamingSession(e);
                 break;
@@ -92,6 +96,26 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
         }
+    }
+
+    public void reportError(final Envelope e, AtmosphereResource r) {
+        String uuid = e.getUuid();
+        final PublisherEndpoint p = endpoints.get(uuid);
+
+        if (!validate(p, e)) return;
+
+        eventBus.message(DB_PUBLISHER_ERROR_REPORT, p, new Reply<Status>() {
+            @Override
+            public void ok(Status status) {
+                logger.trace("Status {}", status);
+                response(e, p, constructMessage(DB_PUBLISHER_ERROR_REPORT, writeAsString(status)));
+            }
+
+            @Override
+            public void fail(Status status) {
+                error(e, p, constructMessage(DB_PUBLISHER_ERROR_REPORT, writeAsString(new Error().error("Unauthorized"))));
+            }
+        });
     }
 
     /**

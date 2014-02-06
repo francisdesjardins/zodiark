@@ -15,45 +15,55 @@
  */
 package org.zodiark.service.publisher;
 
-import org.zodiark.service.config.PublisherConfig;
+import org.zodiark.service.config.PublisherState;
+import org.zodiark.service.db.ShowId;
 import org.zodiark.service.session.StreamingSession;
 
 /**
  * A {@link PublisherEndpoint} data representation. Instance of this class are populated from a database/web service.
  */
-public class PublisherConfigImpl implements PublisherConfig {
+public class PublisherStateImpl implements PublisherState {
     private StreamingSession.TYPE streamingSessionType;
-    private String configuration;
+    private ShowId showId = new ShowId(-1);
 
-    public PublisherConfigImpl() {
+    public PublisherStateImpl() {
         sessionType(StreamingSession.TYPE.PRIVATE);
     }
 
     /**
      * {@inheritDoc}
      */
-    public PublisherConfig sessionType(StreamingSession.TYPE streamingSessionType) {
+    @Override
+    public PublisherState sessionType(StreamingSession.TYPE streamingSessionType) {
         this.streamingSessionType = streamingSessionType;
         return this;
-    }
-
-    @Override
-    public PublisherConfig configuration(String configuration) {
-        this.configuration = configuration;
-        return this;
-    }
-
-    @Override
-    public String configuration() {
-        return configuration;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public StreamingSession.TYPE sessionType() {
         return streamingSessionType;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PublisherState showId(ShowId showId) {
+        this.showId = showId;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ShowId showId() {
+        return showId;
+    }
+
 
 
 }

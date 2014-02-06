@@ -45,6 +45,7 @@ public class RestServiceTest {
 
     public static final String SESSION_CREATE =  "{\"cameraWidth\": \"1\", \"cameraWidth\": \"1\", \"cameraFPS\": \"1\", \"cameraQuality\": \"1\", \"bandwidthOut\": \"1\", \"bandwidthIn\": \"1\"}";
     public static final String AUTHTOKEN = "{\"username\": \"foo\", \"password\":\"12345\", \"ip\": \"127.0.0.1\", \"referrer\":\"zzzz\"}";
+    public static final String PUBLISHER_ERROR = "{\"source\":\"xxx\",\"error\":\"xxx\",\"info\":\"xxx\"}";
     @Test
     public void createPublisherService() throws IllegalAccessException, InstantiationException {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
@@ -735,7 +736,7 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
-        restService.post(Paths.DB_PUBLISHER_ERROR_REPORT.replace("@guid", UUID.randomUUID().toString()), "{\"source\":\"xxx\",\"error\":\"xxx\",\"info\":\"xxx\"}",
+        restService.post(Paths.DB_PUBLISHER_ERROR_REPORT.replace("@guid", UUID.randomUUID().toString()), PUBLISHER_ERROR,
                 new RestService.Reply<Status, DBError>() {
                     @Override
                     public void success(Status success) {

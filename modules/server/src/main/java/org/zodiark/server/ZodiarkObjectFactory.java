@@ -23,9 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.service.config.AuthConfig;
-import org.zodiark.service.config.PublisherConfig;
+import org.zodiark.service.config.PublisherState;
 import org.zodiark.service.config.SubscriberConfig;
-import org.zodiark.service.publisher.PublisherConfigImpl;
+import org.zodiark.service.publisher.PublisherStateImpl;
 import org.zodiark.service.session.StreamingRequest;
 import org.zodiark.service.subscriber.SubscriberConfigImpl;
 import org.zodiark.service.util.RestService;
@@ -51,7 +51,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *  {@link EventBus}, {@link ObjectMapper}, {@link WowzaEndpointManager}, {@link StreamingRequest}
  * <p/>
  * Extendable classes are
- *  {@link AuthConfig}, {@link PublisherConfig}, {@link SubscriberConfig}, {@link org.zodiark.service.util.RestService}
+ *  {@link AuthConfig}, {@link org.zodiark.service.config.PublisherState}, {@link SubscriberConfig}, {@link org.zodiark.service.util.RestService}
  * <p/>
  * Injectable and Extendable can be replaced.
  * <p/>
@@ -110,10 +110,10 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
                 return OKAuthConfig.class;
             }
         });
-        extendable(PublisherConfig.class, new Extendable<PublisherConfig>() {
+        extendable(PublisherState.class, new Extendable<PublisherState>() {
             @Override
-            public Class<PublisherConfigImpl> extend(Class<PublisherConfig> t) {
-                return PublisherConfigImpl.class;
+            public Class<PublisherStateImpl> extend(Class<PublisherState> t) {
+                return PublisherStateImpl.class;
             }
         });
         extendable(SubscriberConfig.class, new Extendable<SubscriberConfig>() {
@@ -172,8 +172,8 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
                     });
                 } else if (field.getType().isAssignableFrom(AuthConfig.class)) {
                     field.set(instance, newClassInstance(framework, AuthConfig.class, implement(AuthConfig.class)));
-                } else if (field.getType().isAssignableFrom(PublisherConfig.class)) {
-                    field.set(instance, newClassInstance(framework, PublisherConfig.class, implement(PublisherConfig.class)));
+                } else if (field.getType().isAssignableFrom(PublisherState.class)) {
+                    field.set(instance, newClassInstance(framework, PublisherState.class, implement(PublisherState.class)));
                 } else if (field.getType().isAssignableFrom(SubscriberConfig.class)) {
                     field.set(instance, newClassInstance(framework, SubscriberConfig.class, implement(SubscriberConfig.class)));
                 } else if (field.getType().isAssignableFrom(StreamingRequest.class)) {

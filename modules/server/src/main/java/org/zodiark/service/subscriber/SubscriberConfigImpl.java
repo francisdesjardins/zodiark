@@ -15,7 +15,6 @@
  */
 package org.zodiark.service.subscriber;
 
-import org.zodiark.service.config.PublisherConfig;
 import org.zodiark.service.config.SubscriberConfig;
 import org.zodiark.service.session.StreamingSession;
 

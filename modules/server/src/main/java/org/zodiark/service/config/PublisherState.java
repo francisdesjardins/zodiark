@@ -16,14 +16,13 @@
 package org.zodiark.service.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.zodiark.service.db.Result;
+import org.zodiark.service.db.ShowId;
 import org.zodiark.service.session.StreamingSession;
 
 /**
  * The data associated with a {@link org.zodiark.service.publisher.PublisherEndpoint}
  */
-public interface PublisherConfig extends Result {
+public interface PublisherState {
     /**
      * The current {@link org.zodiark.service.session.StreamingSession#type()}
      *
@@ -39,11 +38,9 @@ public interface PublisherConfig extends Result {
      * @return this
      */
     @JsonIgnore
-    PublisherConfig sessionType(StreamingSession.TYPE streamingSessionType);
+    PublisherState sessionType(StreamingSession.TYPE streamingSessionType);
 
-    @JsonProperty("configuration")
-    PublisherConfig configuration(String configuration);
+    public PublisherState showId(ShowId showId) ;
 
-    String configuration();
-
+    public ShowId showId() ;
 }

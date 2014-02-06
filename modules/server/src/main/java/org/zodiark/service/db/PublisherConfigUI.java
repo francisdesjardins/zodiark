@@ -27,7 +27,7 @@ import org.zodiark.service.util.RestService;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG;
 
 /**
- * Construct the {@link org.zodiark.service.config.PublisherConfig} based on {@link org.zodiark.service.publisher.PublisherEndpoint#uuid} from the
+ * Construct the {@link org.zodiark.service.config.PublisherState} based on {@link org.zodiark.service.publisher.PublisherEndpoint#uuid} from the
  * remote database/web service.
  */
 @Retrieve(DB_PUBLISHER_LOAD_CONFIG)

@@ -21,13 +21,13 @@ import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.Retrieve;
 import org.zodiark.service.EndpointAdapter;
-import org.zodiark.service.config.PublisherConfig;
+import org.zodiark.service.config.PublisherState;
 import org.zodiark.service.util.RestService;
 
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG;
 
 /**
- * Construct the {@link PublisherConfig} based on {@link org.zodiark.service.publisher.PublisherEndpoint#uuid} from the
+ * Construct the {@link org.zodiark.service.config.PublisherState} based on {@link org.zodiark.service.publisher.PublisherEndpoint#uuid} from the
  * remote database/web service.
  */
 @Retrieve(DB_PUBLISHER_CONFIG)
@@ -44,9 +44,9 @@ public class LoadPublisherConfigService extends DBServiceAdapter {
 
         if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
             final EndpointAdapter p = EndpointAdapter.class.cast(message);
-            restService.get(DB_PUBLISHER_CONFIG.replace("@guid", p.uuid()), new RestService.Reply<PublisherConfig, DBError>() {
+            restService.get(DB_PUBLISHER_CONFIG.replace("@guid", p.uuid()), new RestService.Reply<PublisherState, DBError>() {
                 @Override
-                public void success(PublisherConfig config) {  p.config(config);
+                public void success(PublisherState config) {  p.config(config);
                     reply.ok(p);
                 }
 

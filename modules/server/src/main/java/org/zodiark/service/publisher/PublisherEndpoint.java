@@ -15,8 +15,10 @@
  */
 package org.zodiark.service.publisher;
 
+import org.zodiark.server.annotation.Inject;
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.action.Action;
+import org.zodiark.service.config.PublisherState;
 import org.zodiark.service.db.ShowId;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -28,9 +30,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class PublisherEndpoint extends EndpointAdapter<PublisherEndpoint> {
 
+    @Inject
+    public PublisherState state;
+
     private final AtomicBoolean actionInProgress = new AtomicBoolean();
     private Action action;
-    private ShowId showId = new ShowId().showId(-1);
 
     public PublisherEndpoint() {
         super();
@@ -61,11 +65,15 @@ public class PublisherEndpoint extends EndpointAdapter<PublisherEndpoint> {
     }
 
     public PublisherEndpoint showId(ShowId showId) {
-        this.showId = showId;
+        state.showId(showId);
         return this;
     }
 
     public ShowId showId() {
-        return showId;
+        return state.showId();
+    }
+
+    public boolean hasShow() {
+        return state.showId().showId() != -1;
     }
 }

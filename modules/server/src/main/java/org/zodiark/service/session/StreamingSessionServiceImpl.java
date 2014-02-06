@@ -25,7 +25,7 @@ import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.action.Action;
-import org.zodiark.service.config.PublisherConfig;
+import org.zodiark.service.config.PublisherState;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.session.impl.PrivateStreamingSession;
 import org.zodiark.service.session.impl.ProtectedStreamingSession;
@@ -201,7 +201,7 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
     }
 
     private StreamingSession sessionType(PublisherEndpoint p) {
-        PublisherConfig config = p.config();
+        PublisherState config = p.config();
 
         switch (config.sessionType()) {
             case PUBLIC:
