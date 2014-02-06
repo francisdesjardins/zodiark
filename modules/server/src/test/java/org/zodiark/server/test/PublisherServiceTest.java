@@ -41,6 +41,7 @@ import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNull;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_ERROR_REPORT;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
 
@@ -104,7 +105,7 @@ public class PublisherServiceTest {
         Writer writer = new Writer();
         RESOURCE.getResponse().asyncIOWriter(writer);
 
-        // (1)
+        // UC1
         Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_PUBLISHER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
         eventBus.ioEvent(em, RESOURCE);
 
@@ -123,10 +124,11 @@ public class PublisherServiceTest {
         RESOURCE.getRequest().header(HeaderConfig.X_ATMOSPHERE_TRACKING_ID, UUID);
         RESOURCE.getResponse().asyncIOWriter(writer);
 
+        // UC1
         Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_PUBLISHER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
         eventBus.ioEvent(em, RESOURCE);
 
-        // (2)
+        // (UC2
         em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SHOW_START, RestServiceTest.SESSION_CREATE));
         eventBus.ioEvent(em, RESOURCE);
 
@@ -187,6 +189,35 @@ public class PublisherServiceTest {
         assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
         assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
         assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+    }
+
+    @Test
+    public void uc6Test() throws Exception {
+        EventBus eventBus = EventBusFactory.getDefault().eventBus();
+
+        Writer writer = new Writer();
+        RESOURCE.getRequest().header(HeaderConfig.X_ATMOSPHERE_TRACKING_ID, UUID);
+        RESOURCE.getResponse().asyncIOWriter(writer);
+
+        // UC1
+        Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_PUBLISHER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
+        eventBus.ioEvent(em, RESOURCE);
+
+        // UC2
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SHOW_START, RestServiceTest.SESSION_CREATE));
+        eventBus.ioEvent(em, RESOURCE);
+
+        // UC6
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SAVE_CONFIG_SHOW, ""));
+        eventBus.ioEvent(em, RESOURCE);
+
+        assertNull(writer.error.get());
+        assertEquals(writer.e.size(), 5);
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.SHOWID, writer.e.poll().getMessage().getData());
         assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 }

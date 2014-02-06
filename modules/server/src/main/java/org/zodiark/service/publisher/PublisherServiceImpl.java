@@ -44,6 +44,7 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHRO
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_ERROR_REPORT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
@@ -93,27 +94,38 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             case DB_PUBLISHER_SHOW_END:
                 terminateStreamingSession(e, r);
                 break;
+            case DB_PUBLISHER_SAVE_CONFIG_SHOW:
+                 savePublisherShowType(e, r);
+                break;
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
         }
     }
 
     public void reportError(final Envelope e, AtmosphereResource r) {
+        statusEvent(DB_PUBLISHER_ERROR_REPORT, e);
+    }
+
+    public void savePublisherShowType(final Envelope e, AtmosphereResource r) {
+        statusEvent(DB_PUBLISHER_SAVE_CONFIG_SHOW, e);
+    }
+
+    private void statusEvent(final String path, final Envelope e) {
         String uuid = e.getUuid();
         final PublisherEndpoint p = endpoints.get(uuid);
 
         if (!validate(p, e)) return;
 
-        eventBus.message(DB_PUBLISHER_ERROR_REPORT, p, new Reply<Status>() {
+        eventBus.message(path, p, new Reply<Status>() {
             @Override
             public void ok(Status status) {
                 logger.trace("Status {}", status);
-                response(e, p, constructMessage(DB_PUBLISHER_ERROR_REPORT, writeAsString(status)));
+                response(e, p, constructMessage(path, writeAsString(status)));
             }
 
             @Override
             public void fail(Status status) {
-                error(e, p, constructMessage(DB_PUBLISHER_ERROR_REPORT, writeAsString(new Error().error("Unauthorized"))));
+                error(e, p, constructMessage(path, writeAsString(new Error().error("Unauthorized"))));
             }
         });
     }
@@ -157,23 +169,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
      */
     @Override
     public void terminateStreamingSession(final Envelope e, AtmosphereResource r) {
-        String uuid = e.getUuid();
-        final PublisherEndpoint p = endpoints.get(uuid);
-
-        if (!validate(p, e)) return;
-
-        eventBus.message(DB_PUBLISHER_SHOW_END, p, new Reply<Status>() {
-            @Override
-            public void ok(Status status) {
-                logger.trace("Status {}", status);
-                response(e, p, constructMessage(DB_PUBLISHER_SHOW_END, writeAsString(status)));
-            }
-
-            @Override
-            public void fail(Status status) {
-                error(e, p, constructMessage(DB_PUBLISHER_SHOW_END, writeAsString(new Error().error("Unauthorized"))));
-            }
-        });
+        statusEvent(DB_PUBLISHER_SHOW_END, e);
     }
 
     /**

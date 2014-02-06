@@ -27,9 +27,9 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_ERROR_REPORT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
 
 @Retrieve(DB_PUBLISHER_ERROR_REPORT)
-public class Error extends DBServiceAdapter {
+public class DeleteStatus extends DBServiceAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(Error.class);
+    private final Logger logger = LoggerFactory.getLogger(DeleteStatus.class);
 
     @Inject
     public RestService restService;
