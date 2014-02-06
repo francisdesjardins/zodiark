@@ -41,6 +41,7 @@ import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnDiscon
 import static org.zodiark.protocol.Paths.BROADCASTER_CREATE;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_ERROR_REPORT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT;
@@ -98,11 +99,15 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                 terminateStreamingSession(e, r);
                 break;
             case DB_PUBLISHER_SAVE_CONFIG_SHOW:
-                 savePublisherShowType(e, r);
+                savePublisherShowType(e, r);
                 break;
             case DB_PUBLISHER_SAVE_CONFIG:
                 saveConfig(e, r);
-               break;
+                break;
+            case DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT: {
+                loadShow(e, r);
+                break;
+            }
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
         }
@@ -110,6 +115,10 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 
     public void saveConfig(final Envelope e, AtmosphereResource r) {
         statusEvent(DB_PUBLISHER_SAVE_CONFIG_PUT, e);
+    }
+
+    public void loadShow(final Envelope e, AtmosphereResource r) {
+        passthroughEvent(DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT, e);
     }
 
     public void reportError(final Envelope e, AtmosphereResource r) {
@@ -136,6 +145,25 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             @Override
             public void fail(Status status) {
                 error(e, p, constructMessage(path, writeAsString(new Error().error("Unauthorized"))));
+            }
+        });
+    }
+
+    private void passthroughEvent(final String path, final Envelope e) {
+        String uuid = e.getUuid();
+        final PublisherEndpoint p = endpoints.get(uuid);
+
+        if (!validate(p, e)) return;
+
+        eventBus.message(path, p, new Reply<Passthrough>() {
+            @Override
+            public void ok(Passthrough passthrough) {
+                succesPassThrough(e, p, path, passthrough);
+            }
+
+            @Override
+            public void fail(Passthrough passthrough) {
+                failPassThrough(e, p, passthrough);
             }
         });
     }
@@ -335,6 +363,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                                 public void ok(Passthrough passthrough) {
                                     succesPassThrough(e, p, DB_PUBLISHER_LOAD_CONFIG, passthrough);
 
+                                    // We don't use passthroughEvent as we already know p
                                     eventBus.message(DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT, p, new Reply<Passthrough>() {
                                         @Override
                                         public void ok(Passthrough passthrough) {
