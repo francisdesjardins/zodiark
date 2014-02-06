@@ -268,10 +268,13 @@ public interface Paths {
     String DB_SUBSCRIBER_END = "/v1/subscriber/@guid/favorite/@id/end";
 
     // TODO: LoadConfig
-    String DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT = "/v1/publisher/@guid/settings/ui";
+    String DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT = "/v1/publisher/@guid/settings/ui/";
 
     String DB_PUBLISHER_SAVE_CONFIG = "/v1/publisher/@guid/settings/ui";
+    String DB_PUBLISHER_SAVE_CONFIG_PUT = "_put/v1/publisher/@guid/settings/ui";
+
     String DB_PUBLISHER_LOAD_CONFIG = "/v1/publisher/@guid/settings/ui";
+    String DB_PUBLISHER_LOAD_CONFIG_GET = "_get/v1/publisher/@guid/settings/ui";
 
 
     String DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT = "/v1/publisher/@guid/settings/errors";

@@ -25,11 +25,11 @@ import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.util.RestService;
 
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_GET;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT;
 
 @Retrieve({DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT,
-        DB_PUBLISHER_LOAD_CONFIG,
+        DB_PUBLISHER_LOAD_CONFIG_GET,
         DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT})
 public class PassthoughService extends DBServiceAdapter {
 

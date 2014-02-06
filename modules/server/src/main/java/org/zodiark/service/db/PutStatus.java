@@ -23,9 +23,10 @@ import org.zodiark.server.annotation.Retrieve;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.util.RestService;
 
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_PUT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW;
 
-@Retrieve(DB_PUBLISHER_SAVE_CONFIG_SHOW)
+@Retrieve({DB_PUBLISHER_SAVE_CONFIG_SHOW, DB_PUBLISHER_SAVE_CONFIG_PUT})
 public class PutStatus extends DBServiceAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(PutStatus.class);

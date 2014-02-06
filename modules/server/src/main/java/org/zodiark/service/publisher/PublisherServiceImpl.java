@@ -44,6 +44,9 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHRO
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_ERROR_REPORT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_GET;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_PUT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
@@ -97,9 +100,16 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             case DB_PUBLISHER_SAVE_CONFIG_SHOW:
                  savePublisherShowType(e, r);
                 break;
+            case DB_PUBLISHER_SAVE_CONFIG:
+                saveConfig(e, r);
+               break;
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
         }
+    }
+
+    public void saveConfig(final Envelope e, AtmosphereResource r) {
+        statusEvent(DB_PUBLISHER_SAVE_CONFIG_PUT, e);
     }
 
     public void reportError(final Envelope e, AtmosphereResource r) {
@@ -320,7 +330,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                         public void ok(Passthrough passthrough) {
                             succesPassThrough(e, p, DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, passthrough);
 
-                            eventBus.message(DB_PUBLISHER_LOAD_CONFIG, p, new Reply<Passthrough>() {
+                            eventBus.message(DB_PUBLISHER_LOAD_CONFIG_GET, p, new Reply<Passthrough>() {
                                 @Override
                                 public void ok(Passthrough passthrough) {
                                     succesPassThrough(e, p, DB_PUBLISHER_LOAD_CONFIG, passthrough);
