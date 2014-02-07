@@ -75,6 +75,8 @@ public class InMemoryDB {
 
 
         put.put(replace(Paths.DB_PUBLISHER_SHARED_PRIVATE_START), STATUS_OK);
+        post.put(replace(Paths.DB_PUBLISHER_SHARED_PRIVATE_START), STATUS_OK);
+
         put.put(replace(Paths.DB_PUBLISHER_SHARED_PRIVATE_END), STATUS_OK);
 
         get.put(replace(Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT), PASSTHROUGH);

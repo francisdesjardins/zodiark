@@ -24,8 +24,9 @@ import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.util.RestService;
 
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_ONDEMAND_START;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_START_POST;
 
-@Retrieve(DB_POST_PUBLISHER_ONDEMAND_START)
+@Retrieve({DB_POST_PUBLISHER_ONDEMAND_START, DB_PUBLISHER_SHARED_PRIVATE_START_POST})
 public class PostStatusService extends DBServiceAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(PostStatusService.class);

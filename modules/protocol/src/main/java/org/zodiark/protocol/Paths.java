@@ -250,10 +250,9 @@ public interface Paths {
      * First this to send to the Publisher as soon as the subscriber join.
      */
     String DB_GET_SUBSCRIBER_STATUS_TO_PUBLISHER_PASSTHROUGHT = "/v1/subscriber/@guid/profile";
-    /**
-     * Start the shared private show
-     */
+
     String DB_PUBLISHER_SHARED_PRIVATE_START = "/v1/publisher/@guid/shared/start";
+    String DB_PUBLISHER_SHARED_PRIVATE_START_POST = "/v1/publisher/@guid/shared/start";
 
     String DB_PUBLISHER_SHARED_PRIVATE_END = "/v1/publisher/@guid/shared/end";
 

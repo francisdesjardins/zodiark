@@ -52,6 +52,8 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_GET;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_PUT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_START;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_START_POST;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE;
@@ -124,9 +126,16 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             case DB_PUBLISHER_SUBSCRIBER_PROFILE:
                 getSubscriberProfile(e, r);
                 break;
+            case DB_PUBLISHER_SHARED_PRIVATE_START:
+                sharedPrivateSession(e, r);
+                break;
             default:
                 throw new IllegalStateException("Invalid Message Path " + e.getMessage().getPath());
         }
+    }
+
+    private void sharedPrivateSession(Envelope e, AtmosphereResource r) {
+        statusEvent(DB_PUBLISHER_SHARED_PRIVATE_START_POST, e);
     }
 
     private void getSubscriberProfile(Envelope e, AtmosphereResource r) {
