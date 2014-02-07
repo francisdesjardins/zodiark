@@ -52,6 +52,7 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_GET;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_PUT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_START;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_START_POST;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
@@ -129,9 +130,16 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             case DB_PUBLISHER_SHARED_PRIVATE_START:
                 sharedPrivateSession(e, r);
                 break;
+            case DB_PUBLISHER_SHARED_PRIVATE_END:
+                endSharedPrivateSession(e,r);
+                break;
             default:
                 throw new IllegalStateException("Invalid Message Path " + e.getMessage().getPath());
         }
+    }
+
+    private void endSharedPrivateSession(Envelope e, AtmosphereResource r) {
+        statusEvent(DB_PUBLISHER_SHARED_PRIVATE_END, e);
     }
 
     private void sharedPrivateSession(Envelope e, AtmosphereResource r) {
@@ -177,6 +185,8 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 
         if (!validate(p, e)) return;
 
+        if (!validateShowId(p, e)) return;
+
         eventBus.message(path, p, new Reply<Status>() {
             @Override
             public void ok(Status status) {
@@ -196,6 +206,8 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         final PublisherEndpoint p = endpoints.get(uuid);
 
         if (!validate(p, e)) return;
+
+        if (!validateShowId(p, e)) return;
 
         eventBus.message(path, p, new Reply<Passthrough>() {
             @Override
@@ -286,7 +298,15 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 
     private boolean validate(PublisherEndpoint p, Envelope e) {
         if (p == null) {
-            error(e, p, constructMessage(e.getMessage().getPath(), writeAsString(new Error().error("Unauthorized"))));
+            error(e, p, constructMessage("/error", writeAsString(new Error().error("Unauthorized"))));
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validateShowId(PublisherEndpoint p, Envelope e){
+        if (p == null) {
+            error(e, p, constructMessage("/error", writeAsString(new Error().error("Unauthorized"))));
             return false;
         }
         return true;
