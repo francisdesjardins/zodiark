@@ -96,6 +96,7 @@ public class InMemoryDB {
         put.put(replace(Paths.DB_PUBLISHER_SAVE_CONFIG), STATUS_OK);
 
         get.put(replace(Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT), PASSTHROUGH);
+        get.put(replace(Paths.DB_PUBLISHER_LOAD_CONFIG), PASSTHROUGH);
 
         get.put(replace(Paths.DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT), PASSTHROUGH);
 

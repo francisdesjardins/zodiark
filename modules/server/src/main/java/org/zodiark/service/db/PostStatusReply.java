@@ -31,9 +31,9 @@ import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
  * use the injected {@link org.zodiark.service.util.RestService} to communicate with the remote endpoint.
  */
 @Retrieve(DB_POST_PUBLISHER_SESSION_CREATE)
-public class PostStatusService extends DBServiceAdapter {
+public class PostStatusReply extends DBServiceAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(PostStatusService.class);
+    private final Logger logger = LoggerFactory.getLogger(PostStatusReply.class);
 
     @Inject
     public RestService restService;
@@ -41,9 +41,7 @@ public class PostStatusService extends DBServiceAdapter {
     @Override
     public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
-        if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
-            final EndpointAdapter p = EndpointAdapter.class.cast(message);
-            restService.post(path.replace("@guid", p.uuid()), p.message(), new StatusReply<EndpointAdapter>(reply, p));
-        }
+        final EndpointAdapter p = EndpointAdapter.class.cast(message);
+        restService.post(path.replace("@guid", p.uuid()), p.message(), new StatusReply<EndpointAdapter>(reply, p));
     }
 }

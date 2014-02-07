@@ -28,6 +28,7 @@ import org.zodiark.service.Service;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Synchronous EventBus implementation.
@@ -38,6 +39,7 @@ public class DefaultEventBus implements EventBus {
     private final EndpointMapper<Service> mapper = new DefaultEndpointMapper<>();
     private final ConcurrentHashMap<String, Service> ioServices = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Service> services = new ConcurrentHashMap<>();
+    private final ConcurrentLinkedQueue<PathTransformer> transformers = new ConcurrentLinkedQueue<>();
     private final Reply l = new Reply() {
         @Override
         public void ok(Object response) {
@@ -49,6 +51,18 @@ public class DefaultEventBus implements EventBus {
             logger.trace("failed", response);
         }
     };
+
+    public DefaultEventBus() {
+        transformers.add(new PathTransformer() {
+            @Override
+            public String transform(String path) {
+                if (path.startsWith("_")) {
+                    return path.substring(path.indexOf("/"));
+                }
+                return path;
+            }
+        }) ;
+    }
 
     /**
      * {@inheritDoc}
@@ -84,7 +98,7 @@ public class DefaultEventBus implements EventBus {
         return this;
     }
 
-    private void sendError(Envelope e, AtmosphereResource r){
+    private void sendError(Envelope e, AtmosphereResource r) {
         Message m = new Message();
         m.setPath("/error");
         m.setUUID(e.getMessage().getUUID());
@@ -105,7 +119,7 @@ public class DefaultEventBus implements EventBus {
             logger.debug("Dispatching Message {} to {}", path, s);
 
             if (s != null) {
-                s.reactTo(path, message, reply);
+                s.reactTo(transform(path), message, reply);
             } else {
                 logger.error("No Service available for {}", path);
             }
@@ -113,6 +127,17 @@ public class DefaultEventBus implements EventBus {
             logger.error("Error on {}", path, t);
         }
         return this;
+    }
+
+    private String transform(String path) {
+        for (PathTransformer t : transformers) {
+            try {
+                path = t.transform(path);
+            } catch (Exception ex) {
+                logger.error("", ex);
+            }
+        }
+        return path;
     }
 
     /**
@@ -145,7 +170,14 @@ public class DefaultEventBus implements EventBus {
      */
     @Override
     public EventBus off(String path) {
-        return null;
+        services.remove(path);
+        return this;
+    }
+
+    @Override
+    public EventBus pathTransformer(PathTransformer transformer) {
+        transformers.add(transformer);
+        return this;
     }
 
     public Service service(Class<? extends Service> clazz) {

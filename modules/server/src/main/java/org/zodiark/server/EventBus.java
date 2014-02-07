@@ -101,4 +101,10 @@ public interface EventBus {
      */
     EventBus off(String path);
 
+    EventBus pathTransformer(PathTransformer transformer) ;
+
+
+    public static interface PathTransformer {
+        String transform(String path);
+    }
 }
