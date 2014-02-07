@@ -310,7 +310,7 @@ public class PublisherServiceTest {
         eventBus.ioEvent(em, RESOURCE);
 
         // UC10
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_PUBLISHER_ONDEMAND_END, ""));
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_PUBLISHER_ONDEMAND_END, "{\"actionId\":1}"));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
