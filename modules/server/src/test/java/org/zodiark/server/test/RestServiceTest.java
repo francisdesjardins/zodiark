@@ -124,9 +124,8 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<Motds> motds = new AtomicReference<>();
 
-        restService.post(DB_GET_WORD.replace("@guid", UUID.randomUUID().toString()),
-                "{\"modeId\": \"12345\"}" +
-                        "", new RestService.Reply<Motds, DBError>() {
+        restService.get(DB_GET_WORD.replace("@guid", UUID.randomUUID().toString())
+                        , new RestService.Reply<Motds, DBError>() {
             @Override
             public void success(Motds success) {
                 motds.set(success);

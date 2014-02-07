@@ -60,7 +60,7 @@ public class InMemoryDB {
 
         post.put(replace(DB_POST_SUBSCRIBER_JOIN_SESSION), " {\"watchId\": \"123234\"}");
 
-        post.put(replace(DB_GET_WORD),"{\"motds\": [{\"motdId\": 1, \"title\": \"foo\", \"message\": \"blabla\", \"createdOn\":\"20140125\", \"expiresOn\":\"20140125\", " +
+        get.put(replace(DB_GET_WORD),"{\"motds\": [{\"motdId\": 1, \"title\": \"foo\", \"message\": \"blabla\", \"createdOn\":\"20140125\", \"expiresOn\":\"20140125\", " +
                 "\"expired\": true}]}");
 
         post.put(replace(DB_POST_SUBSCRIBER_CHARGE_START), STATUS_OK);
