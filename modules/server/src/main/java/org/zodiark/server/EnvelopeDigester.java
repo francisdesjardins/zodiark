@@ -25,9 +25,16 @@ import org.atmosphere.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
+import org.zodiark.protocol.From;
+import org.zodiark.protocol.Message;
+import org.zodiark.protocol.Path;
+import org.zodiark.protocol.Protocol;
+import org.zodiark.protocol.To;
+import org.zodiark.protocol.TraceId;
 import org.zodiark.server.annotation.Inject;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * An {@link AtmosphereInterceptor} that intercept requests and dispatch them to the {@link EventBus} when the request's body
@@ -52,7 +59,7 @@ public class EnvelopeDigester extends AtmosphereInterceptorAdapter {
             String message = IOUtils.readEntirely(r).toString();
             if (!message.isEmpty()) {
                 try {
-                    final Envelope e = mapper.readValue(message, Envelope.class);
+                    final Envelope e = newEnvelope(message);
 
                     if (e.getUuid() == null || e.getUuid().isEmpty()) {
                         e.setUuid(r.uuid());
@@ -78,4 +85,27 @@ public class EnvelopeDigester extends AtmosphereInterceptorAdapter {
         return Action.CONTINUE;
     }
 
+    public final Envelope newEnvelope(String m) throws IOException {
+        HashMap<String, Object> envelope = (HashMap<String, Object>) mapper.readValue(m, HashMap.class);
+        return newEnvelope(envelope);
+    }
+
+    public final Envelope newEnvelope(HashMap<String, Object> envelope) throws IOException {
+        HashMap<String, Object> message = (HashMap<String, Object>) envelope.get("message");
+        return new Envelope.Builder()
+                .path(new Path(notNull(envelope.get("path"))))
+                .to(new To(notNull(envelope.get("to"))))
+                .from(new From(notNull(envelope.get("from"))))
+                .traceId(new TraceId((int) envelope.get("traceId")))
+                .message(new Message().setPath(notNull(message.get("path")))
+                        .setData(notNull(message.get("data")))
+                        .setUUID(notNull(message.get("uuid"))))
+                .protocol(new Protocol(notNull(envelope.get("protocol"))))
+                .uuid(notNull(envelope.get("uuid")))
+                .build();
+    }
+
+    private String notNull(Object o) {
+        return o == null ? "" : o.toString();
+    }
 }

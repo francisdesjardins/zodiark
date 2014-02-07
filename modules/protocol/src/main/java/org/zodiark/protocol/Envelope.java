@@ -119,8 +119,7 @@ public class Envelope {
                 '}';
     }
 
-
-    protected final static class Builder {
+    public final static class Builder {
         private Path path = new Path(LeftPathValue.REQUEST, RightPathValue.ACTION);
         private TraceId traceId = new TraceId();
         private To to = new To(ActorValue.SERVER.name());
@@ -194,7 +193,7 @@ public class Envelope {
                 .build();
     }
 
-    public final static Envelope newPublisherToServerRequest( String uuid, Message message) {
+    public final static Envelope newPublisherToServerRequest(String uuid, Message message) {
         return new Envelope.Builder()
                 .path(new Path("/request/action"))
                 .to(new To(ActorValue.PUBLISHER.value()))

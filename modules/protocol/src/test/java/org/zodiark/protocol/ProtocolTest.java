@@ -79,6 +79,23 @@ public class ProtocolTest {
             "    }\n" +
             "}";
 
+    private final static String testValid = "{\n"+
+            "    \"path\": \"/request/action\",\n"+
+            "    \"traceId\": 0,\n"+
+            "    \"to\": \"/server\",\n"+
+            "    \"from\": \"/publisher\",\n"+
+            "    \"message\": {\n"+
+            "        \"path\": \"/v1/publisher/@guid/session/create\",\n"+
+            "        \"uuid\": \"50d2d6b2-f748-aad7-77bd-0c914db240bd\",\n"+
+            "        \"data\": {\n"+
+            "            \"username\": \"Gayluron\",\n"+
+            "            \"password\": \"1234\"\n"+
+            "        }\n"+
+            "    },\n"+
+            "    \"protocol\": \"zodiark/1.0\",\n"+
+            "    \"uuid\": \"2c02e9a6-7ad5-42c1-bb12-d63220718785\"\n"+
+            "}";
+
     @Test
     public void testCreateEnvelope() throws IOException {
         System.out.println(testEnvelope);
