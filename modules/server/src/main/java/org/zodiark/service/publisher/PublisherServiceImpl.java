@@ -32,10 +32,12 @@ import org.zodiark.server.annotation.On;
 import org.zodiark.service.Session;
 import org.zodiark.service.db.Passthrough;
 import org.zodiark.service.db.Status;
+import org.zodiark.service.subscriber.SubscriberEndpoint;
 import org.zodiark.service.wowza.WowzaUUID;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnDisconnect;
 import static org.zodiark.protocol.Paths.BROADCASTER_CREATE;
@@ -59,10 +61,12 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_GET;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_BLOCK;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.FAILED_PUBLISHER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.PUBLISHER_ABOUT_READY;
 import static org.zodiark.protocol.Paths.RETRIEVE_PUBLISHER;
+import static org.zodiark.protocol.Paths.RETRIEVE_SUBSCRIBER;
 import static org.zodiark.protocol.Paths.VALIDATE_PUBLISHER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.WOWZA_CONNECT;
 
@@ -133,9 +137,33 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             case DB_PUBLISHER_SHARED_PRIVATE_END:
                 endSharedPrivateSession(e,r);
                 break;
+            case DB_SUBSCRIBER_BLOCK:
+                blockSubscriber(e ,r);
+                break;
             default:
                 throw new IllegalStateException("Invalid Message Path " + e.getMessage().getPath());
         }
+    }
+
+    private void blockSubscriber(Envelope e, AtmosphereResource r) {
+
+        final PublisherEndpoint p = retrieve(e.getUuid());
+        String[] paths = e.getMessage().getPath().split("/");
+
+        final AtomicBoolean isValid = new AtomicBoolean();
+        eventBus.message(RETRIEVE_SUBSCRIBER, paths[5], new Reply<SubscriberEndpoint>() {
+            @Override
+            public void ok(SubscriberEndpoint s) {
+                isValid.set(s.publisherEndpoint().equals(p));
+            }
+
+            @Override
+            public void fail(SubscriberEndpoint s) {
+                logger.error("No Endpoint");
+            }
+        });
+
+        statusEvent(DB_SUBSCRIBER_BLOCK, e);
     }
 
     private void endSharedPrivateSession(Envelope e, AtmosphereResource r) {
@@ -182,6 +210,10 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     private void statusEvent(final String path, final Envelope e) {
         String uuid = e.getUuid();
         final PublisherEndpoint p = endpoints.get(uuid);
+        statusEvent(path, e, p);
+    }
+
+    private void statusEvent(final String path, final Envelope e, final PublisherEndpoint p ) {
 
         if (!validate(p, e)) return;
 
@@ -204,6 +236,10 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     private void passthroughEvent(final String path, final Envelope e) {
         String uuid = e.getUuid();
         final PublisherEndpoint p = endpoints.get(uuid);
+        passthroughEvent(path, e, p);
+    }
+
+    private void passthroughEvent(final String path, final Envelope e, final PublisherEndpoint p) {
 
         if (!validate(p, e)) return;
 
@@ -269,8 +305,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
      */
     @Override
     public void createOrJoinStreamingSession(final Envelope e, AtmosphereResource r) {
-        String uuid = e.getUuid();
-        PublisherEndpoint p = retrieve(uuid);
+        PublisherEndpoint p = retrieve(e.getUuid());
 
         if (!validate(p, e)) return;
 
@@ -424,19 +459,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                                 @Override
                                 public void ok(Passthrough passthrough) {
                                     succesPassThrough(e, p, DB_PUBLISHER_LOAD_CONFIG, passthrough);
-
-                                    // We don't use passthroughEvent as we already know p
-                                    eventBus.message(DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT, p, new Reply<Passthrough>() {
-                                        @Override
-                                        public void ok(Passthrough passthrough) {
-                                            succesPassThrough(e, p, DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT, passthrough);
-                                        }
-
-                                        @Override
-                                        public void fail(Passthrough passthrough) {
-                                            failPassThrough(e, p, passthrough);
-                                        }
-                                    });
+                                    passthroughEvent(DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT, e, p);
                                 }
 
                                 @Override

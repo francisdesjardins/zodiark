@@ -193,9 +193,14 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     @Override
     public void retrieveEndpoint(Object subscriberUuid, Reply reply) {
         if (String.class.isAssignableFrom(subscriberUuid.getClass())) {
-            reply.ok(endpoints.get(subscriberUuid.toString()));
+            SubscriberEndpoint s = endpoints.get(subscriberUuid.toString());
+            if (s != null) {
+                reply.ok(s);
+            } else {
+                reply.fail(null);
+            }
         } else {
-            reply.fail(new Exception("No Sunscriber associated"));
+            reply.fail(null);
         }
     }
 

@@ -97,7 +97,7 @@ public interface Paths {
     /**
      * A Message to retrieve the subscriber
      */
-    String RETRIEVE_SUBSCRIBER = "/subscriber/retrieve";
+    String RETRIEVE_SUBSCRIBER = "/v1/subscriber/retrieve";
     /**
      * An I/O event for Action requested by a Subscriber
      */
