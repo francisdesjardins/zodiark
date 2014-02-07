@@ -135,10 +135,10 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                 sharedPrivateSession(e, r);
                 break;
             case DB_PUBLISHER_SHARED_PRIVATE_END:
-                endSharedPrivateSession(e,r);
+                endSharedPrivateSession(e, r);
                 break;
             case DB_SUBSCRIBER_BLOCK:
-                blockSubscriber(e ,r);
+                blockSubscriber(e, r);
                 break;
             default:
                 throw new IllegalStateException("Invalid Message Path " + e.getMessage().getPath());
@@ -151,6 +151,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         String[] paths = e.getMessage().getPath().split("/");
 
         final AtomicBoolean isValid = new AtomicBoolean();
+        // DAangerous if the path change.
         eventBus.message(RETRIEVE_SUBSCRIBER, paths[5], new Reply<SubscriberEndpoint>() {
             @Override
             public void ok(SubscriberEndpoint s) {
@@ -162,6 +163,11 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                 logger.error("No Endpoint");
             }
         });
+
+        // TODO: Validate Subscriber
+//        if (!isValid.get()) {
+//            error(e, p, constructMessage("/error", "No Subscriber for " + paths[5]));
+//        }
 
         statusEvent(DB_SUBSCRIBER_BLOCK, e);
     }
@@ -213,7 +219,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         statusEvent(path, e, p);
     }
 
-    private void statusEvent(final String path, final Envelope e, final PublisherEndpoint p ) {
+    private void statusEvent(final String path, final Envelope e, final PublisherEndpoint p) {
 
         if (!validate(p, e)) return;
 
@@ -339,7 +345,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         return true;
     }
 
-    private boolean validateShowId(PublisherEndpoint p, Envelope e){
+    private boolean validateShowId(PublisherEndpoint p, Envelope e) {
         if (p == null) {
             error(e, p, constructMessage("/error", writeAsString(new Error().error("Unauthorized"))));
             return false;
