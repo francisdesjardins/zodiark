@@ -26,9 +26,9 @@ import org.zodiark.service.util.RestService;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
 
 @Retrieve(DB_PUBLISHER_SHOW_END)
-public class ShowEnd extends DBServiceAdapter {
+public class ShowEndService extends DBServiceAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(ShowEnd.class);
+    private final Logger logger = LoggerFactory.getLogger(ShowEndService.class);
 
     @Inject
     public RestService restService;

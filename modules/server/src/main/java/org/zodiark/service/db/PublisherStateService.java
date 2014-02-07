@@ -31,9 +31,9 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG;
  * remote database/web service.
  */
 @Retrieve(DB_PUBLISHER_CONFIG)
-public class LoadPublisherConfigService extends DBServiceAdapter {
+public class PublisherStateService extends DBServiceAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(LoadPublisherConfigService.class);
+    private final Logger logger = LoggerFactory.getLogger(PublisherStateService.class);
 
     @Inject
     public RestService restService;

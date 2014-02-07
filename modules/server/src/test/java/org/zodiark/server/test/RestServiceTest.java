@@ -20,7 +20,6 @@ import org.zodiark.protocol.Paths;
 import org.zodiark.server.ZodiarkObjectFactory;
 import org.zodiark.service.db.ActionState;
 import org.zodiark.service.db.DBError;
-import org.zodiark.service.db.Motds;
 import org.zodiark.service.db.ShowId;
 import org.zodiark.service.db.Status;
 import org.zodiark.service.db.TransactionId;
@@ -32,14 +31,13 @@ import org.zodiark.service.util.mock.OKRestService;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
-import static org.zodiark.protocol.Paths.DB_GET_WORD;
+import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSSTHROUGH;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_CHARGE_END;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_CHARGE_START;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_JOIN_SESSION;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
 
 public class RestServiceTest {
 
@@ -122,12 +120,12 @@ public class RestServiceTest {
     @Test
     public void motdTest() throws IllegalAccessException, InstantiationException {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
-        final AtomicReference<Motds> motds = new AtomicReference<>();
+        final AtomicReference<String> motds = new AtomicReference<>();
 
-        restService.get(DB_GET_WORD.replace("@guid", UUID.randomUUID().toString())
-                        , new RestService.Reply<Motds, DBError>() {
+        restService.get(DB_GET_WORD_PASSSTHROUGH.replace("@guid", UUID.randomUUID().toString())
+                        , new RestService.Reply<String, DBError>() {
             @Override
-            public void success(Motds success) {
+            public void success(String success) {
                 motds.set(success);
             }
 
@@ -141,8 +139,6 @@ public class RestServiceTest {
             }
         });
         assertNotNull(motds.get());
-        assertEquals(1, motds.get().motds().size());
-
     }
 
     @Test

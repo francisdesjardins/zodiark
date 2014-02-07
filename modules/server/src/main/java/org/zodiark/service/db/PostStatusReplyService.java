@@ -31,9 +31,9 @@ import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
  * use the injected {@link org.zodiark.service.util.RestService} to communicate with the remote endpoint.
  */
 @Retrieve(DB_POST_PUBLISHER_SESSION_CREATE)
-public class PostStatusReply extends DBServiceAdapter {
+public class PostStatusReplyService extends DBServiceAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(PostStatusReply.class);
+    private final Logger logger = LoggerFactory.getLogger(PostStatusReplyService.class);
 
     @Inject
     public RestService restService;

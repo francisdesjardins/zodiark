@@ -24,6 +24,7 @@ import org.zodiark.service.db.util.PassthroughReply;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.util.RestService;
 
+import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSSTHROUGH;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_GET;
@@ -32,7 +33,8 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHRO
 @Retrieve({DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT,
         DB_PUBLISHER_LOAD_CONFIG_GET,
         DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT,
-        DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT})
+        DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT,
+        DB_GET_WORD_PASSSTHROUGH})
 public class PassthoughService extends DBServiceAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(PassthoughService.class);

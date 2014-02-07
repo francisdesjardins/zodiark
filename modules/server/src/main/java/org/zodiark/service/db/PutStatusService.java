@@ -27,9 +27,9 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_PUT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW;
 
 @Retrieve({DB_PUBLISHER_SAVE_CONFIG_SHOW, DB_PUBLISHER_SAVE_CONFIG_PUT})
-public class PutStatus extends DBServiceAdapter {
+public class PutStatusService extends DBServiceAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(PutStatus.class);
+    private final Logger logger = LoggerFactory.getLogger(PutStatusService.class);
 
     @Inject
     public RestService restService;

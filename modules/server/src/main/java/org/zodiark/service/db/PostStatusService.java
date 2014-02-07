@@ -20,16 +20,15 @@ import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.Retrieve;
-import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.util.RestService;
 
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
+import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_ONDEMAND_START;
 
-@Retrieve(DB_PUBLISHER_SHOW_START)
-public class ShowStart extends DBServiceAdapter {
+@Retrieve(DB_POST_PUBLISHER_ONDEMAND_START)
+public class PostStatusService extends DBServiceAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(ShowStart.class);
+    private final Logger logger = LoggerFactory.getLogger(PostStatusService.class);
 
     @Inject
     public RestService restService;
@@ -37,27 +36,25 @@ public class ShowStart extends DBServiceAdapter {
     @Override
     public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
-        if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
-            final PublisherEndpoint p = PublisherEndpoint.class.cast(message);
-            restService.post(DB_PUBLISHER_SHOW_START.replace("@guid",p.uuid()),
-                    p.message(), new RestService.Reply<ShowId, DBError>() {
-                @Override
-                public void success(ShowId success) {
-                    reply.ok(p.showId(success));
-                }
+        final PublisherEndpoint p = PublisherEndpoint.class.cast(message);
+        restService.post(path.replace("@guid", p.uuid()),
+                p.message(), new RestService.Reply<Status, DBError>() {
+            @Override
+            public void success(Status success) {
+                reply.ok(success);
+            }
 
-                @Override
-                public void failure(DBError failure) {
-                    reply.fail(p);
-                }
+            @Override
+            public void failure(DBError failure) {
+                reply.fail(p);
+            }
 
-                @Override
-                public void exception(Exception exception) {
-                    logger.trace("", exception);
-                    reply.fail(p);
-                }
-            });
+            @Override
+            public void exception(Exception exception) {
+                logger.trace("", exception);
+                reply.fail(p);
+            }
+        });
 
-        }
     }
 }

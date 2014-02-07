@@ -22,7 +22,7 @@ import org.zodiark.protocol.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.zodiark.protocol.Paths.DB_GET_WORD;
+import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSSTHROUGH;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
@@ -40,6 +40,8 @@ public class InMemoryDB {
     public final static String STATUS_OK = "{\"result\":\"OK\"}";
     public final static String TRANSACTION_ID = "{\"transactionId\":1234}";
     public final static String SHOWID ="{\"showId\":123234}";
+    public final static String MOTD = "{\"motds\": [{\"motdId\": 1, \"title\": \"foo\", \"message\": \"blabla\", \"createdOn\":\"20140125\", \"expiresOn\":\"20140125\", " +
+                    "\"expired\": true}]}";
 
     EndpointMapper<String> mapper = new DefaultEndpointMapper<>();
 
@@ -60,8 +62,7 @@ public class InMemoryDB {
 
         post.put(replace(DB_POST_SUBSCRIBER_JOIN_SESSION), " {\"watchId\": \"123234\"}");
 
-        get.put(replace(DB_GET_WORD),"{\"motds\": [{\"motdId\": 1, \"title\": \"foo\", \"message\": \"blabla\", \"createdOn\":\"20140125\", \"expiresOn\":\"20140125\", " +
-                "\"expired\": true}]}");
+        get.put(replace(DB_GET_WORD_PASSSTHROUGH),MOTD);
 
         post.put(replace(DB_POST_SUBSCRIBER_CHARGE_START), STATUS_OK);
         delete.put(replace(DB_POST_SUBSCRIBER_CHARGE_END), STATUS_OK);

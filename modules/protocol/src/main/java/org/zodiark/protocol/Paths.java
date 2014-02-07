@@ -212,7 +212,7 @@ public interface Paths {
     /**
      * A Message to retrieve the list of banned word for a Streaming Session Chat.
      */
-    String DB_GET_WORD = "/v1/publisher/@guid/motd";
+    String DB_GET_WORD_PASSSTHROUGH = "/v1/publisher/@guid/motd";
     /**
      * a Message to validate the state of a Subscriber
      */
