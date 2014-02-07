@@ -23,10 +23,11 @@ import org.zodiark.server.annotation.Retrieve;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.util.RestService;
 
+import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_ONDEMAND_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_ERROR_REPORT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
 
-@Retrieve(DB_PUBLISHER_ERROR_REPORT)
+@Retrieve({DB_PUBLISHER_ERROR_REPORT, DB_POST_PUBLISHER_ONDEMAND_END})
 public class DeleteStatus extends DBServiceAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(DeleteStatus.class);
