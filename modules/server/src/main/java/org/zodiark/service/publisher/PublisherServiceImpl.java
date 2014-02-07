@@ -39,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnDisconnect;
 import static org.zodiark.protocol.Paths.BROADCASTER_CREATE;
+import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_ONDEMAND_START;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT;
@@ -104,13 +105,19 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             case DB_PUBLISHER_SAVE_CONFIG:
                 saveConfig(e, r);
                 break;
-            case DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT: {
+            case DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT:
                 loadShow(e, r);
                 break;
-            }
+            case DB_POST_PUBLISHER_ONDEMAND_START:
+                onDemandStart(e, r);
+                break;
             default:
-                throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
+                throw new IllegalStateException("Invalid Message Path " + e.getMessage().getPath());
         }
+    }
+
+    private void onDemandStart(Envelope e, AtmosphereResource r) {
+        statusEvent(DB_POST_PUBLISHER_ONDEMAND_START, e);
     }
 
     public void saveConfig(final Envelope e, AtmosphereResource r) {
