@@ -259,7 +259,7 @@ public interface Paths {
 
     String DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT = "/v1/subscriber/@guid/actions";
 
-    String DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT = "/v1/publisher/@guid/actions";
+    String DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT = "/v1/publisher/@guid/settings/actions";
     String DB_SUBSCRIBER_REQUEST_ACTION = "/v1/subscriber/@guid/action/transaction/request";
     String DB_SUBSCRIBER_JOIN_ACTION = "/v1/subscriber/@guid/action/transaction/@id/join";
     String DB_SUBSCRIBER_CHARGE_ACTION = "/v1/subscriber/@guid/action/transaction/@id/charge";
