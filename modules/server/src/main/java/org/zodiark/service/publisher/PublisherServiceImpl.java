@@ -62,6 +62,7 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_GET;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_BLOCK;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_EJECT;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.FAILED_PUBLISHER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.PUBLISHER_ABOUT_READY;
@@ -137,15 +138,16 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             case DB_PUBLISHER_SHARED_PRIVATE_END:
                 endSharedPrivateSession(e, r);
                 break;
+            case DB_SUBSCRIBER_EJECT:
             case DB_SUBSCRIBER_BLOCK:
-                blockSubscriber(e, r);
+                blockOrEjectSubscriber(e.getMessage().getPath(), e, r);
                 break;
             default:
                 throw new IllegalStateException("Invalid Message Path " + e.getMessage().getPath());
         }
     }
 
-    private void blockSubscriber(Envelope e, AtmosphereResource r) {
+    private void blockOrEjectSubscriber(String path, Envelope e, AtmosphereResource r) {
 
         final PublisherEndpoint p = retrieve(e.getUuid());
         String[] paths = e.getMessage().getPath().split("/");
@@ -169,7 +171,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 //            error(e, p, constructMessage("/error", "No Subscriber for " + paths[5]));
 //        }
 
-        statusEvent(DB_SUBSCRIBER_BLOCK, e);
+        statusEvent(path, e);
     }
 
     private void endSharedPrivateSession(Envelope e, AtmosphereResource r) {

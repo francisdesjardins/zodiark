@@ -53,6 +53,7 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_BLOCK;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_EJECT;
 
 public class PublisherServiceTest {
 
@@ -407,7 +408,7 @@ public class PublisherServiceTest {
         Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_PUBLISHER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
         eventBus.ioEvent(em, RESOURCE);
 
-        // UC16
+        // UC17
         em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SHARED_PRIVATE_END, ""));
         eventBus.ioEvent(em, RESOURCE);
 
@@ -430,8 +431,31 @@ public class PublisherServiceTest {
         Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_PUBLISHER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
         eventBus.ioEvent(em, RESOURCE);
 
-        // UC16
+        // UC18
         em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_BLOCK, ""));
+        eventBus.ioEvent(em, RESOURCE);
+
+        assertNull(writer.error.get());
+        assertEquals(writer.e.size(), 4);
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+    }
+
+    @Test
+    public void uc19Test() throws Exception {
+        EventBus eventBus = EventBusFactory.getDefault().eventBus();
+
+        Writer writer = new Writer();
+        RESOURCE.getResponse().asyncIOWriter(writer);
+
+        // UC1
+        Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_PUBLISHER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
+        eventBus.ioEvent(em, RESOURCE);
+
+        // UC19
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_EJECT, ""));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
