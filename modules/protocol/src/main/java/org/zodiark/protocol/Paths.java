@@ -284,6 +284,10 @@ public interface Paths {
     String DB_PUBLISHER_PUBLIC_MODE_END = "/v1/publisher/@guid/settings/public/end";
     String DB_PUBLISHER_ERROR_REPORT = "/v1/publisher/@guid/error/report";
     String DB_PUBLISHER_SUBSCRIBER_PROFILE = "/v1/publisher/@guid/subscriber/@guid/profile";
+    String DB_PUBLISHER_SUBSCRIBER_PROFILE_GET = "/v1/publisher/@guid/subscriber/@guid/profile";
+    String DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT = "/v1/publisher/@guid/subscriber/@guid/profile";
+
+
     String DB_PUBLISHER_ACTIONS = "/v1/publisher/@guid/actions";
     String DB_SUBSCRIBER_EXTRA = "/v1/subscriber/@guid/tip/transaction/request";
     String DB_ENDPOINT_STATE = "/v1/zodiark/session/@guid";

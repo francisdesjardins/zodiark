@@ -54,6 +54,8 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_PUT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_GET;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.FAILED_PUBLISHER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.PUBLISHER_ABOUT_READY;
@@ -119,9 +121,17 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             case DB_GET_WORD_PASSSTHROUGH:
                 getMotd(e, r);
                 break;
+            case DB_PUBLISHER_SUBSCRIBER_PROFILE:
+                getSubscriberProfile(e, r);
+                break;
             default:
                 throw new IllegalStateException("Invalid Message Path " + e.getMessage().getPath());
         }
+    }
+
+    private void getSubscriberProfile(Envelope e, AtmosphereResource r) {
+        // TODO: UC15
+        passthroughEvent(DB_PUBLISHER_SUBSCRIBER_PROFILE_GET, e);
     }
 
     private void getMotd(Envelope e, AtmosphereResource r) {

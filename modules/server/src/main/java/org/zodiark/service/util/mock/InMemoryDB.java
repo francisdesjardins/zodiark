@@ -109,6 +109,8 @@ public class InMemoryDB {
         post.put(replace(Paths.DB_PUBLISHER_ERROR_REPORT), STATUS_OK);
 
         put.put(replace(Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE), STATUS_OK);
+        get.put(replace(Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE), PASSTHROUGH);
+
 
         put.put(replace(Paths.DB_SUBSCRIBER_EXTRA), TRANSACTION_ID);
 

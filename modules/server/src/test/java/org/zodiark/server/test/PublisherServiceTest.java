@@ -49,6 +49,7 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE;
 
 public class PublisherServiceTest {
 
@@ -322,6 +323,7 @@ public class PublisherServiceTest {
         assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
         assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
     }
+
     @Test
     public void uc14Test() throws Exception {
         EventBus eventBus = EventBusFactory.getDefault().eventBus();
@@ -343,5 +345,28 @@ public class PublisherServiceTest {
         assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
         assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
         assertEquals(InMemoryDB.MOTD, writer.e.poll().getMessage().getData());
+    }
+
+    @Test
+    public void uc15Test() throws Exception {
+        EventBus eventBus = EventBusFactory.getDefault().eventBus();
+
+        Writer writer = new Writer();
+        RESOURCE.getResponse().asyncIOWriter(writer);
+
+        // UC1
+        Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_PUBLISHER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
+        eventBus.ioEvent(em, RESOURCE);
+
+        // UC15
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SUBSCRIBER_PROFILE, ""));
+        eventBus.ioEvent(em, RESOURCE);
+
+        assertNull(writer.error.get());
+        assertEquals(writer.e.size(), 4);
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
     }
 }

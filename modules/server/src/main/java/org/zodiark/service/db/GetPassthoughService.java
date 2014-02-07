@@ -29,15 +29,17 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHRO
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_GET;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_GET;
 
 @Retrieve({DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT,
         DB_PUBLISHER_LOAD_CONFIG_GET,
         DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT,
         DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT,
-        DB_GET_WORD_PASSSTHROUGH})
-public class PassthoughService extends DBServiceAdapter {
+        DB_GET_WORD_PASSSTHROUGH,
+        DB_PUBLISHER_SUBSCRIBER_PROFILE_GET})
+public class GetPassthoughService extends DBServiceAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(PassthoughService.class);
+    private final Logger logger = LoggerFactory.getLogger(GetPassthoughService.class);
 
     @Inject
     public RestService restService;
