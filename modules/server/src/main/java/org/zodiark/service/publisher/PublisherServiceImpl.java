@@ -32,6 +32,7 @@ import org.zodiark.server.annotation.On;
 import org.zodiark.service.Session;
 import org.zodiark.service.db.Passthrough;
 import org.zodiark.service.db.Status;
+import org.zodiark.service.session.StreamingSession;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 import org.zodiark.service.wowza.WowzaUUID;
 
@@ -52,6 +53,7 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_GET;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_PUBLIC_MODE;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_PUBLIC_MODE_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_PUT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW;
@@ -141,15 +143,44 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                 break;
             case DB_SUBSCRIBER_EJECT:
             case DB_SUBSCRIBER_BLOCK:
+                validateAndStatusEvent(e.getMessage().getPath(), e);
+                break;
             case DB_PUBLISHER_PUBLIC_MODE:
-                validateAndStatusEvent(e.getMessage().getPath(), e, r);
+            case DB_PUBLISHER_PUBLIC_MODE_END:
+                publisherPublicMode(e.getMessage().getPath(), e);
                 break;
             default:
                 throw new IllegalStateException("Invalid Message Path " + e.getMessage().getPath());
         }
     }
 
-    private void validateAndStatusEvent(String path, Envelope e, AtmosphereResource r) {
+    private void publisherPublicMode(final String path, final Envelope e) {
+
+        final PublisherEndpoint p = retrieve(e.getUuid());
+        if (!validateAll(p, e));
+
+        statusEvent(path, e, p, new Reply<Status>() {
+            @Override
+            public void ok(Status status) {
+                logger.trace("Status {}", status);
+
+                String[] pathSegments = path.split("/");
+                if (pathSegments[6].endsWith("start")) {
+                    p.state().sessionType(StreamingSession.TYPE.PUBLIC);
+                } else {
+                    p.state().sessionType(StreamingSession.TYPE.OFF);
+                }
+                response(e, p, constructMessage(path, writeAsString(status)));
+            }
+
+            @Override
+            public void fail(Status status) {
+                error(e, p, constructMessage(path, writeAsString(new Error().error("Unauthorized"))));
+            }
+        });
+    }
+
+    private void validateAndStatusEvent(String path, Envelope e) {
 
         final PublisherEndpoint p = retrieve(e.getUuid());
         String[] paths = e.getMessage().getPath().split("/");
@@ -225,11 +256,9 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 
     private void statusEvent(final String path, final Envelope e, final PublisherEndpoint p) {
 
-        if (!validate(p, e)) return;
+        if (!validateAll(p, e));
 
-        if (!validateShowId(p, e)) return;
-
-        eventBus.message(path, p, new Reply<Status>() {
+        statusEvent(path, e, p, new Reply<Status>() {
             @Override
             public void ok(Status status) {
                 logger.trace("Status {}", status);
@@ -241,6 +270,10 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                 error(e, p, constructMessage(path, writeAsString(new Error().error("Unauthorized"))));
             }
         });
+    }
+
+    private void statusEvent(final String path, final Envelope e, final PublisherEndpoint p, Reply<Status> r) {
+        eventBus.message(path, p, r);
     }
 
     private void passthroughEvent(final String path, final Envelope e) {
@@ -356,6 +389,15 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         }
         return true;
     }
+
+    private boolean validateAll(PublisherEndpoint p, Envelope e) {
+        if (!validate(p, e)) return false;
+
+        if (!validateShowId(p, e)) return false;
+
+        return true;
+    }
+
 
     /**
      * {@inheritDoc}

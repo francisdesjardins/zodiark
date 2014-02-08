@@ -27,7 +27,7 @@ public class PublisherStateImpl implements PublisherState {
     private ShowId showId = new ShowId(-1);
 
     public PublisherStateImpl() {
-        sessionType(StreamingSession.TYPE.PRIVATE);
+        sessionType(StreamingSession.TYPE.OFF);
     }
 
     /**

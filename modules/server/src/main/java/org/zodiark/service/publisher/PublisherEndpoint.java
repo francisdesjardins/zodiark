@@ -76,4 +76,8 @@ public class PublisherEndpoint extends EndpointAdapter<PublisherEndpoint> {
     public boolean hasShow() {
         return state.showId().showId() != -1;
     }
+
+    public PublisherState state() {
+        return state;
+    }
 }

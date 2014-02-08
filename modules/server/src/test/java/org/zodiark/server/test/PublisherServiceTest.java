@@ -46,6 +46,7 @@ import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_ERROR_REPORT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_PUBLIC_MODE;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_PUBLIC_MODE_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_END;
@@ -485,6 +486,35 @@ public class PublisherServiceTest {
 
         // UC6
         em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_PUBLIC_MODE, ""));
+        eventBus.ioEvent(em, RESOURCE);
+
+        assertNull(writer.error.get());
+        assertEquals(writer.e.size(), 5);
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.SHOWID, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+    }
+
+    @Test
+    public void uc21Test() throws Exception {
+        EventBus eventBus = EventBusFactory.getDefault().eventBus();
+
+        Writer writer = new Writer();
+        RESOURCE.getRequest().header(HeaderConfig.X_ATMOSPHERE_TRACKING_ID, UUID);
+        RESOURCE.getResponse().asyncIOWriter(writer);
+
+        // UC1
+        Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_PUBLISHER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
+        eventBus.ioEvent(em, RESOURCE);
+
+        // UC2
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SHOW_START, RestServiceTest.SESSION_CREATE));
+        eventBus.ioEvent(em, RESOURCE);
+
+        // UC6
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_PUBLIC_MODE_END, ""));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());

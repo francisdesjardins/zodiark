@@ -29,7 +29,7 @@ public interface StreamingSession {
     /**
      * The type of Session.
      */
-    enum TYPE { PUBLIC, PRIVATE, PROTECTED, SHARED_PRIVATE, VIEW}
+    enum TYPE { OFF, PUBLIC, PRIVATE, PROTECTED, SHARED_PRIVATE, VIEW}
 
     /**
      * Execute an {@link Action}
