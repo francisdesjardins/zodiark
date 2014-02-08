@@ -23,6 +23,7 @@ import org.zodiark.server.annotation.Retrieve;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.util.RestService;
 
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_ACTIONS;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_PUBLIC_MODE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_PUT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW;
@@ -31,7 +32,8 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT;
 @Retrieve({DB_PUBLISHER_SAVE_CONFIG_SHOW,
            DB_PUBLISHER_SAVE_CONFIG_PUT,
            DB_PUBLISHER_PUBLIC_MODE,
-           DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT})
+           DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT,
+           DB_PUBLISHER_ACTIONS})
 public class PutStatusService extends DBServiceAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(PutStatusService.class);

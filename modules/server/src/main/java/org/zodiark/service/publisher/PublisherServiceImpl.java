@@ -46,6 +46,7 @@ import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSSTHROUGH;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_ONDEMAND_END;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_ONDEMAND_START;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_ACTIONS;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_ERROR_REPORT;
@@ -151,9 +152,16 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             case DB_PUBLISHER_PUBLIC_MODE_END:
                 publisherPublicMode(path, e);
                 break;
+            case DB_PUBLISHER_ACTIONS:
+                savesAction(path, e);
+                break;
             default:
                 throw new IllegalStateException("Invalid Message Path " + path);
         }
+    }
+
+    private void savesAction(String path, Envelope e) {
+        statusEvent(path, e);
     }
 
     private void publisherPublicMode(final String path, final Envelope e) {
