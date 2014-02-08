@@ -64,6 +64,7 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_GET;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_BLOCK;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_EJECT;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
@@ -95,7 +96,8 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     @Override
     public void reactTo(Envelope e, AtmosphereResource r, Reply reply) {
         logger.trace("Handling Publisher Envelop {} to Service {}", e, r.uuid());
-        switch (e.getMessage().getPath()) {
+        String path = e.getMessage().getPath();
+        switch (path) {
             case DB_POST_PUBLISHER_SESSION_CREATE:
                 createSession(e, r);
                 break;
@@ -133,7 +135,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                 getMotd(e, r);
                 break;
             case DB_PUBLISHER_SUBSCRIBER_PROFILE:
-                getSubscriberProfile(e, r);
+                getOrUpdateSubscriberProfile(path, e);
                 break;
             case DB_PUBLISHER_SHARED_PRIVATE_START:
                 sharedPrivateSession(e, r);
@@ -143,21 +145,21 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                 break;
             case DB_SUBSCRIBER_EJECT:
             case DB_SUBSCRIBER_BLOCK:
-                validateAndStatusEvent(e.getMessage().getPath(), e);
+                validateAndStatusEvent(path, e);
                 break;
             case DB_PUBLISHER_PUBLIC_MODE:
             case DB_PUBLISHER_PUBLIC_MODE_END:
-                publisherPublicMode(e.getMessage().getPath(), e);
+                publisherPublicMode(path, e);
                 break;
             default:
-                throw new IllegalStateException("Invalid Message Path " + e.getMessage().getPath());
+                throw new IllegalStateException("Invalid Message Path " + path);
         }
     }
 
     private void publisherPublicMode(final String path, final Envelope e) {
 
         final PublisherEndpoint p = retrieve(e.getUuid());
-        if (!validateAll(p, e));
+        if (!validateAll(p, e)) ;
 
         statusEvent(path, e, p, new Reply<Status>() {
             @Override
@@ -183,11 +185,24 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     private void validateAndStatusEvent(String path, Envelope e) {
 
         final PublisherEndpoint p = retrieve(e.getUuid());
+        if (!validate(p, e)) return;
+
         String[] paths = e.getMessage().getPath().split("/");
 
+        boolean subscriberOk = validateSubscriberState(paths[5], p);
+
+        // TODO: Validate Subscriber
+//        if (!isValid.get()) {
+//            error(e, p, constructMessage("/error", "No Subscriber for " + paths[5]));
+//        }
+
+        statusEvent(path, e);
+    }
+
+    private boolean validateSubscriberState(String subscriberId, final PublisherEndpoint p) {
         final AtomicBoolean isValid = new AtomicBoolean();
         // DAangerous if the path change.
-        eventBus.message(RETRIEVE_SUBSCRIBER, paths[5], new Reply<SubscriberEndpoint>() {
+        eventBus.message(RETRIEVE_SUBSCRIBER, subscriberId, new Reply<SubscriberEndpoint>() {
             @Override
             public void ok(SubscriberEndpoint s) {
                 isValid.set(s.publisherEndpoint().equals(p));
@@ -198,13 +213,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                 logger.error("No Endpoint");
             }
         });
-
-        // TODO: Validate Subscriber
-//        if (!isValid.get()) {
-//            error(e, p, constructMessage("/error", "No Subscriber for " + paths[5]));
-//        }
-
-        statusEvent(path, e);
+        return isValid.get();
     }
 
     private void endSharedPrivateSession(Envelope e, AtmosphereResource r) {
@@ -215,9 +224,23 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         statusEvent(DB_PUBLISHER_SHARED_PRIVATE_START_POST, e);
     }
 
-    private void getSubscriberProfile(Envelope e, AtmosphereResource r) {
-        // TODO: UC15
-        passthroughEvent(DB_PUBLISHER_SUBSCRIBER_PROFILE_GET, e);
+    private void getOrUpdateSubscriberProfile(String path, Envelope e) {
+        Message m = e.getMessage();
+        if (!m.hasData()) {
+            // TODO: UC15
+            passthroughEvent(DB_PUBLISHER_SUBSCRIBER_PROFILE_GET, e);
+        } else {
+            String[] paths = path.split("/");
+
+            PublisherEndpoint p = retrieve(e.getUuid());
+            if (!validate(p, e)) return;
+
+            // TODO: Validate Subscriber
+            boolean subscriberOk = validateSubscriberState(paths[5], p);
+
+            statusEvent(DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT, e, p);
+        }
+
     }
 
     private void getMotd(Envelope e, AtmosphereResource r) {
@@ -256,7 +279,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 
     private void statusEvent(final String path, final Envelope e, final PublisherEndpoint p) {
 
-        if (!validateAll(p, e));
+        if (!validateAll(p, e)) ;
 
         statusEvent(path, e, p, new Reply<Status>() {
             @Override
@@ -277,9 +300,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     }
 
     private void passthroughEvent(final String path, final Envelope e) {
-        String uuid = e.getUuid();
-        final PublisherEndpoint p = endpoints.get(uuid);
-        passthroughEvent(path, e, p);
+        passthroughEvent(path, e, retrieve(e.getUuid()));
     }
 
     private void passthroughEvent(final String path, final Envelope e, final PublisherEndpoint p) {

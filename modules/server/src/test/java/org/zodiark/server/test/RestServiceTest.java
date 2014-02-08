@@ -45,7 +45,7 @@ public class RestServiceTest {
     public static final String AUTHTOKEN = "{\"username\": \"foo\", \"password\":\"12345\", \"ip\": \"127.0.0.1\", \"referrer\":\"zzzz\"}";
     public static final String PUBLISHER_ERROR = "{\"source\":\"xxx\",\"error\":\"xxx\",\"info\":\"xxx\"}";
     public static final String CONFIG = "{\"colorPerformer\":\"xxx\",\"colorClient\":\"xxx\",\"colorAdmin\":\"xxx\",\"colorSystem\":\"xxx\",\"colorVip\":\"xxx\",\"fontSizeChat\":\"xxx\",\"fontSizeMenu\":\"xxx\",\"shortcut1\":\"xxx\",\"shortcut2\":\"xxx\",\"shortcut3\":\"xxx\",\"shortcut4\":\"xxx\",\"shortcut5\":\"xxx\",\"shortcut6\":\"xxx\",\"shortcut7\":\"xxx\",\"shortcut8\":\"xxx\",\"shortcut9\":\"xxx\",\"shortcut10\":\"xxx\",\"welcomeMessage\":\"xxx\"}\n";
-
+    public static final String PROFILE = "{\"profileFullname\":\"xxx\",\"profileAge\":\"xxx\",\"profileGender\":\"xxx\",\"profileNote\":\"xxx\"}";
     @Test
     public void createPublisherService() throws IllegalAccessException, InstantiationException {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
@@ -758,7 +758,7 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
-        restService.put(Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE.replace("@guid", UUID.randomUUID().toString()), "{\"profileFullname\":\"xxx\",\"profileAge\":\"xxx\",\"profileGender\":\"xxx\",\"profileNote\":\"xxx\"}",
+        restService.put(Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE.replace("@guid", UUID.randomUUID().toString()), PROFILE,
                 new RestService.Reply<Status, DBError>() {
                     @Override
                     public void success(Status success) {

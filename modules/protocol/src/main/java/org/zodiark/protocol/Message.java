@@ -58,6 +58,10 @@ public class Message {
         return this;
     }
 
+    public boolean hasData() {
+        return data != null && !data.isEmpty() && !data.equalsIgnoreCase("null");
+    }
+
     @Override
     public String toString() {
         return "{" +

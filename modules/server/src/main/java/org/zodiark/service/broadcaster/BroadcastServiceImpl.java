@@ -43,7 +43,6 @@ import static org.atmosphere.cpr.ApplicationConfig.SUSPENDED_ATMOSPHERE_RESOURCE
 import static org.zodiark.protocol.Paths.BROADCASTER_CREATE;
 import static org.zodiark.protocol.Paths.BROADCASTER_TRACK;
 import static org.zodiark.protocol.Paths.BROADCAST_TO_ALL;
-import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSSTHROUGH;
 
 /**
  * Create {@link Broadcaster}, or channel, used by {@link PublisherEndpoint} and {@link SubscriberEndpoint} to communicate.
@@ -135,18 +134,18 @@ public class BroadcastServiceImpl implements BroadcasterService {
         AtmosphereFramework f = r.getAtmosphereConfig().framework();
         final Broadcaster b = f.getBroadcasterFactory().lookup("/chat/" + uuid, true);
 
-        eventBus.message(DB_GET_WORD_PASSSTHROUGH, p, new Reply<BroadcasterDBResult>() {
-
-            @Override
-            public void ok(BroadcasterDBResult result) {
-                b.getBroadcasterConfig().addFilter(new WordBroadcastFilter(result));
-            }
-
-            @Override
-            public void fail(BroadcasterDBResult result) {
-                logger.error("{}", result);
-            }
-        });
+//        eventBus.message(DB_GET_WORD_PASSSTHROUGH, p, new Reply<BroadcasterDBResult>() {
+//
+//            @Override
+//            public void ok(BroadcasterDBResult result) {
+//                b.getBroadcasterConfig().addFilter(new WordBroadcastFilter(result));
+//            }
+//
+//            @Override
+//            public void fail(BroadcasterDBResult result) {
+//                logger.error("{}", result);
+//            }
+//        });
         r.setBroadcaster(b);
 
         r.getRequest().setAttribute(SUSPENDED_ATMOSPHERE_RESOURCE_UUID, null);
