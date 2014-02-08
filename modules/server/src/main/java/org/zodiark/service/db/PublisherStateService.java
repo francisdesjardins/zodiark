@@ -18,11 +18,12 @@ package org.zodiark.service.db;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
-import javax.inject.Inject;
 import org.zodiark.server.annotation.Retrieve;
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.config.PublisherState;
 import org.zodiark.service.util.RestService;
+
+import javax.inject.Inject;
 
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG;
 
@@ -39,27 +40,26 @@ public class PublisherStateService extends DBServiceAdapter {
     public RestService restService;
 
     @Override
-    public void reactTo(String path, Object message,final  Reply reply) {
+    public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
 
-        if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
-            final EndpointAdapter p = EndpointAdapter.class.cast(message);
-            restService.get(DB_PUBLISHER_CONFIG.replace("@guid", p.uuid()), new RestService.Reply<PublisherState, DBError>() {
-                @Override
-                public void success(PublisherState config) {  p.config(config);
-                    reply.ok(p);
-                }
+        final EndpointAdapter p = EndpointAdapter.class.cast(message);
+        restService.get(DB_PUBLISHER_CONFIG.replace("@guid", p.uuid()), new RestService.Reply<PublisherState, DBError>() {
+            @Override
+            public void success(PublisherState config) {
+                p.config(config);
+                reply.ok(p);
+            }
 
-                @Override
-                public void failure(DBError failure) {
-                    reply.fail(p);
-                }
+            @Override
+            public void failure(DBError failure) {
+                reply.fail(p);
+            }
 
-                @Override
-                public void exception(Exception exception) {
-                    logger.error("", exception);
-                }
-            });
-        }
+            @Override
+            public void exception(Exception exception) {
+                logger.error("", exception);
+            }
+        });
     }
 }

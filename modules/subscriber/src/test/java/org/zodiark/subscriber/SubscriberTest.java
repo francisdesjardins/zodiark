@@ -101,7 +101,7 @@ public class SubscriberTest {
         }).open();
 
         Envelope createSessionMessage = Envelope.newClientToServerRequest(
-                new Message(new Path(Paths.CREATE_SUBSCRIBER_SESSION), mapper.writeValueAsString(new UserPassword("foo", "bar"))));
+                new Message(new Path(Paths.DB_POST_SUBSCRIBER_SESSION_CREATE), mapper.writeValueAsString(new UserPassword("foo", "bar"))));
         createSessionMessage.setFrom(new From(ActorValue.SUBSCRIBER));
         publisherClient.send(createSessionMessage);
         latch.await();
@@ -209,7 +209,7 @@ public class SubscriberTest {
         }).open();
 
         createSessionMessage = Envelope.newClientToServerRequest(subscriberUUID.get(),
-                new Message(new Path(Paths.CREATE_SUBSCRIBER_SESSION), mapper.writeValueAsString(new UserPassword("123456", "bar"))));
+                new Message(new Path(Paths.DB_POST_SUBSCRIBER_SESSION_CREATE), mapper.writeValueAsString(new UserPassword("123456", "bar"))));
         createSessionMessage.setFrom(new From(ActorValue.SUBSCRIBER));
         subscriberClient.send(createSessionMessage);
         platch.await();
@@ -396,7 +396,7 @@ public class SubscriberTest {
         // ================ Subscriber create the session
 
         createSessionMessage = Envelope.newClientToServerRequest( subscriberUUID.get(),
-                new Message(new Path(Paths.CREATE_SUBSCRIBER_SESSION), mapper.writeValueAsString(new UserPassword("123456", "bar"))));
+                new Message(new Path(Paths.DB_POST_SUBSCRIBER_SESSION_CREATE), mapper.writeValueAsString(new UserPassword("123456", "bar"))));
         createSessionMessage.setFrom(new From(ActorValue.SUBSCRIBER));
         subscriberClient.send(createSessionMessage);
         platch.await();

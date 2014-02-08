@@ -22,11 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
-import org.zodiark.protocol.Paths;
 import org.zodiark.server.Context;
+import org.zodiark.server.EndpointUtils;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
-import javax.inject.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.Session;
 import org.zodiark.service.action.Action;
@@ -34,16 +33,15 @@ import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.session.StreamingRequest;
 import org.zodiark.service.util.UUID;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.zodiark.protocol.Paths.ACTION_VALIDATE;
 import static org.zodiark.protocol.Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCASTER_TRACK;
-import static org.zodiark.protocol.Paths.CREATE_SUBSCRIBER_SESSION;
-import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_SESSION_CREATE;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.FAILED_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.JOIN_SUBSCRIBER_STREAMING_SESSION;
@@ -79,12 +77,18 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     @Inject
     public StreamingRequest requestClass;
 
+    private EndpointUtils<SubscriberEndpoint> utils;
+
+    @PostConstruct
+    public void init() {
+        utils = new EndpointUtils(eventBus, mapper, endpoints);
+    }
+
     @Override
     public void reactTo(Envelope e, AtmosphereResource r, Reply reply) {
         logger.trace("Handling Subscriber Envelop {} to Service {}", e, r.uuid());
-
-        // TODO: One service per Path instead?
-        switch (e.getMessage().getPath()) {
+        String path = e.getMessage().getPath();
+        switch (path) {
             case DB_POST_SUBSCRIBER_SESSION_CREATE:
                 createSession(e, r);
                 break;
@@ -115,7 +119,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     public void connectEndpoint(Envelope e, AtmosphereResource r) {
         logger.info("Subscriber Connected {}", e);
         SubscriberEndpoint s = createEndpoint(r, e.getMessage());
-        response(e, s, constructMessage(SUBSCRIBER_BROWSER_HANDSHAKE_OK, "OK"));
+        response(e, s, utils.constructMessage(SUBSCRIBER_BROWSER_HANDSHAKE_OK, "OK"));
     }
 
     @Override
@@ -134,12 +138,12 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
                 @Override
                 public void ok(Action action) {
                     logger.debug("Action Accepted for {}", action.getSubscriberUUID());
-                    response(e, endpoints.get(action.getSubscriberUUID()), constructMessage(ACTION_VALIDATE, "OK"));
+                    response(e, endpoints.get(action.getSubscriberUUID()), utils.constructMessage(ACTION_VALIDATE, "OK"));
                 }
 
                 @Override
                 public void fail(Action action) {
-                    error(e, s, constructMessage(ACTION_VALIDATE, "error"));
+                    error(e, s, utils.constructMessage(ACTION_VALIDATE, "error"));
                 }
             });
         } catch (IOException e1) {
@@ -152,7 +156,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         try {
             SubscriberResults result = mapper.readValue(e.getMessage().getData(), SubscriberResults.class);
             SubscriberEndpoint p = endpoints.get(result.getUuid());
-            error(e, p, constructMessage(ERROR_STREAMING_SESSION, "error"));
+            error(e, p, utils.constructMessage(ERROR_STREAMING_SESSION, "error"));
         } catch (IOException e1) {
             logger.warn("{}", e1);
         }
@@ -183,7 +187,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
 
                 @Override
                 public void fail(PublisherEndpoint p) {
-                    error(e, s, constructMessage(VALIDATE_SUBSCRIBER_STREAMING_SESSION, "error"));
+                    error(e, s, utils.constructMessage(VALIDATE_SUBSCRIBER_STREAMING_SESSION, "error"));
                 }
             });
         } catch (IOException e1) {
@@ -219,12 +223,12 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         eventBus.message(BEGIN_SUBSCRIBER_STREAMING_SESSION, s, new Reply<SubscriberEndpoint>() {
             @Override
             public void ok(SubscriberEndpoint s) {
-                response(e, s, constructMessage(BEGIN_SUBSCRIBER_STREAMING_SESSION, "OK"));
+                response(e, s, utils.constructMessage(BEGIN_SUBSCRIBER_STREAMING_SESSION, "OK"));
             }
 
             @Override
             public void fail(SubscriberEndpoint s) {
-                error(e, s, constructMessage(BEGIN_SUBSCRIBER_STREAMING_SESSION, "error"));
+                error(e, s, utils.constructMessage(BEGIN_SUBSCRIBER_STREAMING_SESSION, "error"));
             }
         });
     }
@@ -271,18 +275,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         if (s == null || !s.isAuthenticated()) {
             s = createEndpoint(r, e.getMessage());
             endpoints.put(uuid, s);
-            eventBus.message(DB_POST_PUBLISHER_SESSION_CREATE, s, new Reply<SubscriberEndpoint>() {
-                @Override
-                public void ok(SubscriberEndpoint s) {
-                    s.isAuthenticated(true);
-                    lookupConfig(e, s);
-                }
-
-                @Override
-                public void fail(SubscriberEndpoint s) {
-                    error(e, s, constructMessage(VALIDATE_SUBSCRIBER_STREAMING_SESSION, "error"));
-                }
-            });
+            utils.statusEvent(DB_POST_SUBSCRIBER_SESSION_CREATE, e, s);
         } else {
             error(e, r, new Message().setPath("/error").setData("unauthorized"));
         }
@@ -291,39 +284,13 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
 
     @Override
     public void error(Envelope e, SubscriberEndpoint endpoint, Message m) {
-        AtmosphereResource r = endpoint.resource();
-        error(e, r, m);
+        utils.error(e, endpoint, m);
     }
 
     @Override
     public void error(Envelope e, AtmosphereResource r, Message m) {
-        Envelope error = Envelope.newServerReply(e, m);
-        eventBus.ioEvent(error, r);
+        utils.error(e, r, m);
     }
 
-    private void lookupConfig(final Envelope e, SubscriberEndpoint p) {
-        eventBus.message(DB_PUBLISHER_CONFIG, p, new Reply<SubscriberEndpoint>() {
-            @Override
-            public void ok(SubscriberEndpoint p) {
-                response(e, p, constructMessage(CREATE_SUBSCRIBER_SESSION, "OK"));
-            }
-
-            @Override
-            public void fail(SubscriberEndpoint p) {
-                error(e, p, constructMessage(VALIDATE_SUBSCRIBER_STREAMING_SESSION, "error"));
-            }
-        });
-    }
-
-    Message constructMessage(String path, String status) {
-        Message m = new Message();
-        m.setPath(path);
-        try {
-            m.setData(mapper.writeValueAsString(new SubscriberResults(status)));
-        } catch (JsonProcessingException e1) {
-            logger.warn("{}", e1);
-        }
-        return m;
-    }
 
 }

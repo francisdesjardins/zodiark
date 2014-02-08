@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Retrieve;
-import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.util.RestService;
 
@@ -38,27 +37,25 @@ public class ShowStartService extends DBServiceAdapter {
     @Override
     public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
-        if (EndpointAdapter.class.isAssignableFrom(message.getClass())) {
-            final PublisherEndpoint p = PublisherEndpoint.class.cast(message);
-            restService.post(DB_PUBLISHER_SHOW_START.replace("@guid",p.uuid()),
-                    p.message(), new RestService.Reply<ShowId, DBError>() {
-                @Override
-                public void success(ShowId success) {
-                    reply.ok(p.showId(success));
-                }
+        final PublisherEndpoint p = PublisherEndpoint.class.cast(message);
+        restService.post(DB_PUBLISHER_SHOW_START.replace("@guid", p.uuid()),
+                p.message(), new RestService.Reply<ShowId, DBError>() {
+            @Override
+            public void success(ShowId success) {
+                reply.ok(p.showId(success));
+            }
 
-                @Override
-                public void failure(DBError failure) {
-                    reply.fail(p);
-                }
+            @Override
+            public void failure(DBError failure) {
+                reply.fail(p);
+            }
 
-                @Override
-                public void exception(Exception exception) {
-                    logger.trace("", exception);
-                    reply.fail(p);
-                }
-            });
+            @Override
+            public void exception(Exception exception) {
+                logger.trace("", exception);
+                reply.fail(p);
+            }
+        });
 
-        }
     }
 }

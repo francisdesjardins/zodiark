@@ -22,7 +22,6 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
-import javax.inject.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.action.Action;
 import org.zodiark.service.config.PublisherState;
@@ -34,6 +33,7 @@ import org.zodiark.service.session.impl.SharedPrivateStreamingSession;
 import org.zodiark.service.session.impl.ViewStreamingSession;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 
+import javax.inject.Inject;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.zodiark.protocol.Paths.BEGIN_STREAMING_SESSION;

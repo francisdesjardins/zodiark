@@ -35,9 +35,9 @@ public class EndpointUtils<T extends EndpointAdapter> {
 
     private final EventBus eventBus;
     private final ObjectMapper mapper;
-    private final ConcurrentHashMap<String,T> endpoints;
+    private final ConcurrentHashMap<String, T> endpoints;
 
-    public EndpointUtils(EventBus eventBus, ObjectMapper mapper, ConcurrentHashMap<String,T> endpoints) {
+    public EndpointUtils(EventBus eventBus, ObjectMapper mapper, ConcurrentHashMap<String, T> endpoints) {
         this.eventBus = eventBus;
         this.mapper = mapper;
         this.endpoints = endpoints;
@@ -132,6 +132,9 @@ public class EndpointUtils<T extends EndpointAdapter> {
 
     public void error(Envelope e, T endpoint, Message m) {
         AtmosphereResource r = endpoint.resource();
+
+        // TODO: Validate
+        endpoints.remove(endpoint);
         error(e, r, m);
     }
 

@@ -18,17 +18,18 @@ package org.zodiark.service.db;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
-import javax.inject.Inject;
 import org.zodiark.server.annotation.Retrieve;
+import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.db.util.PassthroughReply;
-import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.util.RestService;
+
+import javax.inject.Inject;
 
 import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSSTHROUGH;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_GET;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_GET;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_GET;
 
 @Retrieve({DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT,
@@ -47,7 +48,7 @@ public class GetPassthoughService extends DBServiceAdapter {
     @Override
     public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
-        final PublisherEndpoint p = PublisherEndpoint.class.cast(message);
+        final EndpointAdapter p = EndpointAdapter.class.cast(message);
         restService.get(path.replace("@guid", p.uuid()), new PassthroughReply(reply));
     }
 }

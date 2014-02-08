@@ -27,7 +27,7 @@ public interface Paths {
     /**
      * An I/O event sent Create the SubscriberEndpoint's Session
      */
-    String CREATE_SUBSCRIBER_SESSION = "/subscriber/createUserSession";
+    String DB_POST_SUBSCRIBER_SESSION_CREATE = "/v1/subscriber/@guid/session/create";
     /**
      * An I/O event to create or prepare the Streaming Session by load the data from the dabatase/web service, and by requesting
      * access to a remote Wowza Endpoint.
@@ -209,12 +209,6 @@ public interface Paths {
      * A message to Initialize an Endpoint Session within the remote database/web service endpoint.
      */
     String DB_POST_PUBLISHER_SESSION_CREATE = "/v1/publisher/@guid/session/create";
-
-    /**
-     * A message to Initialize an Endpoint Session within the remote database/web service endpoint.
-     */
-    String DB_POST_SUBSCRIBER_SESSION_CREATE = "/v1/subscriber/@guid/publisher/@guid/session/create";
-
 
     /**
      * A Message to retrieve the list of banned word for a Streaming Session Chat.

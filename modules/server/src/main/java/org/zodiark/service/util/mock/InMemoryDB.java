@@ -118,6 +118,8 @@ public class InMemoryDB {
 
         put.put(replace(Paths.DB_ENDPOINT_STATE), TRANSACTION_ID);
 
+        post.put(replace(Paths.DB_POST_SUBSCRIBER_SESSION_CREATE), STATUS_OK);
+
         put.put(replace(Paths.DB_SUBSCRIBER_CONFIG_PASSTHROUGHT), PASSTHROUGH);
     }
 
