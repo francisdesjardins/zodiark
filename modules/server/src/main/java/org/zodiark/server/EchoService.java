@@ -19,7 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.zodiark.protocol.Envelope;
-import org.zodiark.server.annotation.Inject;
+import javax.inject.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.Service;
 

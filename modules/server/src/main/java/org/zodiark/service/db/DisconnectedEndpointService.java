@@ -18,10 +18,11 @@ package org.zodiark.service.db;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
-import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.util.RestService;
+
+import javax.inject.Inject;
 
 /**
  * Disconnect the {@link org.zodiark.service.Endpoint} by calling the remote Database/Web Service.

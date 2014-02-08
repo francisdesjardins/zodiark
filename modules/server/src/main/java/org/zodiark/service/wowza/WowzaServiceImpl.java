@@ -26,7 +26,7 @@ import org.zodiark.protocol.Paths;
 import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
-import org.zodiark.server.annotation.Inject;
+import javax.inject.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.publisher.PublisherEndpoint;

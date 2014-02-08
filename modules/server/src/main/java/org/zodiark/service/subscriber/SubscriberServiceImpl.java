@@ -22,10 +22,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
+import org.zodiark.protocol.Paths;
 import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
-import org.zodiark.server.annotation.Inject;
+import javax.inject.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.Session;
 import org.zodiark.service.action.Action;
@@ -41,6 +42,7 @@ import static org.zodiark.protocol.Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCASTER_TRACK;
 import static org.zodiark.protocol.Paths.CREATE_SUBSCRIBER_SESSION;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
+import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.FAILED_SUBSCRIBER_STREAMING_SESSION;
@@ -83,7 +85,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
 
         // TODO: One service per Path instead?
         switch (e.getMessage().getPath()) {
-            case CREATE_SUBSCRIBER_SESSION:
+            case DB_POST_SUBSCRIBER_SESSION_CREATE:
                 createSession(e, r);
                 break;
             case VALIDATE_SUBSCRIBER_STREAMING_SESSION:
@@ -263,11 +265,11 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     @Override
-    public SubscriberEndpoint createSession(final Envelope e, AtmosphereResource resource) {
+    public SubscriberEndpoint createSession(final Envelope e, AtmosphereResource r) {
         String uuid = e.getUuid();
         SubscriberEndpoint s = endpoints.get(uuid);
         if (s == null || !s.isAuthenticated()) {
-            s = createEndpoint(resource, e.getMessage());
+            s = createEndpoint(r, e.getMessage());
             endpoints.put(uuid, s);
             eventBus.message(DB_POST_PUBLISHER_SESSION_CREATE, s, new Reply<SubscriberEndpoint>() {
                 @Override
@@ -282,7 +284,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
                 }
             });
         } else {
-            logger.error("Subscriber Hacking Identity {}", s);
+            error(e, r, new Message().setPath("/error").setData("unauthorized"));
         }
         return s;
     }

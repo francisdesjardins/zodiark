@@ -15,12 +15,12 @@
  */
 package org.zodiark.service.publisher;
 
-import org.zodiark.server.annotation.Inject;
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.action.Action;
 import org.zodiark.service.config.PublisherState;
 import org.zodiark.service.db.ShowId;
 
+import javax.inject.Inject;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**

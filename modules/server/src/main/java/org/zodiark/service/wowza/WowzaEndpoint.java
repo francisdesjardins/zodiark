@@ -24,7 +24,7 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.protocol.Paths;
 import org.zodiark.server.Reply;
-import org.zodiark.server.annotation.Inject;
+import javax.inject.Inject;
 import org.zodiark.service.Endpoint;
 import org.zodiark.service.session.StreamingSession;
 import org.zodiark.service.subscriber.SubscriberEndpoint;

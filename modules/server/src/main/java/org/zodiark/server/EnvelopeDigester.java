@@ -31,7 +31,7 @@ import org.zodiark.protocol.Path;
 import org.zodiark.protocol.Protocol;
 import org.zodiark.protocol.To;
 import org.zodiark.protocol.TraceId;
-import org.zodiark.server.annotation.Inject;
+import javax.inject.Inject;
 
 import java.io.IOException;
 import java.util.HashMap;

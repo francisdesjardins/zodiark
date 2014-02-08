@@ -18,7 +18,7 @@ package org.zodiark.service.db;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
-import org.zodiark.server.annotation.Inject;
+import javax.inject.Inject;
 import org.zodiark.server.annotation.Retrieve;
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.db.util.StatusReply;

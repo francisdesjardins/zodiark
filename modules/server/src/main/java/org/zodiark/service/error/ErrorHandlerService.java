@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.Reply;
-import org.zodiark.server.annotation.Inject;
+import javax.inject.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.Service;
 

@@ -25,7 +25,7 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
-import org.zodiark.server.annotation.Inject;
+import javax.inject.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.publisher.PublisherResults;

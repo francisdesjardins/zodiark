@@ -19,9 +19,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Context;
-import org.zodiark.server.annotation.Inject;
 import org.zodiark.service.util.RestService;
 
+import javax.inject.Inject;
 import java.lang.reflect.Method;
 
 import static org.zodiark.service.util.mock.OKRestService.METHOD.DELETE;

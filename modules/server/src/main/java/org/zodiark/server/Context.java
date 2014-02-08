@@ -16,7 +16,7 @@
 package org.zodiark.server;
 
 /**
- * A class that can be injected, using the {@link org.zodiark.server.annotation.Inject} annotation and used for delegating
+ * A class that can be injected, using the {@link javax.inject.Inject} annotation and used for delegating
  * class' creation by the {@link ZodiarkObjectFactory}
  */
 public interface Context {

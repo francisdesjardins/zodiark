@@ -21,7 +21,6 @@ import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereObjectFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zodiark.server.annotation.Inject;
 import org.zodiark.service.config.AuthConfig;
 import org.zodiark.service.config.PublisherState;
 import org.zodiark.service.config.SubscriberConfig;
@@ -35,7 +34,11 @@ import org.zodiark.service.util.mock.OKRestService;
 import org.zodiark.service.wowza.WowzaEndpointManager;
 import org.zodiark.service.wowza.WowzaEndpointManagerImpl;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -180,6 +183,17 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
                     field.set(instance, inject(StreamingRequest.class));
                 } else if (field.getType().isAssignableFrom(ScheduledExecutorService.class)) {
                     field.set(instance, timer);
+                }
+            }
+        }
+
+        Method[] methods = tClass.getMethods();
+        for (Method m : methods) {
+            if (m.isAnnotationPresent(PostConstruct.class)) {
+                try {
+                    m.invoke(instance);
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }

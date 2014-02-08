@@ -25,10 +25,11 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.protocol.Paths;
 import org.zodiark.server.Context;
+import org.zodiark.server.EndpointUtils;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
-import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.On;
+import org.zodiark.service.Error;
 import org.zodiark.service.Session;
 import org.zodiark.service.db.Passthrough;
 import org.zodiark.service.db.Status;
@@ -36,6 +37,8 @@ import org.zodiark.service.session.StreamingSession;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 import org.zodiark.service.wowza.WowzaUUID;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -93,6 +96,13 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 
     @Inject
     public Context context;
+
+    private EndpointUtils<PublisherEndpoint> utils;
+
+    @PostConstruct
+    public void init() {
+        utils = new EndpointUtils(eventBus, mapper, endpoints);
+    }
 
     @Override
     public void reactTo(Envelope e, AtmosphereResource r, Reply reply) {
@@ -161,15 +171,15 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     }
 
     private void savesAction(String path, Envelope e) {
-        statusEvent(path, e);
+        utils.statusEvent(path, e);
     }
 
     private void publisherPublicMode(final String path, final Envelope e) {
 
-        final PublisherEndpoint p = retrieve(e.getUuid());
-        if (!validateAll(p, e)) ;
+        final PublisherEndpoint p = utils.retrieve(e.getUuid());
+        if (!utils.validateAll(p, e)) ;
 
-        statusEvent(path, e, p, new Reply<Status>() {
+        utils.statusEvent(path, e, p, new Reply<Status>() {
             @Override
             public void ok(Status status) {
                 logger.trace("Status {}", status);
@@ -180,31 +190,31 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                 } else {
                     p.state().sessionType(StreamingSession.TYPE.OFF);
                 }
-                response(e, p, constructMessage(path, writeAsString(status)));
+                response(e, p, utils.constructMessage(path, utils.writeAsString(status)));
             }
 
             @Override
             public void fail(Status status) {
-                error(e, p, constructMessage(path, writeAsString(new Error().error("Unauthorized"))));
+                error(e, p, utils.constructMessage(path, utils.writeAsString(new org.zodiark.service.Error().error("Unauthorized"))));
             }
         });
     }
 
     private void validateAndStatusEvent(String path, Envelope e) {
 
-        final PublisherEndpoint p = retrieve(e.getUuid());
-        if (!validate(p, e)) return;
+        final PublisherEndpoint p = utils.retrieve(e.getUuid());
+        if (!utils.validate(p, e)) return;
 
         String[] paths = e.getMessage().getPath().split("/");
 
         boolean subscriberOk = validateSubscriberState(paths[5], p);
 
-        // TODO: Validate Subscriber
+        // TODO: utils.validate Subscriber
 //        if (!isValid.get()) {
-//            error(e, p, constructMessage("/error", "No Subscriber for " + paths[5]));
+//            error(e, p, utils.constructMessage("/error", "No Subscriber for " + paths[5]));
 //        }
 
-        statusEvent(path, e);
+        utils.statusEvent(path, e);
     }
 
     private boolean validateSubscriberState(String subscriberId, final PublisherEndpoint p) {
@@ -225,109 +235,58 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     }
 
     private void endSharedPrivateSession(Envelope e, AtmosphereResource r) {
-        statusEvent(DB_PUBLISHER_SHARED_PRIVATE_END, e);
+        utils.statusEvent(DB_PUBLISHER_SHARED_PRIVATE_END, e);
     }
 
     private void sharedPrivateSession(Envelope e, AtmosphereResource r) {
-        statusEvent(DB_PUBLISHER_SHARED_PRIVATE_START_POST, e);
+        utils.statusEvent(DB_PUBLISHER_SHARED_PRIVATE_START_POST, e);
     }
 
     private void getOrUpdateSubscriberProfile(String path, Envelope e) {
         Message m = e.getMessage();
         if (!m.hasData()) {
             // TODO: UC15
-            passthroughEvent(DB_PUBLISHER_SUBSCRIBER_PROFILE_GET, e);
+            utils.passthroughEvent(DB_PUBLISHER_SUBSCRIBER_PROFILE_GET, e);
         } else {
             String[] paths = path.split("/");
 
-            PublisherEndpoint p = retrieve(e.getUuid());
-            if (!validate(p, e)) return;
+            PublisherEndpoint p = utils.retrieve(e.getUuid());
+            if (!utils.validate(p, e)) return;
 
-            // TODO: Validate Subscriber
+            // TODO: utils.validate Subscriber
             boolean subscriberOk = validateSubscriberState(paths[5], p);
 
-            statusEvent(DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT, e, p);
+            utils.statusEvent(DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT, e, p);
         }
 
     }
 
     private void getMotd(Envelope e, AtmosphereResource r) {
-        passthroughEvent(DB_GET_WORD_PASSSTHROUGH, e);
+        utils.passthroughEvent(DB_GET_WORD_PASSSTHROUGH, e);
     }
 
     private void onDemandEnd(Envelope e, AtmosphereResource r) {
-        statusEvent(DB_POST_PUBLISHER_ONDEMAND_END, e);
+        utils.statusEvent(DB_POST_PUBLISHER_ONDEMAND_END, e);
     }
 
     private void onDemandStart(Envelope e, AtmosphereResource r) {
-        statusEvent(DB_POST_PUBLISHER_ONDEMAND_START, e);
+        utils.statusEvent(DB_POST_PUBLISHER_ONDEMAND_START, e);
     }
 
     public void saveConfig(final Envelope e, AtmosphereResource r) {
-        statusEvent(DB_PUBLISHER_SAVE_CONFIG_PUT, e);
+        utils.statusEvent(DB_PUBLISHER_SAVE_CONFIG_PUT, e);
     }
 
     public void loadShow(final Envelope e, AtmosphereResource r) {
-        passthroughEvent(DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT, e);
+        utils.passthroughEvent(DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT, e);
     }
 
     public void reportError(final Envelope e, AtmosphereResource r) {
-        statusEvent(DB_PUBLISHER_ERROR_REPORT, e);
+        utils.statusEvent(DB_PUBLISHER_ERROR_REPORT, e);
     }
 
     public void savePublisherShowType(final Envelope e, AtmosphereResource r) {
-        statusEvent(DB_PUBLISHER_SAVE_CONFIG_SHOW, e);
-    }
-
-    private void statusEvent(final String path, final Envelope e) {
-        String uuid = e.getUuid();
-        final PublisherEndpoint p = endpoints.get(uuid);
-        statusEvent(path, e, p);
-    }
-
-    private void statusEvent(final String path, final Envelope e, final PublisherEndpoint p) {
-
-        if (!validateAll(p, e)) ;
-
-        statusEvent(path, e, p, new Reply<Status>() {
-            @Override
-            public void ok(Status status) {
-                logger.trace("Status {}", status);
-                response(e, p, constructMessage(path, writeAsString(status)));
-            }
-
-            @Override
-            public void fail(Status status) {
-                error(e, p, constructMessage(path, writeAsString(new Error().error("Unauthorized"))));
-            }
-        });
-    }
-
-    private void statusEvent(final String path, final Envelope e, final PublisherEndpoint p, Reply<Status> r) {
-        eventBus.message(path, p, r);
-    }
-
-    private void passthroughEvent(final String path, final Envelope e) {
-        passthroughEvent(path, e, retrieve(e.getUuid()));
-    }
-
-    private void passthroughEvent(final String path, final Envelope e, final PublisherEndpoint p) {
-
-        if (!validate(p, e)) return;
-
-        if (!validateShowId(p, e)) return;
-
-        eventBus.message(path, p, new Reply<Passthrough>() {
-            @Override
-            public void ok(Passthrough passthrough) {
-                succesPassThrough(e, p, path, passthrough);
-            }
-
-            @Override
-            public void fail(Passthrough passthrough) {
-                failPassThrough(e, p, passthrough);
-            }
-        });
+        utils.statusEvent(DB_PUBLISHER_SAVE_CONFIG_SHOW, e);
     }
 
     /**
@@ -369,7 +328,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
      */
     @Override
     public void terminateStreamingSession(final Envelope e, AtmosphereResource r) {
-        statusEvent(DB_PUBLISHER_SHOW_END, e);
+        utils.statusEvent(DB_PUBLISHER_SHOW_END, e);
     }
 
     /**
@@ -377,9 +336,9 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
      */
     @Override
     public void createOrJoinStreamingSession(final Envelope e, AtmosphereResource r) {
-        PublisherEndpoint p = retrieve(e.getUuid());
+        PublisherEndpoint p = utils.retrieve(e.getUuid());
 
-        if (!validate(p, e)) return;
+        if (!utils.validate(p, e)) return;
 
         try {
             p.wowzaServerUUID(mapper.readValue(e.getMessage().getData(), WowzaUUID.class).getUuid());
@@ -398,35 +357,10 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 
             @Override
             public void fail(PublisherEndpoint p) {
-                error(e, p, constructMessage(WOWZA_CONNECT, "error"));
+                error(e, p, utils.constructMessage(WOWZA_CONNECT, "error"));
             }
         });
     }
-
-    private boolean validate(PublisherEndpoint p, Envelope e) {
-        if (p == null) {
-            error(e, p, constructMessage("/error", writeAsString(new Error().error("Unauthorized"))));
-            return false;
-        }
-        return true;
-    }
-
-    private boolean validateShowId(PublisherEndpoint p, Envelope e) {
-        if (p == null) {
-            error(e, p, constructMessage("/error", writeAsString(new Error().error("Unauthorized"))));
-            return false;
-        }
-        return true;
-    }
-
-    private boolean validateAll(PublisherEndpoint p, Envelope e) {
-        if (!validate(p, e)) return false;
-
-        if (!validateShowId(p, e)) return false;
-
-        return true;
-    }
-
 
     /**
      * {@inheritDoc}
@@ -435,48 +369,27 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     public void startStreamingSession(final Envelope e, AtmosphereResource r) {
         String uuid = e.getUuid();
 
-        PublisherEndpoint p = retrieve(uuid);
-        if (!validate(p, e)) return;
+        PublisherEndpoint p = utils.retrieve(uuid);
+        if (!utils.validate(p, e)) return;
 
         eventBus.message(DB_PUBLISHER_SHOW_START, p, new Reply<PublisherEndpoint>() {
             @Override
             public void ok(PublisherEndpoint p) {
                 logger.trace("Publisher ready {}", p);
-                response(e, p, constructMessage(DB_PUBLISHER_SHOW_START, writeAsString(p.showId())));
+                response(e, p, utils.constructMessage(DB_PUBLISHER_SHOW_START, utils.writeAsString(p.showId())));
             }
 
             @Override
             public void fail(PublisherEndpoint p) {
                 // TODO: Wrong error message
-                error(e, p, constructMessage(DB_PUBLISHER_SHOW_START, writeAsString(new Error().error("Unauthorized"))));
+                error(e, p, utils.constructMessage(DB_PUBLISHER_SHOW_START, utils.writeAsString(new Error().error("Unauthorized"))));
             }
         }).message(BROADCASTER_CREATE, p);
     }
 
-    Message constructMessage(String path, String status) {
-        Message m = new Message();
-        m.setPath(path);
-        m.setData(status);
-        return m;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void response(Envelope e, PublisherEndpoint endpoint, Message m) {
-        AtmosphereResource r = endpoint.resource();
-        Envelope newResponse = Envelope.newServerReply(e, m);
-        try {
-            r.write(mapper.writeValueAsString(newResponse));
-        } catch (JsonProcessingException e1) {
-            logger.debug("Unable to write {} {}", endpoint, m);
-        }
-    }
-
-    PublisherEndpoint retrieve(String uuid) {
-        PublisherEndpoint p = endpoints.get(uuid);
-        return p;
+        utils.response(e, endpoint, m);
     }
 
     /**
@@ -534,32 +447,32 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                     eventBus.message(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, p, new Reply<Passthrough>() {
                         @Override
                         public void ok(Passthrough passthrough) {
-                            succesPassThrough(e, p, DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, passthrough);
+                            utils.succesPassThrough(e, p, DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, passthrough);
 
                             eventBus.message(DB_PUBLISHER_LOAD_CONFIG_GET, p, new Reply<Passthrough>() {
                                 @Override
                                 public void ok(Passthrough passthrough) {
-                                    succesPassThrough(e, p, DB_PUBLISHER_LOAD_CONFIG, passthrough);
-                                    passthroughEvent(DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT, e, p);
+                                    utils.succesPassThrough(e, p, DB_PUBLISHER_LOAD_CONFIG, passthrough);
+                                    utils.passthroughEvent(DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT, e, p);
                                 }
 
                                 @Override
                                 public void fail(Passthrough passthrough) {
-                                    failPassThrough(e, p, passthrough);
+                                    utils.failPassThrough(e, p, passthrough);
                                 }
                             });
                         }
 
                         @Override
                         public void fail(Passthrough passthrough) {
-                            failPassThrough(e, p, passthrough);
+                            utils.failPassThrough(e, p, passthrough);
                         }
                     });
                 }
 
                 @Override
                 public void fail(PublisherEndpoint p) {
-                    error(e, p, constructMessage(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, "error"));
+                    error(e, p, utils.constructMessage(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, "error"));
                 }
             });
         }
@@ -574,39 +487,15 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         return p;
     }
 
-    private void succesPassThrough(Envelope e, PublisherEndpoint p, String path, Passthrough passthrough) {
-        logger.trace("Passthrough succeed {}", passthrough);
-        response(e, p, constructMessage(path, passthrough.response()));
-    }
-
-    private void failPassThrough(Envelope e, PublisherEndpoint p, Passthrough passthrough) {
-        logger.trace("Passthrough failed {}", passthrough);
-        error(e, p, constructMessage(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, passthrough.exception().getMessage()));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void error(Envelope e, PublisherEndpoint endpoint, Message m) {
-        AtmosphereResource r = endpoint.resource();
-        error(e, r, m);
+        utils.error(e, endpoint, m);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void error(Envelope e, AtmosphereResource r, Message m) {
-        Envelope error = Envelope.newServerReply(e, m);
-        eventBus.ioEvent(error, r);
+        utils.error(e, r, m);
     }
 
-    private String writeAsString(Object o) {
-        try {
-            return mapper.writeValueAsString(o);
-        } catch (JsonProcessingException e) {
-            return "{\"error\":\"" + e.getMessage() + "\"}";
-        }
-    }
+
 }

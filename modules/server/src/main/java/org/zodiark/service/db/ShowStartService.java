@@ -18,11 +18,12 @@ package org.zodiark.service.db;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
-import org.zodiark.server.annotation.Inject;
 import org.zodiark.server.annotation.Retrieve;
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.util.RestService;
+
+import javax.inject.Inject;
 
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
 
