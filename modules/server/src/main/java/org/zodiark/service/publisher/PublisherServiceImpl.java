@@ -51,6 +51,7 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_ERROR_REPORT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_GET;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_PUBLIC_MODE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_PUT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW;
@@ -140,14 +141,15 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                 break;
             case DB_SUBSCRIBER_EJECT:
             case DB_SUBSCRIBER_BLOCK:
-                blockOrEjectSubscriber(e.getMessage().getPath(), e, r);
+            case DB_PUBLISHER_PUBLIC_MODE:
+                validateAndStatusEvent(e.getMessage().getPath(), e, r);
                 break;
             default:
                 throw new IllegalStateException("Invalid Message Path " + e.getMessage().getPath());
         }
     }
 
-    private void blockOrEjectSubscriber(String path, Envelope e, AtmosphereResource r) {
+    private void validateAndStatusEvent(String path, Envelope e, AtmosphereResource r) {
 
         final PublisherEndpoint p = retrieve(e.getUuid());
         String[] paths = e.getMessage().getPath().split("/");
