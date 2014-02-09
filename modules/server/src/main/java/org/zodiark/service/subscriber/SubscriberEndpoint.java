@@ -25,6 +25,7 @@ public class SubscriberEndpoint extends EndpointAdapter<SubscriberEndpoint> {
 
     private PublisherEndpoint publisherEndpoint;
     private boolean hasSession = true;
+    private boolean actionsAvailable;
 
     public SubscriberEndpoint() {
         super();
@@ -46,6 +47,15 @@ public class SubscriberEndpoint extends EndpointAdapter<SubscriberEndpoint> {
 
     public SubscriberEndpoint hasSession(boolean hasSession) {
         this.hasSession = hasSession;
+        return this;
+    }
+
+    public boolean actionsAvailable() {
+        return actionsAvailable;
+    }
+
+    public SubscriberEndpoint actionsAvailable(boolean actionsAvailable) {
+        this.actionsAvailable = actionsAvailable;
         return this;
     }
 

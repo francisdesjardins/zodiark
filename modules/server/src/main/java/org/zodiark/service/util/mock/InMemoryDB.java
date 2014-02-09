@@ -83,7 +83,7 @@ public class InMemoryDB {
         get.put(replace(Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT), PASSTHROUGH);
         put.put(replace(Paths.DB_PUBLISHER_ACTIONS), STATUS_OK);
 
-        post.put(replace(Paths.DB_SUBSCRIBER_REQUEST_ACTION), "{\"transactionId\": \"1\",\"clear\":\"true\"," +
+        post.put(replace(Paths.DB_SUBSCRIBER_REQUEST_ACTION_PASSTHROUGH), "{\"transactionId\": \"1\",\"clear\":\"true\"," +
                 "\"joinDurationInSeconds\":30," +
                 "\"minimumDurationInSeconds\":30," +
                 "\"maximumDurationsInSeconds\":30," +

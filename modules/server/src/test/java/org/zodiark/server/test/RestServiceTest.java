@@ -46,6 +46,8 @@ public class RestServiceTest {
     public static final String PUBLISHER_ERROR = "{\"source\":\"xxx\",\"error\":\"xxx\",\"info\":\"xxx\"}";
     public static final String CONFIG = "{\"colorPerformer\":\"xxx\",\"colorClient\":\"xxx\",\"colorAdmin\":\"xxx\",\"colorSystem\":\"xxx\",\"colorVip\":\"xxx\",\"fontSizeChat\":\"xxx\",\"fontSizeMenu\":\"xxx\",\"shortcut1\":\"xxx\",\"shortcut2\":\"xxx\",\"shortcut3\":\"xxx\",\"shortcut4\":\"xxx\",\"shortcut5\":\"xxx\",\"shortcut6\":\"xxx\",\"shortcut7\":\"xxx\",\"shortcut8\":\"xxx\",\"shortcut9\":\"xxx\",\"shortcut10\":\"xxx\",\"welcomeMessage\":\"xxx\"}\n";
     public static final String PROFILE = "{\"profileFullname\":\"xxx\",\"profileAge\":\"xxx\",\"profileGender\":\"xxx\",\"profileNote\":\"xxx\"}";
+    public static final String ACTION = "\"{\"actionId\":123\"}";
+
     @Test
     public void createPublisherService() throws IllegalAccessException, InstantiationException {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
@@ -414,7 +416,7 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<ActionState> result = new AtomicReference<>();
 
-        restService.post(Paths.DB_SUBSCRIBER_REQUEST_ACTION.replace("@guid", UUID.randomUUID().toString()), "{\"actionId\":\123\"}", new RestService.Reply<ActionState, DBError>() {
+        restService.post(Paths.DB_SUBSCRIBER_REQUEST_ACTION_PASSTHROUGH.replace("@guid", UUID.randomUUID().toString()), ACTION, new RestService.Reply<ActionState, DBError>() {
             @Override
             public void success(ActionState success) {
                 result.set(success);
