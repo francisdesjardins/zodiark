@@ -39,6 +39,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNull;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_SESSION_CREATE;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT;
 
 public class SubscriberServiceTest {
 
@@ -91,6 +92,27 @@ public class SubscriberServiceTest {
     @AfterMethod
     public void after() {
         server.off();
+    }
+
+    @Test
+    public void uc24() throws Exception {
+        EventBus eventBus = EventBusFactory.getDefault().eventBus();
+
+        Writer writer = new Writer();
+        RESOURCE.getResponse().asyncIOWriter(writer);
+
+        // UC29
+        Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_SUBSCRIBER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
+        eventBus.ioEvent(em, RESOURCE);
+
+        // UC24
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT, ""));
+        eventBus.ioEvent(em, RESOURCE);
+
+        assertNull(writer.error.get());
+        assertEquals(writer.e.size(), 2);
+        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
     }
 
     @Test
