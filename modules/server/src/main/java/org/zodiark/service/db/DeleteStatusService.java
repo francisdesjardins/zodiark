@@ -29,13 +29,13 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_ERROR_REPORT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_PUBLIC_MODE_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
-import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_END;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_FAVORITES_END;
 
 @Retrieve({DB_PUBLISHER_ERROR_REPORT,
            DB_POST_PUBLISHER_ONDEMAND_END,
            DB_PUBLISHER_SHARED_PRIVATE_END,
            DB_PUBLISHER_PUBLIC_MODE_END,
-           DB_SUBSCRIBER_END})
+        DB_SUBSCRIBER_FAVORITES_END})
 public class DeleteStatusService extends DBServiceAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(DeleteStatusService.class);

@@ -265,7 +265,8 @@ public interface Paths {
     String DB_SUBSCRIBER_CHARGE_ACTION = "/v1/subscriber/@guid/action/transaction/@id/charge";
     String DB_SUBSCRIBER_BLOCK = "/v1/publisher/@guid/subscriber/@guid/block";
     String DB_SUBSCRIBER_EJECT = "/v1/publisher/@guid/subscriber/@guid/eject";
-    String DB_SUBSCRIBER_END = "/v1/subscriber/@guid/favorite/@id/end";
+    String DB_SUBSCRIBER_FAVORITES_END = "/v1/subscriber/@guid/favorite/@id/end";
+    String DB_SUBSCRIBER_FAVORITES_START = "/v1/subscriber/@guid/favorite/@id";
 
     // TODO: LoadConfig
     String DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT = "/v1/publisher/@guid/settings/ui/";

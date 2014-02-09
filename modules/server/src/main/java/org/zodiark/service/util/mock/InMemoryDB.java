@@ -39,6 +39,7 @@ public class InMemoryDB {
     public final static String PASSTHROUGH = "{\"no_need_to_parse\": \"_something_\"}\"";
     public final static String STATUS_OK = "{\"result\":\"OK\"}";
     public final static String TRANSACTION_ID = "{\"transactionId\":1234}";
+    public final static String FAVORITE_ID = "{\"favoriteId\":1234}";
     public final static String SHOWID ="{\"showId\":123234}";
     public final static String MOTD = "{\"motds\": [{\"motdId\": 1, \"title\": \"foo\", \"message\": \"blabla\", \"createdOn\":\"20140125\", \"expiresOn\":\"20140125\", " +
                     "\"expired\": true}]}";
@@ -94,7 +95,7 @@ public class InMemoryDB {
         post.put(replace(Paths.DB_SUBSCRIBER_CHARGE_ACTION), STATUS_OK);
         post.put(replace(Paths.DB_SUBSCRIBER_BLOCK), STATUS_OK);
         post.put(replace(Paths.DB_SUBSCRIBER_EJECT), STATUS_OK);
-        delete.put(replace(Paths.DB_SUBSCRIBER_END), STATUS_OK);
+        delete.put(replace(Paths.DB_SUBSCRIBER_FAVORITES_END), STATUS_OK);
         get.put(replace(Paths.DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT), PASSTHROUGH);
         put.put(replace(Paths.DB_PUBLISHER_SAVE_CONFIG), STATUS_OK);
 
@@ -121,6 +122,8 @@ public class InMemoryDB {
         post.put(replace(Paths.DB_POST_SUBSCRIBER_SESSION_CREATE), STATUS_OK);
 
         put.put(replace(Paths.DB_SUBSCRIBER_CONFIG_PASSTHROUGHT), PASSTHROUGH);
+
+        post.put(replace(Paths.DB_SUBSCRIBER_FAVORITES_START), FAVORITE_ID);
     }
 
     public String serve(OKRestService.METHOD m, String url, String body, RESULT passOrFail) {

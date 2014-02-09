@@ -25,9 +25,10 @@ import org.zodiark.service.util.RestService;
 
 import javax.inject.Inject;
 
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_FAVORITES_START;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_REQUEST_ACTION_PASSTHROUGH;
 
-@Retrieve({DB_SUBSCRIBER_REQUEST_ACTION_PASSTHROUGH})
+@Retrieve({DB_SUBSCRIBER_REQUEST_ACTION_PASSTHROUGH, DB_SUBSCRIBER_FAVORITES_START})
 public class PostPassthoughService extends DBServiceAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(PostPassthoughService.class);
@@ -39,6 +40,6 @@ public class PostPassthoughService extends DBServiceAdapter {
     public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
         final EndpointAdapter p = EndpointAdapter.class.cast(message);
-        restService.post(path.replace("@guid", p.uuid()), message, new PassthroughReply(reply));
+        restService.post(path.replace("@guid", p.uuid()), p.message(), new PassthroughReply(reply));
     }
 }

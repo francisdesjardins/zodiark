@@ -440,7 +440,7 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<TransactionId> result = new AtomicReference<>();
 
-        restService.put(Paths.DB_SUBSCRIBER_JOIN_ACTION.replace("@guid", UUID.randomUUID().toString()), "", new RestService.Reply<TransactionId, DBError>() {
+        restService.post(Paths.DB_SUBSCRIBER_JOIN_ACTION.replace("@guid", UUID.randomUUID().toString()), "", new RestService.Reply<TransactionId, DBError>() {
             @Override
             public void success(TransactionId success) {
                 result.set(success);
@@ -536,7 +536,7 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
-        restService.post(Paths.DB_SUBSCRIBER_END.replace("@guid", UUID.randomUUID().toString()), "", new RestService.Reply<Status, DBError>() {
+        restService.delete(Paths.DB_SUBSCRIBER_FAVORITES_END.replace("@guid", UUID.randomUUID().toString()), "", new RestService.Reply<Status, DBError>() {
             @Override
             public void success(Status success) {
                 result.set(success);
