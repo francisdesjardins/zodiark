@@ -42,6 +42,7 @@ import static org.zodiark.protocol.Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCASTER_TRACK;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_JOIN_ACTION;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_REQUEST_ACTION_PASSTHROUGH;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.FAILED_SUBSCRIBER_STREAMING_SESSION;
@@ -118,9 +119,35 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             case DB_SUBSCRIBER_REQUEST_ACTION_PASSTHROUGH:
                 requestAction(e, r);
                 break;
+            case DB_SUBSCRIBER_JOIN_ACTION:
+                joinAction(e,r);
+                break;
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
         }
+    }
+
+    private void joinAction(final Envelope e, AtmosphereResource r) {
+        SubscriberEndpoint s = utils.retrieve(e.getUuid());
+
+        if (!utils.validate(s, e)) return;
+
+        if (!s.hasSession() || !s.actionsAvailable()) {
+            error(e, r, new Message().setPath("/error").setData("unauthorized"));
+        }
+
+        eventBus.message(DB_SUBSCRIBER_JOIN_ACTION, s, new Reply<SubscriberEndpoint>() {
+            @Override
+            public void ok(SubscriberEndpoint s) {
+                logger.debug("Action Accepted for {}", s);
+                response(e, s, utils.constructMessage(DB_SUBSCRIBER_JOIN_ACTION, utils.writeAsString(s.transactionId())));
+            }
+
+            @Override
+            public void fail(SubscriberEndpoint s) {
+                error(e, s, utils.constructMessage(DB_SUBSCRIBER_JOIN_ACTION, "error"));
+            }
+        });
     }
 
     private void requestAction(Envelope e, AtmosphereResource r) {

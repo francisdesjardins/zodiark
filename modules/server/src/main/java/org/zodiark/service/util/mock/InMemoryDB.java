@@ -89,7 +89,7 @@ public class InMemoryDB {
                 "\"maximumDurationsInSeconds\":30," +
                 "\"cooldownDurationInSeconds\":30}");
 
-        put.put(replace(Paths.DB_SUBSCRIBER_JOIN_ACTION), TRANSACTION_ID);
+        post.put(replace(Paths.DB_SUBSCRIBER_JOIN_ACTION), TRANSACTION_ID);
 
         post.put(replace(Paths.DB_SUBSCRIBER_CHARGE_ACTION), STATUS_OK);
         post.put(replace(Paths.DB_SUBSCRIBER_BLOCK), STATUS_OK);

@@ -26,6 +26,7 @@ public class TransactionId {
         return this;
     }
 
+    @JsonProperty("transactionId")
     public int transactionId() {
         return transactionId;
     }
