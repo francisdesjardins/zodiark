@@ -40,6 +40,7 @@ import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNull;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_EXTRA;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_FAVORITES_END;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_FAVORITES_START;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_JOIN_ACTION;
@@ -233,5 +234,26 @@ public class SubscriberServiceTest {
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 1);
         assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+    }
+
+    @Test
+    public void uc30Test() throws Exception {
+        EventBus eventBus = EventBusFactory.getDefault().eventBus();
+
+        Writer writer = new Writer();
+        RESOURCE.getResponse().asyncIOWriter(writer);
+
+        // UC29
+        Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_SUBSCRIBER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
+        eventBus.ioEvent(em, RESOURCE);
+
+        // UC30
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_EXTRA, RestServiceTest.AMOUNT_TOKEN));
+        eventBus.ioEvent(em, RESOURCE);
+
+        assertNull(writer.error.get());
+        assertEquals(writer.e.size(), 2);
+        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.TRANSACTION_ID, writer.e.poll().getMessage().getData());
     }
 }

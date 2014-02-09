@@ -24,10 +24,11 @@ import org.zodiark.service.util.RestService;
 
 import javax.inject.Inject;
 
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_EXTRA;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_JOIN_ACTION;
 
-@Retrieve(DB_SUBSCRIBER_JOIN_ACTION)
-public class PostActionTransactionService extends DBServiceAdapter {
+@Retrieve({DB_SUBSCRIBER_JOIN_ACTION, DB_SUBSCRIBER_EXTRA})
+public class PostTransactionService extends DBServiceAdapter {
     private final Logger logger = LoggerFactory.getLogger(PostPassthoughService.class);
 
     @Inject

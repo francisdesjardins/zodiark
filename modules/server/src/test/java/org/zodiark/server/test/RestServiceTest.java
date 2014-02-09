@@ -47,6 +47,7 @@ public class RestServiceTest {
     public static final String CONFIG = "{\"colorPerformer\":\"xxx\",\"colorClient\":\"xxx\",\"colorAdmin\":\"xxx\",\"colorSystem\":\"xxx\",\"colorVip\":\"xxx\",\"fontSizeChat\":\"xxx\",\"fontSizeMenu\":\"xxx\",\"shortcut1\":\"xxx\",\"shortcut2\":\"xxx\",\"shortcut3\":\"xxx\",\"shortcut4\":\"xxx\",\"shortcut5\":\"xxx\",\"shortcut6\":\"xxx\",\"shortcut7\":\"xxx\",\"shortcut8\":\"xxx\",\"shortcut9\":\"xxx\",\"shortcut10\":\"xxx\",\"welcomeMessage\":\"xxx\"}\n";
     public static final String PROFILE = "{\"profileFullname\":\"xxx\",\"profileAge\":\"xxx\",\"profileGender\":\"xxx\",\"profileNote\":\"xxx\"}";
     public static final String ACTION = "\"{\"actionId\":123\"}";
+    public static final String AMOUNT_TOKEN = "{\"amountTokens\":234}";
 
     @Test
     public void createPublisherService() throws IllegalAccessException, InstantiationException {
@@ -785,7 +786,7 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<TransactionId> result = new AtomicReference<>();
 
-        restService.put(Paths.DB_SUBSCRIBER_EXTRA.replace("@guid", UUID.randomUUID().toString()), "", new RestService.Reply<TransactionId, DBError>() {
+        restService.post(Paths.DB_SUBSCRIBER_EXTRA.replace("@guid", UUID.randomUUID().toString()), AMOUNT_TOKEN, new RestService.Reply<TransactionId, DBError>() {
             @Override
             public void success(TransactionId success) {
                 result.set(success);

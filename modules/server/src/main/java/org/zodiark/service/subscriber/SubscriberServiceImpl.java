@@ -42,6 +42,7 @@ import static org.zodiark.protocol.Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCASTER_TRACK;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_EXTRA;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_FAVORITES_END;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_FAVORITES_START;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_JOIN_ACTION;
@@ -130,9 +131,35 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             case DB_SUBSCRIBER_FAVORITES_START:
                 addFavorites(e, r);
                 break;
+            case DB_SUBSCRIBER_EXTRA:
+                tipPublisher(e,r);
+                break;
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
         }
+    }
+
+    private void tipPublisher(final Envelope e, AtmosphereResource r) {
+        SubscriberEndpoint s = utils.retrieve(e.getUuid());
+
+        if (!utils.validate(s, e)) return;
+
+        if (!s.hasSession()) {
+            error(e, r, new Message().setPath("/error").setData("unauthorized"));
+        }
+
+        eventBus.message(DB_SUBSCRIBER_EXTRA, s, new Reply<SubscriberEndpoint>() {
+            @Override
+            public void ok(SubscriberEndpoint s) {
+                logger.debug("Action Accepted for {}", s);
+                response(e, s, utils.constructMessage(DB_SUBSCRIBER_EXTRA, utils.writeAsString(s.transactionId())));
+            }
+
+            @Override
+            public void fail(SubscriberEndpoint s) {
+                error(e, s, utils.constructMessage(DB_SUBSCRIBER_EXTRA, "error"));
+            }
+        });
     }
 
     private void addFavorites(Envelope e, AtmosphereResource r) {
