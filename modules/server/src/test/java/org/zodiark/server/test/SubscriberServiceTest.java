@@ -40,6 +40,7 @@ import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNull;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_END;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_JOIN_ACTION;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_REQUEST_ACTION_PASSTHROUGH;
 
@@ -97,7 +98,7 @@ public class SubscriberServiceTest {
     }
 
     @Test
-    public void uc24() throws Exception {
+    public void uc24Test() throws Exception {
         EventBus eventBus = EventBusFactory.getDefault().eventBus();
 
         Writer writer = new Writer();
@@ -118,7 +119,7 @@ public class SubscriberServiceTest {
     }
 
     @Test
-    public void uc25() throws Exception {
+    public void uc25Test() throws Exception {
         EventBus eventBus = EventBusFactory.getDefault().eventBus();
 
         Writer writer = new Writer();
@@ -143,9 +144,8 @@ public class SubscriberServiceTest {
         assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
     }
 
-
     @Test
-    public void uc26() throws Exception {
+    public void uc26Test() throws Exception {
         EventBus eventBus = EventBusFactory.getDefault().eventBus();
 
         Writer writer = new Writer();
@@ -173,6 +173,27 @@ public class SubscriberServiceTest {
         assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
         assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
         assertEquals(InMemoryDB.TRANSACTION_ID, writer.e.poll().getMessage().getData());
+    }
+
+    @Test
+    public void uc27Test() throws Exception {
+        EventBus eventBus = EventBusFactory.getDefault().eventBus();
+
+        Writer writer = new Writer();
+        RESOURCE.getResponse().asyncIOWriter(writer);
+
+        // UC29
+        Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_SUBSCRIBER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
+        eventBus.ioEvent(em, RESOURCE);
+
+        // UC27
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_END, ""));
+        eventBus.ioEvent(em, RESOURCE);
+
+        assertNull(writer.error.get());
+        assertEquals(writer.e.size(), 2);
+        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 
     @Test

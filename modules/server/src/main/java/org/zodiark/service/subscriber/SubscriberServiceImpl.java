@@ -42,6 +42,7 @@ import static org.zodiark.protocol.Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCASTER_TRACK;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_END;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_JOIN_ACTION;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_REQUEST_ACTION_PASSTHROUGH;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
@@ -122,9 +123,20 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             case DB_SUBSCRIBER_JOIN_ACTION:
                 joinAction(e,r);
                 break;
+            case DB_SUBSCRIBER_END:
+                deleteFavorite(e,r);
+                break;
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
         }
+    }
+
+    private void deleteFavorite(Envelope e, AtmosphereResource r) {
+        SubscriberEndpoint s = utils.retrieve(e.getUuid());
+        // TODO: Should we keep favorites in memory? JFA -> No
+        if (!utils.validate(s, e) || !s.hasSession()) return;
+
+        utils.statusEvent(DB_SUBSCRIBER_END, e, s);
     }
 
     private void joinAction(final Envelope e, AtmosphereResource r) {

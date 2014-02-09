@@ -94,7 +94,7 @@ public class InMemoryDB {
         post.put(replace(Paths.DB_SUBSCRIBER_CHARGE_ACTION), STATUS_OK);
         post.put(replace(Paths.DB_SUBSCRIBER_BLOCK), STATUS_OK);
         post.put(replace(Paths.DB_SUBSCRIBER_EJECT), STATUS_OK);
-        post.put(replace(Paths.DB_SUBSCRIBER_END), STATUS_OK);
+        delete.put(replace(Paths.DB_SUBSCRIBER_END), STATUS_OK);
         get.put(replace(Paths.DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT), PASSTHROUGH);
         put.put(replace(Paths.DB_PUBLISHER_SAVE_CONFIG), STATUS_OK);
 
