@@ -432,18 +432,28 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
      * {@inheritDoc}
      */
     @Override
-    public PublisherEndpoint createSession(final Envelope e, final AtmosphereResource resource) {
+    public PublisherEndpoint createSession(final Envelope e, final AtmosphereResource r) {
 
         // TODO: Replace the IP and the referrer. GRab the IP and log a warning if the message's ip != connection ip.
         // Could be a proxy.
+
+        if (!e.getMessage().hasData()) {
+            error(e, r, utils.constructMessage(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, "error"));
+            return null;
+        }
 
         final String uuid = e.getUuid();
         PublisherEndpoint p = endpoints.get(uuid);
         if (p == null) {
             p = context.newInstance(PublisherEndpoint.class);
-            p.uuid(uuid).message(e.getMessage()).resource(resource);
+            p.uuid(uuid).message(e.getMessage()).resource(r);
 
             endpoints.put(uuid, p);
+
+            String data = e.getMessage().getData();
+
+            e.getMessage().setData(injectIp(r.getRequest().getRemoteAddr(), data));
+
             eventBus.message(DB_POST_PUBLISHER_SESSION_CREATE, p, new Reply<PublisherEndpoint>() {
                 @Override
                 public void ok(final PublisherEndpoint p) {
@@ -482,7 +492,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             });
         }
 
-        resource.addEventListener(new OnDisconnect() {
+        r.addEventListener(new OnDisconnect() {
             @Override
             public void onDisconnect(AtmosphereResourceEvent event) {
                 logger.debug("Publisher {} disconnected", uuid);
@@ -490,6 +500,10 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             }
         });
         return p;
+    }
+
+    private String injectIp(String remoteAddr, String data) {
+        return data.replaceAll("\\s+","").replace("\"\"", "\"" + remoteAddr + "\"");
     }
 
     @Override
