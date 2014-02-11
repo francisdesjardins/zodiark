@@ -54,6 +54,7 @@ public class EndpointUtils<T extends EndpointAdapter> {
 
         if (!validateAll(p, e)) ;
 
+
         statusEvent(path, e, p, new Reply<Status>() {
             @Override
             public void ok(Status status) {
@@ -69,7 +70,7 @@ public class EndpointUtils<T extends EndpointAdapter> {
     }
 
     public void statusEvent(final String path, final Envelope e, final T p, Reply<Status> r) {
-        eventBus.message(path, p, r);
+        eventBus.message(path, new RetrieveMessage(p.uuid(), e.getMessage()), r);
     }
 
     public void passthroughEvent(final String path, final Envelope e) {
@@ -82,7 +83,7 @@ public class EndpointUtils<T extends EndpointAdapter> {
 
         if (!validateShowId(p, e)) return;
 
-        eventBus.message(path, p, new Reply<Passthrough>() {
+        eventBus.message(path, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<Passthrough>() {
             @Override
             public void ok(Passthrough passthrough) {
                 succesPassThrough(e, p, path, passthrough);

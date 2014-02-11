@@ -27,6 +27,7 @@ import org.zodiark.server.Reply;
 import javax.inject.Inject;
 import org.zodiark.service.Endpoint;
 import org.zodiark.service.session.StreamingSession;
+import org.zodiark.service.state.EndpointState;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 import org.zodiark.service.util.UUID;
 
@@ -74,6 +75,12 @@ public class WowzaEndpoint implements Endpoint {
     @Override
     public String uuid() {
         return uuid;
+    }
+
+    @Override
+    public EndpointState state() {
+        // TODO: State
+        return null;
     }
 
     /**

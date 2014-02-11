@@ -24,13 +24,12 @@ import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.action.Action;
-import org.zodiark.service.config.PublisherState;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.session.impl.PrivateStreamingSession;
-import org.zodiark.service.session.impl.ProtectedStreamingSession;
 import org.zodiark.service.session.impl.PublicStreamingSession;
 import org.zodiark.service.session.impl.SharedPrivateStreamingSession;
 import org.zodiark.service.session.impl.ViewStreamingSession;
+import org.zodiark.service.state.EndpointState;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 
 import javax.inject.Inject;
@@ -201,21 +200,19 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
     }
 
     private StreamingSession sessionType(PublisherEndpoint p) {
-        PublisherState config = p.config();
+        EndpointState state = p.state();
 
-        switch (config.sessionType()) {
+        switch (state.modeId().mode()) {
             case PUBLIC:
                 return context.newInstance(PublicStreamingSession.class);
             case PRIVATE:
                 return context.newInstance(PrivateStreamingSession.class);
-            case SHARED_PRIVATE:
+            case SHAREDPRIVATE:
                 return context.newInstance(SharedPrivateStreamingSession.class);
             case VIEW:
                 return context.newInstance(ViewStreamingSession.class);
-            case PROTECTED:
-                return context.newInstance(ProtectedStreamingSession.class);
             default:
-                throw new IllegalStateException("Unsupported Session " + config.sessionType());
+                throw new IllegalStateException("Unsupported Session " + state.modeId());
         }
     }
 

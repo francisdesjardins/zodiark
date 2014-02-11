@@ -88,7 +88,7 @@ public class OKRestService implements RestService {
                 Object object = context.newInstance(success);
                 r.success(String.class.isAssignableFrom(success) ? restResponse : mapper.readerForUpdating(object).readValue(restResponse));
             } catch (Exception ex) {
-                ex.printStackTrace();
+                logger.error("",ex);
                 Object object = context.newInstance(failure);
                 r.failure(String.class.isAssignableFrom(failure) ? restResponse : mapper.readerForUpdating(object).readValue(restResponse));
             }

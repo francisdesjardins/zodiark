@@ -15,6 +15,8 @@
  */
 package org.zodiark.service;
 
+import org.zodiark.service.state.EndpointState;
+
 /**
  * Representation of a remote endpoint: can be a subscriber, a publisher, a super user or a wowza instance.
  */
@@ -41,4 +43,5 @@ public interface Endpoint {
      */
     public String uuid();
 
+    public EndpointState state();
 }

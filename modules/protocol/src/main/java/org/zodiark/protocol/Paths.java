@@ -27,7 +27,7 @@ public interface Paths {
     /**
      * An I/O event sent Create the SubscriberEndpoint's Session
      */
-    String DB_POST_SUBSCRIBER_SESSION_CREATE = "/v1/subscriber/@guid/session/create";
+    String DB_POST_SUBSCRIBER_SESSION_CREATE = "/v1/subscriber/{guid}/session/create";
     /**
      * An I/O event to create or prepare the Streaming Session by load the data from the dabatase/web service, and by requesting
      * access to a remote Wowza Endpoint.
@@ -45,9 +45,6 @@ public interface Paths {
      * An I/O event Send by Wowza when the Streaming Session cannot be started, for whatever reason, for a Subscriber.
      */
     String FAILED_SUBSCRIBER_STREAMING_SESSION = "/subscriber/errorStreamingSession";
-    /**
-     * An I/O event {@link Message#path} sent back to the remote Endpoint
-     */
     String ERROR_STREAMING_SESSION = "/error/errorStreamingSession";
     /**
      * An I/O event and a message. Once the Publisher has been authorized to Stream, the PublisherService will
@@ -195,103 +192,101 @@ public interface Paths {
     /**
      * A message to Initialize an Endpoint Session within the remote database/web service endpoint.
      */
-    String DB_POST_PUBLISHER_SESSION_CREATE = "/v1/publisher/@guid/session/create";
+    String DB_POST_PUBLISHER_SESSION_CREATE = "/v1/publisher/{guid}/session/create";
 
     /**
      * A Message to retrieve the list of banned word for a Streaming Session Chat.
      */
-    String DB_GET_WORD_PASSTHROUGH = "/v1/publisher/@guid/motd";
+    String DB_GET_WORD_PASSTHROUGH = "/v1/publisher/{guid}/motd";
     /**
      * a Message to validate the state of a Subscriber
      */
-    String DB_SUBSCRIBER_VALIDATE_STATE = "/v1/subscriber/@guid/session/validate";
+    String DB_SUBSCRIBER_VALIDATE_STATE = "/v1/subscriber/{guid}/session/validate";
     /**
      * Start Show
      */
-    String DB_PUBLISHER_SHOW_START = "/v1/publisher/@guid/show/start";
+    String DB_PUBLISHER_SHOW_START = "/v1/publisher/{guid}/show/start";
     /**
      * End Show
      */
-    String DB_PUBLISHER_SHOW_END = "/v1/publisher/@guid/show/@showId/end";
+    String DB_PUBLISHER_SHOW_END = "/v1/publisher/{guid}/show/{showId}/end";
     /**
      *
      */
-    String DB_POST_SUBSCRIBER_JOIN_SESSION = "/v1/subscriber/@guid/watch/start";
+    String DB_POST_SUBSCRIBER_JOIN_SESSION = "/v1/subscriber/{guid}/watch/start";
 
     /**
      *
      */
-    String DB_POST_SUBSCRIBER_CHARGE_START = "/v1/subscriber/@guid/watch/@watchId/charge";
+    String DB_POST_SUBSCRIBER_CHARGE_START = "/v1/subscriber/{guid}/watch/{watchId}/charge";
     /**
      *
      */
-    String DB_POST_SUBSCRIBER_CHARGE_END = "/v1/subscriber/@guid/watch/@watchId/end";
+    String DB_POST_SUBSCRIBER_CHARGE_END = "/v1/subscriber/{guid}/watch/{watchId}/end";
     /**
      *
      */
-    String DB_POST_PUBLISHER_ONDEMAND_START = "/v1/publisher/@guid/ondemand/start";
+    String DB_POST_PUBLISHER_ONDEMAND_START = "/v1/publisher/{guid}/ondemand/start";
 
-    String DB_POST_PUBLISHER_ONDEMAND_KEEPALIVE = "/v1/publisher/@guid/ondemand/keepalive";
+    String DB_POST_PUBLISHER_ONDEMAND_KEEPALIVE = "/v1/publisher/{guid}/ondemand/keepalive";
 
-    String DB_POST_PUBLISHER_ONDEMAND_END = "/v1/publisher/@guid/ondemand/end";
+    String DB_POST_PUBLISHER_ONDEMAND_END = "/v1/publisher/{guid}/ondemand/end";
     /**
      * First this to send to the Publisher as soon as the subscriber join.
      */
-    String DB_GET_SUBSCRIBER_STATUS_TO_PUBLISHER_PASSTHROUGHT = "/v1/subscriber/@guid/profile";
+    String DB_GET_SUBSCRIBER_STATUS_TO_PUBLISHER_PASSTHROUGHT = "/v1/subscriber/{guid}/profile";
 
-    String DB_PUBLISHER_SHARED_PRIVATE_START = "/v1/publisher/@guid/shared/start";
-    String DB_PUBLISHER_SHARED_PRIVATE_START_POST = "/v1/publisher/@guid/shared/start";
+    String DB_PUBLISHER_SHARED_PRIVATE_START = "/v1/publisher/{guid}/shared/start";
+    String DB_PUBLISHER_SHARED_PRIVATE_START_POST = "/v1/publisher/{guid}/shared/start";
 
-    String DB_PUBLISHER_SHARED_PRIVATE_END = "/v1/publisher/@guid/shared/end";
+    String DB_PUBLISHER_SHARED_PRIVATE_END = "/v1/publisher/{guid}/shared/end";
 
-    String DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT = "/v1/subscriber/@guid/actions";
+    String DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT = "/v1/subscriber/{guid}/actions";
 
-    String DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT = "/v1/publisher/@guid/settings/actions";
-    String DB_SUBSCRIBER_REQUEST_ACTION = "/v1/subscriber/@guid/action/transaction/request";
-    String DB_SUBSCRIBER_JOIN_ACTION = "/v1/subscriber/@guid/action/transaction/@id/join";
-    String DB_SUBSCRIBER_CHARGE_ACTION = "/v1/subscriber/@guid/action/transaction/@id/charge";
+    String DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT = "/v1/publisher/{guid}/settings/actions";
+    String DB_SUBSCRIBER_REQUEST_ACTION = "/v1/subscriber/{guid}/action/transaction/request";
+    String DB_SUBSCRIBER_JOIN_ACTION = "/v1/subscriber/{guid}/action/transaction/{id}/join";
+    String DB_SUBSCRIBER_CHARGE_ACTION = "/v1/subscriber/{guid}/action/transaction/{id}/charge";
     // TODO: Change replace of subscriberGuid
-    String DB_SUBSCRIBER_BLOCK = "/v1/publisher/@guid/subscriber/block";
-    String DB_SUBSCRIBER_EJECT = "/v1/publisher/@guid/subscriber/eject";
-    String DB_SUBSCRIBER_FAVORITES_END = "/v1/subscriber/@guid/favorite/@favoriteId/end";
-    String DB_SUBSCRIBER_FAVORITES_START = "/v1/subscriber/@guid/favorite/";
+    String DB_SUBSCRIBER_BLOCK = "/v1/publisher/{guid}/subscriber/block";
+    String DB_SUBSCRIBER_EJECT = "/v1/publisher/{guid}/subscriber/eject";
+    String DB_SUBSCRIBER_FAVORITES_END = "/v1/subscriber/{guid}/favorite/{favoriteId}end";
+    String DB_SUBSCRIBER_FAVORITES_START = "/v1/subscriber/{guid}/favorite/";
+    String DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT = "/v1/publisher/{guid}/settings/ui/";
 
-    // TODO: LoadConfig
-    String DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT = "/v1/publisher/@guid/settings/ui/";
+    String DB_PUBLISHER_SAVE_CONFIG = "/v1/publisher/{guid}/settings/ui";
+    String DB_PUBLISHER_SAVE_CONFIG_PUT = "_put/v1/publisher/{guid}/settings/ui";
 
-    String DB_PUBLISHER_SAVE_CONFIG = "/v1/publisher/@guid/settings/ui";
-    String DB_PUBLISHER_SAVE_CONFIG_PUT = "_put/v1/publisher/@guid/settings/ui";
+    String DB_PUBLISHER_LOAD_CONFIG = "/v1/publisher/{guid}/settings/ui";
+    String DB_PUBLISHER_LOAD_CONFIG_GET = "_get/v1/publisher/{guid}/settings/ui";
 
-    String DB_PUBLISHER_LOAD_CONFIG = "/v1/publisher/@guid/settings/ui";
-    String DB_PUBLISHER_LOAD_CONFIG_GET = "_get/v1/publisher/@guid/settings/ui";
-
-    String DB_PUBLISHER_SETTINGS_SHOW = "/v1/publisher/@guid/settings/show";
+    String DB_PUBLISHER_SETTINGS_SHOW = "/v1/publisher/{guid}/settings/show";
     String DB_PUBLISHER_SETTINGS_SHOW_GET_PASSTHROUGHT = "_get" + DB_PUBLISHER_SETTINGS_SHOW;
     String DB_PUBLISHER_SETTINGS_SHOW_SAVE = "_post" + DB_PUBLISHER_SETTINGS_SHOW;
 
-    String DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT = "/v1/publisher/@guid/settings/errors";
-    String DB_PUBLISHER_PUBLIC_MODE = "/v1/publisher/@guid/settings/public/start";
-    String DB_PUBLISHER_PUBLIC_MODE_END = "/v1/publisher/@guid/settings/public/end";
-    String DB_PUBLISHER_ERROR_REPORT = "/v1/publisher/@guid/error/report";
+    String DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT = "/v1/publisher/{guid}/settings/errors";
+    String DB_PUBLISHER_PUBLIC_MODE = "/v1/publisher/{guid}/settings/public/start";
+    String DB_PUBLISHER_PUBLIC_MODE_END = "/v1/publisher/{guid}/settings/public/end";
+    String DB_PUBLISHER_ERROR_REPORT = "/v1/publisher/{guid}/error/report";
 
-    String DB_PUBLISHER_SUBSCRIBER_PROFILE = "/v1/publisher/@guid/subscriber/@guid/profile";
+    String DB_PUBLISHER_SUBSCRIBER_PROFILE = "/v1/publisher/{guid}/subscriber/{guid}/profile";
     String DB_PUBLISHER_SUBSCRIBER_PROFILE_GET = "_get" + DB_PUBLISHER_SUBSCRIBER_PROFILE;
     String DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT = "_put" + DB_PUBLISHER_SUBSCRIBER_PROFILE;;
 
 
-    String DB_PUBLISHER_ACTIONS = "/v1/publisher/@guid/actions";
-    String DB_SUBSCRIBER_EXTRA = "/v1/subscriber/@guid/tip/transaction/request";
-    String DB_ENDPOINT_STATE = "/v1/zodiark/session/@guid";
+    String DB_PUBLISHER_ACTIONS = "/v1/publisher/{guid}/actions";
+    String DB_SUBSCRIBER_EXTRA = "/v1/subscriber/{guid}/tip/transaction/request";
+    String DB_ENDPOINT_STATE = "/v1/zodiark/session/{guid}";
 
-    String DB_SUBSCRIBER_CONFIG_PASSTHROUGHT = "/v1/subscriber/@guid/settings/ui";
+    String DB_SUBSCRIBER_CONFIG_PASSTHROUGHT = "/v1/subscriber/{guid}/settings/ui";
 
     // Message sent to or from
-    String PUBLISHER_ACTION_ACCEPT = "/v1/publisher/@guid/action/@transactionId";
-    String ZODIARK_ACTION_ACCEPTED = "/v1/publisher/@guid/action/@transactionId/accepted";
+    String PUBLISHER_ACTION_ACCEPT = "/v1/publisher/{guid}/action/{transactionId}";
+    String ZODIARK_ACTION_ACCEPTED = "/v1/publisher/{guid}/action/{transactionId}/accepted";
 
 
     // Internal Message
 
-    String MESSAGE_ACTION_VALIDATE = "/v1/action/@actionID/validate";
+    String MESSAGE_ACTION_VALIDATE = "/v1/action/{actionID}/validate";
 
 }

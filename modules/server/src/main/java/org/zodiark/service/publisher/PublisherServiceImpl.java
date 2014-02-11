@@ -25,15 +25,18 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.protocol.Paths;
 import org.zodiark.server.Context;
-import org.zodiark.service.EndpointUtils;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.On;
+import org.zodiark.service.EndpointUtils;
 import org.zodiark.service.Error;
+import org.zodiark.service.RetrieveMessage;
 import org.zodiark.service.Session;
+import org.zodiark.service.db.ModeId;
 import org.zodiark.service.db.Passthrough;
+import org.zodiark.service.db.ShowId;
 import org.zodiark.service.db.Status;
-import org.zodiark.service.session.StreamingSession;
+import org.zodiark.service.state.EndpointState;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 import org.zodiark.service.wowza.WowzaUUID;
 
@@ -42,17 +45,17 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnDisconnect;
 import static org.zodiark.protocol.Paths.BROADCASTER_CREATE;
+import static org.zodiark.protocol.Paths.DB_ENDPOINT_STATE;
 import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSTHROUGH;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_ONDEMAND_END;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_ONDEMAND_START;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_ACTIONS;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SETTINGS_SHOW;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SETTINGS_SHOW_GET_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_ERROR_REPORT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT;
@@ -61,6 +64,8 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_PUBLIC_MODE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_PUBLIC_MODE_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_PUT;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SETTINGS_SHOW;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SETTINGS_SHOW_GET_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SETTINGS_SHOW_SAVE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_START;
@@ -184,9 +189,9 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 
                 String[] pathSegments = path.split("/");
                 if (pathSegments[6].endsWith("start")) {
-                    p.state().sessionType(StreamingSession.TYPE.PUBLIC);
+                    p.state().modeId(ModeId.PUBLIC);
                 } else {
-                    p.state().sessionType(StreamingSession.TYPE.OFF);
+                    p.state().modeId(ModeId.VOID);
                 }
                 response(e, p, utils.constructMessage(path, utils.writeAsString(status)));
             }
@@ -329,7 +334,10 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
      */
     @Override
     public void terminateStreamingSession(final Envelope e, AtmosphereResource r) {
-        utils.statusEvent(DB_PUBLISHER_SHOW_END, e);
+        final PublisherEndpoint p = utils.retrieve(e.getUuid());
+        if (!utils.validate(p, e)) return;
+
+        utils.statusEvent(DB_PUBLISHER_SHOW_END.replace("{showId}", String.valueOf(p.state().showId().showId())), e);
     }
 
     /**
@@ -337,7 +345,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
      */
     @Override
     public void createOrJoinStreamingSession(final Envelope e, AtmosphereResource r) {
-        PublisherEndpoint p = utils.retrieve(e.getUuid());
+        final PublisherEndpoint p = utils.retrieve(e.getUuid());
 
         if (!utils.validate(p, e)) return;
 
@@ -348,16 +356,16 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         }
 
         // TODO: Callback is not called at the moment as the dispatching to Wowza is asynchronous
-        eventBus.message(WOWZA_CONNECT, p, new Reply<PublisherEndpoint>() {
+        eventBus.message(WOWZA_CONNECT, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<String>() {
             @Override
-            public void ok(PublisherEndpoint p) {
+            public void ok(String uuid) {
                 // TODO: Proper Message
                 Message m = new Message();
                 response(e, p, m);
             }
 
             @Override
-            public void fail(PublisherEndpoint p) {
+            public void fail(String uuid) {
                 error(e, p, utils.constructMessage(WOWZA_CONNECT, "error"));
             }
         });
@@ -370,18 +378,19 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     public void startStreamingSession(final Envelope e, AtmosphereResource r) {
         String uuid = e.getUuid();
 
-        PublisherEndpoint p = utils.retrieve(uuid);
+        final PublisherEndpoint p = utils.retrieve(uuid);
         if (!utils.validate(p, e)) return;
 
-        eventBus.message(DB_PUBLISHER_SHOW_START, p, new Reply<PublisherEndpoint>() {
+        eventBus.message(DB_PUBLISHER_SHOW_START, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<ShowId>() {
             @Override
-            public void ok(PublisherEndpoint p) {
+            public void ok(ShowId showId) {
                 logger.trace("Publisher ready {}", p);
-                response(e, p, utils.constructMessage(DB_PUBLISHER_SHOW_START, utils.writeAsString(p.showId())));
+                p.state().showId(showId);
+                response(e, p, utils.constructMessage(DB_PUBLISHER_SHOW_START, utils.writeAsString(p.state().showId())));
             }
 
             @Override
-            public void fail(PublisherEndpoint p) {
+            public void fail(ShowId showId) {
                 // TODO: Wrong error message
                 error(e, p, utils.constructMessage(DB_PUBLISHER_SHOW_START, utils.writeAsString(new Error().error("Unauthorized"))));
             }
@@ -405,6 +414,8 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             case PUBLISHER_ABOUT_READY:
                 resetEndpoint(message, reply);
                 break;
+            default:
+                logger.error("Can't react to {}", path);
         }
     }
 
@@ -443,29 +454,41 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         PublisherEndpoint p = endpoints.get(uuid);
         if (p == null) {
             p = context.newInstance(PublisherEndpoint.class);
-            p.uuid(uuid).message(e.getMessage()).resource(r);
-
+            p.uuid(uuid).resource(r);
             endpoints.put(uuid, p);
-
+            final AtomicReference<PublisherEndpoint> publisher = new AtomicReference<>(p);
             String data = e.getMessage().getData();
 
             e.getMessage().setData(injectIp(r.getRequest().getRemoteAddr(), data));
 
-            eventBus.message(DB_POST_PUBLISHER_SESSION_CREATE, p, new Reply<PublisherEndpoint>() {
+            eventBus.message(DB_ENDPOINT_STATE, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<EndpointState>() {
                 @Override
-                public void ok(final PublisherEndpoint p) {
-                    logger.trace("{} succeed for {}", DB_POST_PUBLISHER_SESSION_CREATE, p);
+                public void ok(EndpointState state) {
+                    final PublisherEndpoint p = publisher.get();
+                    p.state(state);
 
-                    eventBus.message(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, p, new Reply<Passthrough>() {
+                    eventBus.message(DB_POST_PUBLISHER_SESSION_CREATE, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<Status>() {
                         @Override
-                        public void ok(Passthrough passthrough) {
-                            utils.succesPassThrough(e, p, DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, passthrough);
+                        public void ok(final Status status) {
+                            logger.trace("{} succeed for {}", DB_POST_PUBLISHER_SESSION_CREATE, p);
 
-                            eventBus.message(DB_PUBLISHER_LOAD_CONFIG_GET, p, new Reply<Passthrough>() {
+                            eventBus.message(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<Passthrough>() {
                                 @Override
                                 public void ok(Passthrough passthrough) {
-                                    utils.succesPassThrough(e, p, DB_PUBLISHER_LOAD_CONFIG, passthrough);
-                                    utils.passthroughEvent(DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT, e, p);
+                                    utils.succesPassThrough(e, p, DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, passthrough);
+
+                                    eventBus.message(DB_PUBLISHER_LOAD_CONFIG_GET, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<Passthrough>() {
+                                        @Override
+                                        public void ok(Passthrough passthrough) {
+                                            utils.succesPassThrough(e, p, DB_PUBLISHER_LOAD_CONFIG, passthrough);
+                                            utils.passthroughEvent(DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT, e, p);
+                                        }
+
+                                        @Override
+                                        public void fail(Passthrough passthrough) {
+                                            utils.failPassThrough(e, p, passthrough);
+                                        }
+                                    });
                                 }
 
                                 @Override
@@ -476,17 +499,18 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                         }
 
                         @Override
-                        public void fail(Passthrough passthrough) {
-                            utils.failPassThrough(e, p, passthrough);
+                        public void fail(Status status) {
+                            error(e, publisher.get(), utils.constructMessage(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, "error"));
                         }
                     });
                 }
 
                 @Override
-                public void fail(PublisherEndpoint p) {
-                    error(e, p, utils.constructMessage(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, "error"));
+                public void fail(EndpointState response) {
+                    error(e, publisher.get(), utils.constructMessage(DB_ENDPOINT_STATE, "error"));
                 }
             });
+
         }
 
         r.addEventListener(new OnDisconnect() {

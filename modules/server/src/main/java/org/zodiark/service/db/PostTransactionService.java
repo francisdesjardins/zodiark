@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Retrieve;
-import org.zodiark.service.subscriber.SubscriberEndpoint;
+import org.zodiark.service.RetrieveMessage;
 import org.zodiark.service.util.RestService;
 
 import javax.inject.Inject;
@@ -37,12 +37,11 @@ public class PostTransactionService extends DBServiceAdapter {
     @Override
     public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
-        final SubscriberEndpoint s = SubscriberEndpoint.class.cast(message);
-        restService.post(path.replace("@guid", s.uuid()), s.message(), new RestService.Reply<TransactionId, DBError>() {
+        final RetrieveMessage s = RetrieveMessage.class.cast(message);
+        restService.post(path.replace("{guid}", s.uuid()), s.message(), new RestService.Reply<TransactionId, DBError>() {
             @Override
             public void success(TransactionId success) {
-                s.transactionId(success);
-                reply.ok(s);
+                reply.ok(success);
             }
 
             @Override

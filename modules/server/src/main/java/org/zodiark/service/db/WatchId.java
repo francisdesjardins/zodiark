@@ -20,9 +20,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class WatchId {
     private int watchId;
 
+    public WatchId() {
+    }
+
+    public WatchId(int watchId) {
+        this.watchId = watchId;
+    }
+
     @JsonProperty
-    public WatchId watchId(int showId) {
-        this.watchId = showId;
+    public WatchId watchId(int watchId) {
+        this.watchId = watchId;
         return this;
     }
 

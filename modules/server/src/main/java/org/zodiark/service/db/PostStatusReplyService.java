@@ -18,11 +18,12 @@ package org.zodiark.service.db;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
-import javax.inject.Inject;
 import org.zodiark.server.annotation.Retrieve;
-import org.zodiark.service.EndpointAdapter;
+import org.zodiark.service.RetrieveMessage;
 import org.zodiark.service.db.util.StatusReply;
 import org.zodiark.service.util.RestService;
+
+import javax.inject.Inject;
 
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
 
@@ -41,7 +42,7 @@ public class PostStatusReplyService extends DBServiceAdapter {
     @Override
     public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
-        final EndpointAdapter p = EndpointAdapter.class.cast(message);
-        restService.post(path.replace("@guid", p.uuid()), p.message(), new StatusReply<EndpointAdapter>(reply, p));
+        final RetrieveMessage p = RetrieveMessage.class.cast(message);
+        restService.post(path.replace("{guid}", p.uuid()), p.message(), new StatusReply<Status>(reply, new Status()));
     }
 }

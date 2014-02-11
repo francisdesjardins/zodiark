@@ -15,7 +15,7 @@
  */
 package org.zodiark.service.util.mock;
 
-import org.zodiark.service.config.AuthConfig;
+import org.zodiark.service.state.AuthConfig;
 
 /**
  * Mock class for testing purpose only.

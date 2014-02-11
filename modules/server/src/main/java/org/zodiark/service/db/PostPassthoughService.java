@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Retrieve;
-import org.zodiark.service.EndpointAdapter;
+import org.zodiark.service.RetrieveMessage;
 import org.zodiark.service.db.util.PassthroughReply;
 import org.zodiark.service.util.RestService;
 
@@ -39,7 +39,7 @@ public class PostPassthoughService extends DBServiceAdapter {
     @Override
     public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
-        final EndpointAdapter p = EndpointAdapter.class.cast(message);
-        restService.post(path.replace("@guid", p.uuid()), p.message(), new PassthroughReply(reply));
+        final RetrieveMessage p = RetrieveMessage.class.cast(message);
+        restService.post(path.replace("{guid}", p.uuid()), p.message(), new PassthroughReply(reply));
     }
 }

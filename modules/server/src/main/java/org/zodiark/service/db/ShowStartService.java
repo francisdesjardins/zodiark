@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Retrieve;
-import org.zodiark.service.publisher.PublisherEndpoint;
+import org.zodiark.service.RetrieveMessage;
 import org.zodiark.service.util.RestService;
 
 import javax.inject.Inject;
@@ -37,12 +37,12 @@ public class ShowStartService extends DBServiceAdapter {
     @Override
     public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
-        final PublisherEndpoint p = PublisherEndpoint.class.cast(message);
-        restService.post(DB_PUBLISHER_SHOW_START.replace("@guid", p.uuid()),
+        final RetrieveMessage p = RetrieveMessage.class.cast(message);
+        restService.post(DB_PUBLISHER_SHOW_START.replace("{guid}", p.uuid()),
                 p.message(), new RestService.Reply<ShowId, DBError>() {
             @Override
             public void success(ShowId success) {
-                reply.ok(p.showId(success));
+                reply.ok(success);
             }
 
             @Override

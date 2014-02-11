@@ -21,12 +21,9 @@ import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereObjectFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zodiark.service.config.AuthConfig;
-import org.zodiark.service.config.PublisherState;
-import org.zodiark.service.config.SubscriberConfig;
-import org.zodiark.service.publisher.PublisherStateImpl;
 import org.zodiark.service.session.StreamingRequest;
-import org.zodiark.service.subscriber.SubscriberConfigImpl;
+import org.zodiark.service.state.AuthConfig;
+import org.zodiark.service.state.EndpointState;
 import org.zodiark.service.util.RestService;
 import org.zodiark.service.util.StreamingRequestImpl;
 import org.zodiark.service.util.mock.OKAuthConfig;
@@ -54,7 +51,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *  {@link EventBus}, {@link ObjectMapper}, {@link WowzaEndpointManager}, {@link StreamingRequest}
  * <p/>
  * Extendable classes are
- *  {@link AuthConfig}, {@link org.zodiark.service.config.PublisherState}, {@link SubscriberConfig}, {@link org.zodiark.service.util.RestService}
+ *  {@link AuthConfig}, {@link org.zodiark.service.util.RestService}
  * <p/>
  * Injectable and Extendable can be replaced.
  * <p/>
@@ -113,18 +110,6 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
                 return OKAuthConfig.class;
             }
         });
-        extendable(PublisherState.class, new Extendable<PublisherState>() {
-            @Override
-            public Class<PublisherStateImpl> extend(Class<PublisherState> t) {
-                return PublisherStateImpl.class;
-            }
-        });
-        extendable(SubscriberConfig.class, new Extendable<SubscriberConfig>() {
-            @Override
-            public Class<SubscriberConfigImpl> extend(Class<SubscriberConfig> t) {
-                return SubscriberConfigImpl.class;
-            }
-        });
 
         extendable(RestService.class, new Extendable<RestService>() {
             @Override
@@ -175,10 +160,8 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
                     });
                 } else if (field.getType().isAssignableFrom(AuthConfig.class)) {
                     field.set(instance, newClassInstance(framework, AuthConfig.class, implement(AuthConfig.class)));
-                } else if (field.getType().isAssignableFrom(PublisherState.class)) {
-                    field.set(instance, newClassInstance(framework, PublisherState.class, implement(PublisherState.class)));
-                } else if (field.getType().isAssignableFrom(SubscriberConfig.class)) {
-                    field.set(instance, newClassInstance(framework, SubscriberConfig.class, implement(SubscriberConfig.class)));
+                } else if (field.getType().isAssignableFrom(EndpointState.class)) {
+                    field.set(instance, newClassInstance(framework, EndpointState.class, implement(EndpointState.class)));
                 } else if (field.getType().isAssignableFrom(StreamingRequest.class)) {
                     field.set(instance, inject(StreamingRequest.class));
                 } else if (field.getType().isAssignableFrom(ScheduledExecutorService.class)) {

@@ -22,14 +22,14 @@ import org.zodiark.protocol.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.zodiark.protocol.Paths.DB_ENDPOINT_STATE;
 import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSTHROUGH;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_CHARGE_END;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_CHARGE_START;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_JOIN_SESSION;
-import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_VALIDATE_STATE;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
 
 public class InMemoryDB {
 
@@ -42,6 +42,7 @@ public class InMemoryDB {
     public final static String SHOWID ="{\"showId\":123234}";
     public final static String MOTD = "{\"motds\": [{\"motdId\": 1, \"title\": \"foo\", \"message\": \"blabla\", \"createdOn\":\"20140125\", \"expiresOn\":\"20140125\", " +
                     "\"expired\": true}]}";
+    public final static String STATE = "{\"username\":\"123\",\"language\":\"fr\",\"showId\":123,\"watchId\":123,\"modeId\":123,\"type\":\"0\",\"administrator\": true}";
 
     EndpointMapper<String> mapper = new DefaultEndpointMapper<>();
 
@@ -54,73 +55,72 @@ public class InMemoryDB {
 
 
     public InMemoryDB() {
-        post.put(replace(DB_POST_PUBLISHER_SESSION_CREATE), STATUS_OK);
-        get.put(replace(DB_SUBSCRIBER_VALIDATE_STATE), " {\"configuration\": \"null\"}");
-        post.put(replace(DB_PUBLISHER_SHOW_START), SHOWID);
-        delete.put(replace(DB_PUBLISHER_SHOW_END), STATUS_OK);
+        post.put(DB_POST_PUBLISHER_SESSION_CREATE, STATUS_OK);
+        get.put(DB_ENDPOINT_STATE, STATE);
 
-        post.put(replace(DB_POST_SUBSCRIBER_JOIN_SESSION), " {\"watchId\": \"123234\"}");
+        post.put(DB_PUBLISHER_SHOW_START, SHOWID);
+        delete.put(DB_PUBLISHER_SHOW_END, STATUS_OK);
 
-        get.put(replace(DB_GET_WORD_PASSTHROUGH),MOTD);
+        post.put(DB_POST_SUBSCRIBER_JOIN_SESSION, " {\"watchId\": \"123234\"}");
 
-        post.put(replace(DB_POST_SUBSCRIBER_CHARGE_START), STATUS_OK);
-        delete.put(replace(DB_POST_SUBSCRIBER_CHARGE_END), STATUS_OK);
+        get.put(DB_GET_WORD_PASSTHROUGH,MOTD);
 
-        post.put(replace(Paths.DB_POST_PUBLISHER_ONDEMAND_START), STATUS_OK);
-        post.put(replace(Paths.DB_POST_PUBLISHER_ONDEMAND_KEEPALIVE), STATUS_OK);
-        delete.put(replace(Paths.DB_POST_PUBLISHER_ONDEMAND_END), STATUS_OK);
+        post.put(DB_POST_SUBSCRIBER_CHARGE_START, STATUS_OK);
+        delete.put(DB_POST_SUBSCRIBER_CHARGE_END, STATUS_OK);
 
-        get.put(replace(Paths.DB_GET_SUBSCRIBER_STATUS_TO_PUBLISHER_PASSTHROUGHT), PASSTHROUGH);
+        post.put(Paths.DB_POST_PUBLISHER_ONDEMAND_START, STATUS_OK);
+        post.put(Paths.DB_POST_PUBLISHER_ONDEMAND_KEEPALIVE, STATUS_OK);
+        delete.put(Paths.DB_POST_PUBLISHER_ONDEMAND_END, STATUS_OK);
+
+        get.put(Paths.DB_GET_SUBSCRIBER_STATUS_TO_PUBLISHER_PASSTHROUGHT, PASSTHROUGH);
 
 
-        post.put(replace(Paths.DB_PUBLISHER_SHARED_PRIVATE_START), STATUS_OK);
-        delete.put(replace(Paths.DB_PUBLISHER_SHARED_PRIVATE_START), STATUS_OK);
+        post.put(Paths.DB_PUBLISHER_SHARED_PRIVATE_START, STATUS_OK);
+        delete.put(Paths.DB_PUBLISHER_SHARED_PRIVATE_START, STATUS_OK);
 
-        put.put(replace(Paths.DB_PUBLISHER_SHARED_PRIVATE_END), STATUS_OK);
+        put.put(Paths.DB_PUBLISHER_SHARED_PRIVATE_END, STATUS_OK);
 
-        get.put(replace(Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT), PASSTHROUGH);
-        get.put(replace(Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT), PASSTHROUGH);
-        put.put(replace(Paths.DB_PUBLISHER_ACTIONS), STATUS_OK);
+        get.put(Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT, PASSTHROUGH);
+        get.put(Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, PASSTHROUGH);
+        put.put(Paths.DB_PUBLISHER_ACTIONS, STATUS_OK);
 
-        post.put(replace(Paths.DB_SUBSCRIBER_REQUEST_ACTION), "{\"transactionId\": \"1\",\"clear\":\"true\"," +
+        post.put(Paths.DB_SUBSCRIBER_REQUEST_ACTION, "{\"transactionId\": \"1\",\"clear\":\"true\"," +
                 "\"joinDurationInSeconds\":30," +
                 "\"minimumDurationInSeconds\":30," +
                 "\"maximumDurationsInSeconds\":30," +
                 "\"cooldownDurationInSeconds\":30}");
 
-        post.put(replace(Paths.DB_SUBSCRIBER_JOIN_ACTION), TRANSACTION_ID);
+        post.put(Paths.DB_SUBSCRIBER_JOIN_ACTION, TRANSACTION_ID);
 
-        post.put(replace(Paths.DB_SUBSCRIBER_CHARGE_ACTION), STATUS_OK);
-        post.put(replace(Paths.DB_SUBSCRIBER_BLOCK), STATUS_OK);
-        post.put(replace(Paths.DB_SUBSCRIBER_EJECT), STATUS_OK);
-        delete.put(replace(Paths.DB_SUBSCRIBER_FAVORITES_END), STATUS_OK);
-        get.put(replace(Paths.DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT), PASSTHROUGH);
-        put.put(replace(Paths.DB_PUBLISHER_SAVE_CONFIG), STATUS_OK);
+        post.put(Paths.DB_SUBSCRIBER_CHARGE_ACTION, STATUS_OK);
+        post.put(Paths.DB_SUBSCRIBER_BLOCK, STATUS_OK);
+        post.put(Paths.DB_SUBSCRIBER_EJECT, STATUS_OK);
+        delete.put(Paths.DB_SUBSCRIBER_FAVORITES_END, STATUS_OK);
+        get.put(Paths.DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT, PASSTHROUGH);
+        put.put(Paths.DB_PUBLISHER_SAVE_CONFIG, STATUS_OK);
 
-        get.put(replace(Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT), PASSTHROUGH);
-        get.put(replace(Paths.DB_PUBLISHER_LOAD_CONFIG), PASSTHROUGH);
+        get.put(Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT, PASSTHROUGH);
+        get.put(Paths.DB_PUBLISHER_LOAD_CONFIG, PASSTHROUGH);
 
-        get.put(replace(Paths.DB_PUBLISHER_SETTINGS_SHOW), PASSTHROUGH);
-        put.put(replace(Paths.DB_PUBLISHER_SETTINGS_SHOW), STATUS_OK);
+        get.put(Paths.DB_PUBLISHER_SETTINGS_SHOW, PASSTHROUGH);
+        put.put(Paths.DB_PUBLISHER_SETTINGS_SHOW, STATUS_OK);
 
-        post.put(replace(Paths.DB_PUBLISHER_PUBLIC_MODE), STATUS_OK);
+        post.put(Paths.DB_PUBLISHER_PUBLIC_MODE, STATUS_OK);
 
-        delete.put(replace(Paths.DB_PUBLISHER_PUBLIC_MODE_END), STATUS_OK);
-        post.put(replace(Paths.DB_PUBLISHER_ERROR_REPORT), STATUS_OK);
+        delete.put(Paths.DB_PUBLISHER_PUBLIC_MODE_END, STATUS_OK);
+        post.put(Paths.DB_PUBLISHER_ERROR_REPORT, STATUS_OK);
 
-        put.put(replace(Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE), STATUS_OK);
-        get.put(replace(Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE), PASSTHROUGH);
+        put.put(Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE, STATUS_OK);
+        get.put(Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE, PASSTHROUGH);
 
 
-        post.put(replace(Paths.DB_SUBSCRIBER_EXTRA), TRANSACTION_ID);
+        post.put(Paths.DB_SUBSCRIBER_EXTRA, TRANSACTION_ID);
 
-        put.put(replace(Paths.DB_ENDPOINT_STATE), TRANSACTION_ID);
+        post.put(Paths.DB_POST_SUBSCRIBER_SESSION_CREATE, STATUS_OK);
 
-        post.put(replace(Paths.DB_POST_SUBSCRIBER_SESSION_CREATE), STATUS_OK);
+        put.put(Paths.DB_SUBSCRIBER_CONFIG_PASSTHROUGHT, PASSTHROUGH);
 
-        put.put(replace(Paths.DB_SUBSCRIBER_CONFIG_PASSTHROUGHT), PASSTHROUGH);
-
-        post.put(replace(Paths.DB_SUBSCRIBER_FAVORITES_START), FAVORITE_ID);
+        post.put(Paths.DB_SUBSCRIBER_FAVORITES_START, FAVORITE_ID);
     }
 
     public String serve(OKRestService.METHOD m, String url, String body, RESULT passOrFail) {
@@ -148,9 +148,4 @@ public class InMemoryDB {
         return bdResult;
 
     }
-    
-    private String replace(String s) {
-        return s.replace("@guid", "{guid}").replace("@showId", "{showId}");
-    }
-
 }

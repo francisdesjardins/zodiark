@@ -16,8 +16,7 @@
 package org.zodiark.service;
 
 import org.atmosphere.cpr.AtmosphereResource;
-import org.zodiark.protocol.Message;
-import org.zodiark.service.config.PublisherState;
+import org.zodiark.service.state.EndpointState;
 
 /**
  * Base class for {@link Endpoint}
@@ -25,8 +24,7 @@ import org.zodiark.service.config.PublisherState;
  */
 public class EndpointAdapter<T> implements Endpoint {
     protected String uuid;
-    protected PublisherState config;
-    protected Message message;
+    protected EndpointState state;
     protected AtmosphereResource resource;
     protected String wowzaServer;
 
@@ -37,18 +35,13 @@ public class EndpointAdapter<T> implements Endpoint {
         return uuid;
     }
 
-    public T config(PublisherState config) {
-        this.config = config;
+    public T state(EndpointState state) {
+        this.state = state;
         return (T) this;
     }
 
-    public PublisherState config() {
-        return config;
-    }
-
-    public T message(Message message) {
-        this.message = message;
-        return (T) this;
+    public EndpointState state() {
+        return state;
     }
 
     public T uuid(String uuid) {
@@ -63,10 +56,6 @@ public class EndpointAdapter<T> implements Endpoint {
 
     @Override
     public void terminate() {
-    }
-
-    public Message message() {
-        return message;
     }
 
     public AtmosphereResource resource() {
