@@ -434,9 +434,6 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     @Override
     public PublisherEndpoint createSession(final Envelope e, final AtmosphereResource r) {
 
-        // TODO: Replace the IP and the referrer. GRab the IP and log a warning if the message's ip != connection ip.
-        // Could be a proxy.
-
         if (!e.getMessage().hasData()) {
             error(e, r, utils.constructMessage(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, "error"));
             return null;
