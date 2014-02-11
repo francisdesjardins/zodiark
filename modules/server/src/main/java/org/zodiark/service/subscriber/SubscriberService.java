@@ -26,14 +26,6 @@ import org.zodiark.service.Service;
 public interface SubscriberService extends Service {
 
     /**
-     * Sent by a remote {@link SubscriberEndpoint} asking to execute an {@link org.zodiark.service.action.Action} with
-     * a {@link org.zodiark.service.publisher.PublisherEndpoint}'s Streaming Session.
-     * @param e an {@link Envelope} containing the subscriber's request
-     * @param r an {@link AtmosphereResource} connected to the subscriber
-     */
-    public void requestForAction(Envelope e, AtmosphereResource r);
-
-    /**
      * Retrieve the {@link SubscriberEndpoint} associated with a
      * @param subscriberUuid
      * @param reply

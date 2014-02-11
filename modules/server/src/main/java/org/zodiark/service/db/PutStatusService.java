@@ -25,14 +25,12 @@ import org.zodiark.service.util.RestService;
 import javax.inject.Inject;
 
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_ACTIONS;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_PUBLIC_MODE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_PUT;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SETTINGS_SHOW_SAVE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT;
 
-@Retrieve({DB_PUBLISHER_SAVE_CONFIG_SHOW,
+@Retrieve({DB_PUBLISHER_SETTINGS_SHOW_SAVE,
            DB_PUBLISHER_SAVE_CONFIG_PUT,
-           DB_PUBLISHER_PUBLIC_MODE,
            DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT,
            DB_PUBLISHER_ACTIONS})
 public class PutStatusService extends DBServiceAdapter {

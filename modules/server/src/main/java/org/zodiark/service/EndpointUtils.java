@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.server;
+package org.zodiark.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,8 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
-import org.zodiark.service.EndpointAdapter;
-import org.zodiark.service.Error;
+import org.zodiark.server.EventBus;
+import org.zodiark.server.Reply;
 import org.zodiark.service.db.Passthrough;
 import org.zodiark.service.db.Status;
 

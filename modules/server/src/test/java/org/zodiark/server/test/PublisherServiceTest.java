@@ -15,13 +15,9 @@
  */
 package org.zodiark.server.test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.atmosphere.cpr.AsyncIOWriter;
-import org.atmosphere.cpr.AsyncIOWriterAdapter;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceFactory;
-import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.cpr.HeaderConfig;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -33,23 +29,18 @@ import org.zodiark.server.EventBusFactory;
 import org.zodiark.server.ZodiarkServer;
 import org.zodiark.service.util.mock.InMemoryDB;
 
-import java.io.IOException;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicReference;
-
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNull;
-import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSSTHROUGH;
+import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSTHROUGH;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_ONDEMAND_END;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_ONDEMAND_START;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_ACTIONS;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_ERROR_REPORT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_PUBLIC_MODE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_PUBLIC_MODE_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SETTINGS_SHOW;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_START;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
@@ -65,40 +56,8 @@ public class PublisherServiceTest {
     public final static AtmosphereResource RESOURCE = AtmosphereResourceFactory.getDefault().create(framework.getAtmosphereConfig(), UUID);
     private ZodiarkServer server;
 
-    public final static String UC1 = "";
-
-
     public Message message(String path, String message) {
         return new Message().setPath(path).setData(message);
-    }
-
-    private final static class Writer extends AsyncIOWriterAdapter {
-        final ConcurrentLinkedQueue<Envelope> e = new ConcurrentLinkedQueue<>();
-        final AtomicReference<Throwable> error = new AtomicReference<>();
-        final ObjectMapper mapper = new ObjectMapper();
-
-        @Override
-        public AsyncIOWriter writeError(AtmosphereResponse r, int errorCode, String message) throws IOException {
-            error.set(new IOException(message));
-            return this;
-        }
-
-        @Override
-        public AsyncIOWriter write(AtmosphereResponse r, String data) throws IOException {
-            e.add(mapper.readValue(data, Envelope.class));
-            return this;
-        }
-
-        @Override
-        public AsyncIOWriter write(AtmosphereResponse r, byte[] data) throws IOException {
-            e.add(mapper.readValue(data, Envelope.class));
-            return this;
-        }
-
-        @Override
-        public AsyncIOWriter write(AtmosphereResponse r, byte[] data, int offset, int length) throws IOException {
-            return this;
-        }
     }
 
     @BeforeMethod
@@ -222,7 +181,7 @@ public class PublisherServiceTest {
         eventBus.ioEvent(em, RESOURCE);
 
         // UC6
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SAVE_CONFIG_SHOW, ""));
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SETTINGS_SHOW, RestServiceTest.SHOWTYPE_ID));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
@@ -246,7 +205,7 @@ public class PublisherServiceTest {
         eventBus.ioEvent(em, RESOURCE);
 
         // UC7
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT, ""));
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SETTINGS_SHOW, ""));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
@@ -343,7 +302,7 @@ public class PublisherServiceTest {
         eventBus.ioEvent(em, RESOURCE);
 
         // UC14
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_GET_WORD_PASSSTHROUGH, ""));
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_GET_WORD_PASSTHROUGH, ""));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
@@ -435,7 +394,7 @@ public class PublisherServiceTest {
         eventBus.ioEvent(em, RESOURCE);
 
         // UC18
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_BLOCK, ""));
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_BLOCK, "{\"guid\":\"1234\"}"));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
@@ -458,7 +417,7 @@ public class PublisherServiceTest {
         eventBus.ioEvent(em, RESOURCE);
 
         // UC19
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_EJECT, ""));
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_EJECT, "{\"guid\":\"1234\"}"));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());

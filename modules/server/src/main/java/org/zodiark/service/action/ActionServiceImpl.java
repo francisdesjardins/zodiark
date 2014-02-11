@@ -25,32 +25,32 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
-import javax.inject.Inject;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.publisher.PublisherResults;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
 import org.zodiark.service.subscriber.SubscriberResults;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.zodiark.protocol.Paths.ACTION_ACCEPT;
-import static org.zodiark.protocol.Paths.ACTION_ACCEPT_OK;
 import static org.zodiark.protocol.Paths.ACTION_ACCEPT_REFUSED;
 import static org.zodiark.protocol.Paths.ACTION_COMPLETED;
 import static org.zodiark.protocol.Paths.ACTION_START_OK;
 import static org.zodiark.protocol.Paths.ACTION_TIMER;
-import static org.zodiark.protocol.Paths.ACTION_VALIDATE;
+import static org.zodiark.protocol.Paths.MESSAGE_ACTION_VALIDATE;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_VALIDATE_STATE;
+import static org.zodiark.protocol.Paths.PUBLISHER_ACTION_ACCEPT;
 import static org.zodiark.protocol.Paths.RETRIEVE_PUBLISHER;
 import static org.zodiark.protocol.Paths.RETRIEVE_SUBSCRIBER;
 import static org.zodiark.protocol.Paths.SERVICE_ACTION;
 import static org.zodiark.protocol.Paths.STREAMING_COMPLETE_ACTION;
 import static org.zodiark.protocol.Paths.STREAMING_EXECUTE_ACTION;
+import static org.zodiark.protocol.Paths.ZODIARK_ACTION_ACCEPTED;
 
 @On(SERVICE_ACTION)
 public class ActionServiceImpl implements ActionService {
@@ -71,7 +71,7 @@ public class ActionServiceImpl implements ActionService {
     @Override
     public void reactTo(Envelope e, AtmosphereResource r, Reply reply) {
         switch (e.getMessage().getPath()) {
-            case ACTION_ACCEPT_OK:
+            case ZODIARK_ACTION_ACCEPTED:
                 actionAccepted(e);
                 break;
             case ACTION_ACCEPT_REFUSED:
@@ -166,7 +166,7 @@ public class ActionServiceImpl implements ActionService {
     @Override
     public void reactTo(String path, Object message, Reply reply) {
         switch (path) {
-            case ACTION_VALIDATE:
+            case MESSAGE_ACTION_VALIDATE:
                 if (Action.class.isAssignableFrom(message.getClass())) {
                     Action action = Action.class.cast(message);
                     validateAction(action, reply);
@@ -196,7 +196,7 @@ public class ActionServiceImpl implements ActionService {
                 logger.trace("Action {} succeeded. Sending request to publisher {}", action, s);
 
                 // No need to have a listener here since the response will be dispatched to EnvelopeDigester
-                action.setPath(ACTION_ACCEPT);
+                action.setPath(PUBLISHER_ACTION_ACCEPT);
                 handshakingActions.put(s.uuid(), reply);
                 requestForAction(p, action);
             }

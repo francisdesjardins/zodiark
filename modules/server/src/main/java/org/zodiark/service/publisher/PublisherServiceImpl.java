@@ -25,7 +25,7 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.protocol.Paths;
 import org.zodiark.server.Context;
-import org.zodiark.server.EndpointUtils;
+import org.zodiark.service.EndpointUtils;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.On;
@@ -45,13 +45,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnDisconnect;
 import static org.zodiark.protocol.Paths.BROADCASTER_CREATE;
-import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSSTHROUGH;
+import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSTHROUGH;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_ONDEMAND_END;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_ONDEMAND_START;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_ACTIONS;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SETTINGS_SHOW;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SETTINGS_SHOW_GET_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_ERROR_REPORT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT;
@@ -60,7 +61,7 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_PUBLIC_MODE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_PUBLIC_MODE_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_PUT;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SETTINGS_SHOW_SAVE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_START;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_START_POST;
@@ -127,14 +128,11 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             case DB_PUBLISHER_SHOW_END:
                 terminateStreamingSession(e, r);
                 break;
-            case DB_PUBLISHER_SAVE_CONFIG_SHOW:
-                savePublisherShowType(e, r);
-                break;
             case DB_PUBLISHER_SAVE_CONFIG:
                 saveConfig(e, r);
                 break;
-            case DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT:
-                loadShow(e, r);
+            case DB_PUBLISHER_SETTINGS_SHOW:
+                loadOrSaveShow(e, r);
                 break;
             case DB_POST_PUBLISHER_ONDEMAND_START:
                 onDemandStart(e, r);
@@ -142,7 +140,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             case DB_POST_PUBLISHER_ONDEMAND_END:
                 onDemandEnd(e, r);
                 break;
-            case DB_GET_WORD_PASSSTHROUGH:
+            case DB_GET_WORD_PASSTHROUGH:
                 getMotd(e, r);
                 break;
             case DB_PUBLISHER_SUBSCRIBER_PROFILE:
@@ -262,7 +260,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     }
 
     private void getMotd(Envelope e, AtmosphereResource r) {
-        utils.passthroughEvent(DB_GET_WORD_PASSSTHROUGH, e);
+        utils.passthroughEvent(DB_GET_WORD_PASSTHROUGH, e);
     }
 
     private void onDemandEnd(Envelope e, AtmosphereResource r) {
@@ -277,17 +275,20 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         utils.statusEvent(DB_PUBLISHER_SAVE_CONFIG_PUT, e);
     }
 
-    public void loadShow(final Envelope e, AtmosphereResource r) {
-        utils.passthroughEvent(DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT, e);
+    public void loadOrSaveShow(final Envelope e, AtmosphereResource r) {
+        Message m = e.getMessage();
+        if (!m.hasData()) {
+            utils.passthroughEvent(DB_PUBLISHER_SETTINGS_SHOW_GET_PASSTHROUGHT, e);
+        } else {
+            utils.statusEvent(DB_PUBLISHER_SETTINGS_SHOW_SAVE, e);
+        }
+
     }
 
     public void reportError(final Envelope e, AtmosphereResource r) {
         utils.statusEvent(DB_PUBLISHER_ERROR_REPORT, e);
     }
 
-    public void savePublisherShowType(final Envelope e, AtmosphereResource r) {
-        utils.statusEvent(DB_PUBLISHER_SAVE_CONFIG_SHOW, e);
-    }
 
     /**
      * {@inheritDoc}
@@ -432,6 +433,10 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
      */
     @Override
     public PublisherEndpoint createSession(final Envelope e, final AtmosphereResource resource) {
+
+        // TODO: Replace the IP and the referrer. GRab the IP and log a warning if the message's ip != connection ip.
+        // Could be a proxy.
+
         final String uuid = e.getUuid();
         PublisherEndpoint p = endpoints.get(uuid);
         if (p == null) {

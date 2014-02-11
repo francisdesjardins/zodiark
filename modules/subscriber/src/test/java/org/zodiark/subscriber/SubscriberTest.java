@@ -330,10 +330,10 @@ public class SubscriberTest {
                         answer.set(mapper.readValue(e.getMessage().getData(), PublisherResults.class));
                         tlatch.countDown();
                         break;
-                    case Paths.ACTION_ACCEPT:
+                    case Paths.PUBLISHER_ACTION_ACCEPT:
                         Action a = mapper.readValue(e.getMessage().getData(), Action.class);
                         Envelope publisherOk = Envelope.newClientToServerRequest(e.getUuid(),
-                                new Message(new Path(Paths.ACTION_ACCEPT_OK), e.getMessage().getData()));
+                                new Message(new Path(Paths.ZODIARK_ACTION_ACCEPTED), e.getMessage().getData()));
                         publisherClient.send(publisherOk);
                         break;
                     case Paths.ACTION_START:
@@ -441,7 +441,7 @@ public class SubscriberTest {
             @Override
             public boolean onEnvelop(Envelope e) throws IOException {
                 switch (e.getMessage().getPath()) {
-                    case Paths.ACTION_VALIDATE:
+                    case Paths.MESSAGE_ACTION_VALIDATE:
                         response.set(e);
                         actionLatch.countDown();
                         break;
@@ -463,7 +463,7 @@ public class SubscriberTest {
 
         actionLatch.await();
 
-        assertEquals(Paths.ACTION_VALIDATE, response.get().getMessage().getPath());
+        assertEquals(Paths.MESSAGE_ACTION_VALIDATE, response.get().getMessage().getPath());
         assertEquals("{\"results\":\"OK\",\"uuid\":null}", response.get().getMessage().getData());
 
         completed.await();

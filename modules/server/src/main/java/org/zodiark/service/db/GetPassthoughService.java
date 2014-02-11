@@ -25,9 +25,9 @@ import org.zodiark.service.util.RestService;
 
 import javax.inject.Inject;
 
-import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSSTHROUGH;
+import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSTHROUGH;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SETTINGS_SHOW_GET_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_GET;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_GET;
@@ -36,8 +36,8 @@ import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHR
 @Retrieve({DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT,
         DB_PUBLISHER_LOAD_CONFIG_GET,
         DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT,
-        DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT,
-        DB_GET_WORD_PASSSTHROUGH,
+        DB_PUBLISHER_SETTINGS_SHOW_GET_PASSTHROUGHT,
+        DB_GET_WORD_PASSTHROUGH,
         DB_PUBLISHER_SUBSCRIBER_PROFILE_GET,
         DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT})
 public class GetPassthoughService extends DBServiceAdapter {

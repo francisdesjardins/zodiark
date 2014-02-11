@@ -102,18 +102,9 @@ public interface Paths {
      * An I/O event for Action requested by a Subscriber
      */
     String SUBSCRIBER_ACTION = "/subscriber/action";
-    /**
-     * A message to validate if an Action can be executed by a Publisher, from a Subscriber
-     */
-    String ACTION_VALIDATE = "/action/validate";
-    /**
-     * A message to request an Action
-     */
-    String ACTION_ACCEPT = "/action/accept";
-    /**
-     * A I/O event from the publisher when accepting an Action
-     */
-    String ACTION_ACCEPT_OK = "/action/actionAccepted";
+
+
+
     /**
      * A Message sent to the Publisher and Subscriber when an Action is about to start
      */
@@ -202,10 +193,6 @@ public interface Paths {
 
     // DB-Mapping
     /**
-     * A message to retrieve the data from an Endpoint
-     */
-    String DB_PUBLISHER_CONFIG = "/v1/publisher/@guid/session/config";
-    /**
      * A message to Initialize an Endpoint Session within the remote database/web service endpoint.
      */
     String DB_POST_PUBLISHER_SESSION_CREATE = "/v1/publisher/@guid/session/create";
@@ -213,7 +200,7 @@ public interface Paths {
     /**
      * A Message to retrieve the list of banned word for a Streaming Session Chat.
      */
-    String DB_GET_WORD_PASSSTHROUGH = "/v1/publisher/@guid/motd";
+    String DB_GET_WORD_PASSTHROUGH = "/v1/publisher/@guid/motd";
     /**
      * a Message to validate the state of a Subscriber
      */
@@ -234,11 +221,11 @@ public interface Paths {
     /**
      *
      */
-    String DB_POST_SUBSCRIBER_CHARGE_START = "/v1/subscriber/@guid/watch/@id/charge";
+    String DB_POST_SUBSCRIBER_CHARGE_START = "/v1/subscriber/@guid/watch/@watchId/charge";
     /**
      *
      */
-    String DB_POST_SUBSCRIBER_CHARGE_END = "/v1/subscriber/@guid/watch/@id/end";
+    String DB_POST_SUBSCRIBER_CHARGE_END = "/v1/subscriber/@guid/watch/@watchId/end";
     /**
      *
      */
@@ -260,13 +247,14 @@ public interface Paths {
     String DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT = "/v1/subscriber/@guid/actions";
 
     String DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT = "/v1/publisher/@guid/settings/actions";
-    String DB_SUBSCRIBER_REQUEST_ACTION_PASSTHROUGH = "/v1/subscriber/@guid/action/transaction/request";
+    String DB_SUBSCRIBER_REQUEST_ACTION = "/v1/subscriber/@guid/action/transaction/request";
     String DB_SUBSCRIBER_JOIN_ACTION = "/v1/subscriber/@guid/action/transaction/@id/join";
     String DB_SUBSCRIBER_CHARGE_ACTION = "/v1/subscriber/@guid/action/transaction/@id/charge";
-    String DB_SUBSCRIBER_BLOCK = "/v1/publisher/@guid/subscriber/@guid/block";
-    String DB_SUBSCRIBER_EJECT = "/v1/publisher/@guid/subscriber/@guid/eject";
-    String DB_SUBSCRIBER_FAVORITES_END = "/v1/subscriber/@guid/favorite/@id/end";
-    String DB_SUBSCRIBER_FAVORITES_START = "/v1/subscriber/@guid/favorite/@id";
+    // TODO: Change replace of subscriberGuid
+    String DB_SUBSCRIBER_BLOCK = "/v1/publisher/@guid/subscriber/block";
+    String DB_SUBSCRIBER_EJECT = "/v1/publisher/@guid/subscriber/eject";
+    String DB_SUBSCRIBER_FAVORITES_END = "/v1/subscriber/@guid/favorite/@favoriteId/end";
+    String DB_SUBSCRIBER_FAVORITES_START = "/v1/subscriber/@guid/favorite/";
 
     // TODO: LoadConfig
     String DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT = "/v1/publisher/@guid/settings/ui/";
@@ -277,16 +265,18 @@ public interface Paths {
     String DB_PUBLISHER_LOAD_CONFIG = "/v1/publisher/@guid/settings/ui";
     String DB_PUBLISHER_LOAD_CONFIG_GET = "_get/v1/publisher/@guid/settings/ui";
 
+    String DB_PUBLISHER_SETTINGS_SHOW = "/v1/publisher/@guid/settings/show";
+    String DB_PUBLISHER_SETTINGS_SHOW_GET_PASSTHROUGHT = "_get" + DB_PUBLISHER_SETTINGS_SHOW;
+    String DB_PUBLISHER_SETTINGS_SHOW_SAVE = "_post" + DB_PUBLISHER_SETTINGS_SHOW;
 
     String DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT = "/v1/publisher/@guid/settings/errors";
-    String DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT = "/v1/publisher/@guid/settings/show";
-    String DB_PUBLISHER_SAVE_CONFIG_SHOW = "/v1/publisher/@guid/settings/show/@showTypeId";
     String DB_PUBLISHER_PUBLIC_MODE = "/v1/publisher/@guid/settings/public/start";
     String DB_PUBLISHER_PUBLIC_MODE_END = "/v1/publisher/@guid/settings/public/end";
     String DB_PUBLISHER_ERROR_REPORT = "/v1/publisher/@guid/error/report";
+
     String DB_PUBLISHER_SUBSCRIBER_PROFILE = "/v1/publisher/@guid/subscriber/@guid/profile";
-    String DB_PUBLISHER_SUBSCRIBER_PROFILE_GET = "_get/v1/publisher/@guid/subscriber/@guid/profile";
-    String DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT = "_put/v1/publisher/@guid/subscriber/@guid/profile";
+    String DB_PUBLISHER_SUBSCRIBER_PROFILE_GET = "_get" + DB_PUBLISHER_SUBSCRIBER_PROFILE;
+    String DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT = "_put" + DB_PUBLISHER_SUBSCRIBER_PROFILE;;
 
 
     String DB_PUBLISHER_ACTIONS = "/v1/publisher/@guid/actions";
@@ -294,4 +284,14 @@ public interface Paths {
     String DB_ENDPOINT_STATE = "/v1/zodiark/session/@guid";
 
     String DB_SUBSCRIBER_CONFIG_PASSTHROUGHT = "/v1/subscriber/@guid/settings/ui";
+
+    // Message sent to or from
+    String PUBLISHER_ACTION_ACCEPT = "/v1/publisher/@guid/action/@transactionId";
+    String ZODIARK_ACTION_ACCEPTED = "/v1/publisher/@guid/action/@transactionId/accepted";
+
+
+    // Internal Message
+
+    String MESSAGE_ACTION_VALIDATE = "/v1/action/@actionID/validate";
+
 }

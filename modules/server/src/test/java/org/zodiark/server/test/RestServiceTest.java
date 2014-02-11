@@ -32,7 +32,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.testng.Assert.assertNotNull;
-import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSSTHROUGH;
+import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSTHROUGH;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_CHARGE_END;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_CHARGE_START;
@@ -48,6 +48,7 @@ public class RestServiceTest {
     public static final String PROFILE = "{\"profileFullname\":\"xxx\",\"profileAge\":\"xxx\",\"profileGender\":\"xxx\",\"profileNote\":\"xxx\"}";
     public static final String ACTION = "\"{\"actionId\":123\"}";
     public static final String AMOUNT_TOKEN = "{\"amountTokens\":234}";
+    public static final String SHOWTYPE_ID = "{\"showTypeId\":1234}";
 
     @Test
     public void createPublisherService() throws IllegalAccessException, InstantiationException {
@@ -125,7 +126,7 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<String> motds = new AtomicReference<>();
 
-        restService.get(DB_GET_WORD_PASSSTHROUGH.replace("@guid", UUID.randomUUID().toString())
+        restService.get(DB_GET_WORD_PASSTHROUGH.replace("@guid", UUID.randomUUID().toString())
                         , new RestService.Reply<String, DBError>() {
             @Override
             public void success(String success) {
@@ -321,7 +322,7 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
-        restService.put(Paths.DB_PUBLISHER_SHARED_PRIVATE_START.replace("@guid", UUID.randomUUID().toString()), "", new RestService.Reply<Status, DBError>() {
+        restService.post(Paths.DB_PUBLISHER_SHARED_PRIVATE_START.replace("@guid", UUID.randomUUID().toString()), "", new RestService.Reply<Status, DBError>() {
             @Override
             public void success(Status success) {
                 result.set(success);
@@ -417,7 +418,7 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<ActionState> result = new AtomicReference<>();
 
-        restService.post(Paths.DB_SUBSCRIBER_REQUEST_ACTION_PASSTHROUGH.replace("@guid", UUID.randomUUID().toString()), ACTION, new RestService.Reply<ActionState, DBError>() {
+        restService.post(Paths.DB_SUBSCRIBER_REQUEST_ACTION.replace("@guid", UUID.randomUUID().toString()), ACTION, new RestService.Reply<ActionState, DBError>() {
             @Override
             public void success(ActionState success) {
                 result.set(success);
@@ -636,7 +637,7 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<String> result = new AtomicReference<>();
 
-        restService.get(Paths.DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT.replace("@guid", UUID.randomUUID().toString()),
+        restService.get(Paths.DB_PUBLISHER_SETTINGS_SHOW.replace("@guid", UUID.randomUUID().toString()),
                 new RestService.Reply<String, DBError>() {
                     @Override
                     public void success(String success) {
@@ -661,7 +662,7 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
-        restService.put(Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW.replace("@guid", UUID.randomUUID().toString()), "",
+        restService.put(Paths.DB_PUBLISHER_SETTINGS_SHOW.replace("@guid", UUID.randomUUID().toString()), SHOWTYPE_ID,
                 new RestService.Reply<Status, DBError>() {
                     @Override
                     public void success(Status success) {
@@ -682,11 +683,11 @@ public class RestServiceTest {
     }
 
     @Test
-    public void putPublisherPublicShow() throws IllegalAccessException, InstantiationException {
+    public void postPublisherPublicShow() throws IllegalAccessException, InstantiationException {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
-        restService.put(Paths.DB_PUBLISHER_PUBLIC_MODE.replace("@guid", UUID.randomUUID().toString()), "",
+        restService.post(Paths.DB_PUBLISHER_PUBLIC_MODE.replace("@guid", UUID.randomUUID().toString()), "",
                 new RestService.Reply<Status, DBError>() {
                     @Override
                     public void success(Status success) {

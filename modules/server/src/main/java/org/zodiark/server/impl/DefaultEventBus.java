@@ -77,8 +77,18 @@ public class DefaultEventBus implements EventBus {
      */
     @Override
     public EventBus ioEvent(Envelope e, AtmosphereResource r, Reply reply) {
+        if (ioServices.size() == 0) {
+            throw new Error("No Service available. Zodiark not properly configured.");
+        }
+
         try {
             Service s = mapper.map(e.getMessage().getPath(), ioServices);
+
+            // Prevent stack overflow
+            if (s == null && e.getMessage().getPath().equalsIgnoreCase("/error")) {
+                throw new Error("No Error Service available. Zodiark not properly configured.");
+            }
+
             logger.debug("Dispatching Envelop {} to Service {}", e, s);
 
             if (e.getUuid().isEmpty() || e.getUuid().equals("0")) {
@@ -98,14 +108,6 @@ public class DefaultEventBus implements EventBus {
         return this;
     }
 
-    private void sendError(Envelope e, AtmosphereResource r) {
-        Message m = new Message();
-        m.setPath("/error");
-        m.setUUID(e.getMessage().getUUID());
-        Envelope error = Envelope.newServerReply(e, m);
-        ioEvent(error, r);
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -121,9 +123,10 @@ public class DefaultEventBus implements EventBus {
             if (s != null) {
                 s.reactTo(transform(path), message, reply);
             } else {
-                logger.error("No Service available for {}", path);
+                logger.error("No @On or @Retrieval available for {}", path);
             }
         } catch (Throwable t) {
+            logger.error("{}", t);
             logger.error("Error on {}", path, t);
         }
         return this;
@@ -172,6 +175,14 @@ public class DefaultEventBus implements EventBus {
     public EventBus off(String path) {
         services.remove(path);
         return this;
+    }
+
+    private void sendError(Envelope e, AtmosphereResource r) {
+        Message m = new Message();
+        m.setPath("/error");
+        m.setUUID(e.getMessage().getUUID());
+        Envelope error = Envelope.newServerReply(e, m);
+        ioEvent(error, r);
     }
 
     @Override

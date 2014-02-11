@@ -22,21 +22,20 @@ import org.zodiark.protocol.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSSTHROUGH;
+import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSTHROUGH;
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_CHARGE_END;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_CHARGE_START;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_JOIN_SESSION;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_CONFIG;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_VALIDATE_STATE;
 
 public class InMemoryDB {
 
     public enum RESULT {PASS, FAIL}
 
-    public final static String PASSTHROUGH = "{\"no_need_to_parse\": \"_something_\"}\"";
+    public final static String PASSTHROUGH = "{\"no_need_to_parse\": \"_something_\"}";
     public final static String STATUS_OK = "{\"result\":\"OK\"}";
     public final static String TRANSACTION_ID = "{\"transactionId\":1234}";
     public final static String FAVORITE_ID = "{\"favoriteId\":1234}";
@@ -56,14 +55,13 @@ public class InMemoryDB {
 
     public InMemoryDB() {
         post.put(replace(DB_POST_PUBLISHER_SESSION_CREATE), STATUS_OK);
-        get.put(replace(DB_PUBLISHER_CONFIG), " {\"configuration\": \"bla bla bla\"}");
         get.put(replace(DB_SUBSCRIBER_VALIDATE_STATE), " {\"configuration\": \"null\"}");
         post.put(replace(DB_PUBLISHER_SHOW_START), SHOWID);
         delete.put(replace(DB_PUBLISHER_SHOW_END), STATUS_OK);
 
         post.put(replace(DB_POST_SUBSCRIBER_JOIN_SESSION), " {\"watchId\": \"123234\"}");
 
-        get.put(replace(DB_GET_WORD_PASSSTHROUGH),MOTD);
+        get.put(replace(DB_GET_WORD_PASSTHROUGH),MOTD);
 
         post.put(replace(DB_POST_SUBSCRIBER_CHARGE_START), STATUS_OK);
         delete.put(replace(DB_POST_SUBSCRIBER_CHARGE_END), STATUS_OK);
@@ -75,8 +73,8 @@ public class InMemoryDB {
         get.put(replace(Paths.DB_GET_SUBSCRIBER_STATUS_TO_PUBLISHER_PASSTHROUGHT), PASSTHROUGH);
 
 
-        put.put(replace(Paths.DB_PUBLISHER_SHARED_PRIVATE_START), STATUS_OK);
         post.put(replace(Paths.DB_PUBLISHER_SHARED_PRIVATE_START), STATUS_OK);
+        delete.put(replace(Paths.DB_PUBLISHER_SHARED_PRIVATE_START), STATUS_OK);
 
         put.put(replace(Paths.DB_PUBLISHER_SHARED_PRIVATE_END), STATUS_OK);
 
@@ -84,7 +82,7 @@ public class InMemoryDB {
         get.put(replace(Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT), PASSTHROUGH);
         put.put(replace(Paths.DB_PUBLISHER_ACTIONS), STATUS_OK);
 
-        post.put(replace(Paths.DB_SUBSCRIBER_REQUEST_ACTION_PASSTHROUGH), "{\"transactionId\": \"1\",\"clear\":\"true\"," +
+        post.put(replace(Paths.DB_SUBSCRIBER_REQUEST_ACTION), "{\"transactionId\": \"1\",\"clear\":\"true\"," +
                 "\"joinDurationInSeconds\":30," +
                 "\"minimumDurationInSeconds\":30," +
                 "\"maximumDurationsInSeconds\":30," +
@@ -102,11 +100,10 @@ public class InMemoryDB {
         get.put(replace(Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT), PASSTHROUGH);
         get.put(replace(Paths.DB_PUBLISHER_LOAD_CONFIG), PASSTHROUGH);
 
-        get.put(replace(Paths.DB_PUBLISHER_CONFIG_SHOW_AVAILABLE_PASSTHROUGHT), PASSTHROUGH);
+        get.put(replace(Paths.DB_PUBLISHER_SETTINGS_SHOW), PASSTHROUGH);
+        put.put(replace(Paths.DB_PUBLISHER_SETTINGS_SHOW), STATUS_OK);
 
-        put.put(replace(Paths.DB_PUBLISHER_SAVE_CONFIG_SHOW), STATUS_OK);
-
-        put.put(replace(Paths.DB_PUBLISHER_PUBLIC_MODE), STATUS_OK);
+        post.put(replace(Paths.DB_PUBLISHER_PUBLIC_MODE), STATUS_OK);
 
         delete.put(replace(Paths.DB_PUBLISHER_PUBLIC_MODE_END), STATUS_OK);
         post.put(replace(Paths.DB_PUBLISHER_ERROR_REPORT), STATUS_OK);

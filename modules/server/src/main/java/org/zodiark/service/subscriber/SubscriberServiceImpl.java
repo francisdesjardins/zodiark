@@ -22,12 +22,11 @@ import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.server.Context;
-import org.zodiark.server.EndpointUtils;
+import org.zodiark.service.EndpointUtils;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.Session;
-import org.zodiark.service.action.Action;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.session.StreamingRequest;
 import org.zodiark.service.util.UUID;
@@ -37,7 +36,6 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.zodiark.protocol.Paths.ACTION_VALIDATE;
 import static org.zodiark.protocol.Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCASTER_TRACK;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_SESSION_CREATE;
@@ -46,7 +44,7 @@ import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_EXTRA;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_FAVORITES_END;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_FAVORITES_START;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_JOIN_ACTION;
-import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_REQUEST_ACTION_PASSTHROUGH;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_REQUEST_ACTION;
 import static org.zodiark.protocol.Paths.ERROR_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.FAILED_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.JOIN_SUBSCRIBER_STREAMING_SESSION;
@@ -54,7 +52,6 @@ import static org.zodiark.protocol.Paths.MONITOR_RESOURCE;
 import static org.zodiark.protocol.Paths.RETRIEVE_PUBLISHER;
 import static org.zodiark.protocol.Paths.RETRIEVE_SUBSCRIBER;
 import static org.zodiark.protocol.Paths.SERVICE_SUBSCRIBER;
-import static org.zodiark.protocol.Paths.SUBSCRIBER_ACTION;
 import static org.zodiark.protocol.Paths.SUBSCRIBER_BROWSER_HANDSHAKE;
 import static org.zodiark.protocol.Paths.SUBSCRIBER_BROWSER_HANDSHAKE_OK;
 import static org.zodiark.protocol.Paths.TERMINATE_SUBSCRIBER_STREAMING_SESSSION;
@@ -109,17 +106,13 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             case TERMINATE_SUBSCRIBER_STREAMING_SESSSION:
                 terminateStreamingSession(e, r);
                 break;
-            case SUBSCRIBER_ACTION:
-                // TODO: Deprecated?
-                requestForAction(e, r);
-                break;
             case SUBSCRIBER_BROWSER_HANDSHAKE:
                 connectEndpoint(e, r);
                 break;
             case DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT:
                 availableActions(e, r);
                 break;
-            case DB_SUBSCRIBER_REQUEST_ACTION_PASSTHROUGH:
+            case DB_SUBSCRIBER_REQUEST_ACTION:
                 requestAction(e, r);
                 break;
             case DB_SUBSCRIBER_JOIN_ACTION:
@@ -209,9 +202,31 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             error(e, r, new Message().setPath("/error").setData("unauthorized"));
         }
 
+        // (1) Load DB_SUBSCRIBER_REQUEST_ACTION in memory
+        // (2) Wait for Publisher's response. Response is asynchronous until the Publisher disconnect or change state.
+        // (3) OK => Public => Subscriber's chat(facturation)  scramble = false, maxDuration =0
+        // (4) Ok => Public  avec Timer  scramble = false, maxDuration = XXX
+        // (5) OK => scramble = true, maxDuration = 0 ..... (Ping le Publisher pour min et max duration)
+        // Facturation plus tardive pour les suivants
+
+
+        // LA DB peut renvoyée une erreur.
+
+
+
         // Subscriber will be deleted in case an error happens.
         s.actionsAvailable(true);
+
+
+
         utils.passthroughEvent(DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT, e);
+
+
+        //eventBus.message(Paths.MESSAGE_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT)
+
+
+
+
     }
 
     @Override
@@ -276,35 +291,6 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         logger.info("Subscriber Connected {}", e);
         SubscriberEndpoint s = createEndpoint(r, e.getMessage());
         response(e, s, utils.constructMessage(SUBSCRIBER_BROWSER_HANDSHAKE_OK, "OK"));
-    }
-
-    @Override
-    public void requestForAction(final Envelope e, AtmosphereResource r) {
-        Message m = e.getMessage();
-        final SubscriberEndpoint s = endpoints.get(e.getUuid());
-
-        if (s == null) {
-            throw new IllegalStateException("No Subscriber associated with " + e.getUuid());
-        }
-
-        try {
-            Action a = mapper.readValue(m.getData(), Action.class);
-            a.subscriber(s);
-            eventBus.message(ACTION_VALIDATE, a, new Reply<Action>() {
-                @Override
-                public void ok(Action action) {
-                    logger.debug("Action Accepted for {}", action.getSubscriberUUID());
-                    response(e, endpoints.get(action.getSubscriberUUID()), utils.constructMessage(ACTION_VALIDATE, "OK"));
-                }
-
-                @Override
-                public void fail(Action action) {
-                    error(e, s, utils.constructMessage(ACTION_VALIDATE, "error"));
-                }
-            });
-        } catch (IOException e1) {
-            logger.warn("{}", e1);
-        }
     }
 
     @Override

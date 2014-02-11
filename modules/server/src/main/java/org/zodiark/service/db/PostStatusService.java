@@ -26,6 +26,7 @@ import javax.inject.Inject;
 
 import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_ONDEMAND_START;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_SESSION_CREATE;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_PUBLIC_MODE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_START_POST;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_BLOCK;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_EJECT;
@@ -34,6 +35,7 @@ import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_EJECT;
         DB_PUBLISHER_SHARED_PRIVATE_START_POST,
         DB_SUBSCRIBER_BLOCK,
         DB_SUBSCRIBER_EJECT,
+        DB_PUBLISHER_PUBLIC_MODE,
         DB_POST_SUBSCRIBER_SESSION_CREATE})
 public class PostStatusService extends DBServiceAdapter {
 

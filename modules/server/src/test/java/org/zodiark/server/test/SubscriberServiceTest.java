@@ -15,13 +15,9 @@
  */
 package org.zodiark.server.test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.atmosphere.cpr.AsyncIOWriter;
-import org.atmosphere.cpr.AsyncIOWriterAdapter;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceFactory;
-import org.atmosphere.cpr.AtmosphereResponse;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -32,10 +28,6 @@ import org.zodiark.server.EventBusFactory;
 import org.zodiark.server.ZodiarkServer;
 import org.zodiark.service.util.mock.InMemoryDB;
 
-import java.io.IOException;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicReference;
-
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNull;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_SESSION_CREATE;
@@ -44,7 +36,7 @@ import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_EXTRA;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_FAVORITES_END;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_FAVORITES_START;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_JOIN_ACTION;
-import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_REQUEST_ACTION_PASSTHROUGH;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_REQUEST_ACTION;
 
 public class SubscriberServiceTest {
 
@@ -55,38 +47,8 @@ public class SubscriberServiceTest {
 
     public final static String UC1 = "";
 
-
     public Message message(String path, String message) {
         return new Message().setPath(path).setData(message);
-    }
-
-    private final static class Writer extends AsyncIOWriterAdapter {
-        final ConcurrentLinkedQueue<Envelope> e = new ConcurrentLinkedQueue<>();
-        final AtomicReference<Throwable> error = new AtomicReference<>();
-        final ObjectMapper mapper = new ObjectMapper();
-
-        @Override
-        public AsyncIOWriter writeError(AtmosphereResponse r, int errorCode, String message) throws IOException {
-            error.set(new IOException(message));
-            return this;
-        }
-
-        @Override
-        public AsyncIOWriter write(AtmosphereResponse r, String data) throws IOException {
-            e.add(mapper.readValue(data, Envelope.class));
-            return this;
-        }
-
-        @Override
-        public AsyncIOWriter write(AtmosphereResponse r, byte[] data) throws IOException {
-            e.add(mapper.readValue(data, Envelope.class));
-            return this;
-        }
-
-        @Override
-        public AsyncIOWriter write(AtmosphereResponse r, byte[] data, int offset, int length) throws IOException {
-            return this;
-        }
     }
 
     @BeforeMethod
@@ -107,11 +69,11 @@ public class SubscriberServiceTest {
         RESOURCE.getResponse().asyncIOWriter(writer);
 
         // UC29
-        Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_SUBSCRIBER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
+        Envelope em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_POST_SUBSCRIBER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
         eventBus.ioEvent(em, RESOURCE);
 
         // UC24
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT, ""));
+        em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT, ""));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
@@ -132,11 +94,11 @@ public class SubscriberServiceTest {
         eventBus.ioEvent(em, RESOURCE);
 
         // UC24
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT, ""));
+        em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT, ""));
         eventBus.ioEvent(em, RESOURCE);
 
         // UC25
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_REQUEST_ACTION_PASSTHROUGH, RestServiceTest.ACTION));
+        em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_SUBSCRIBER_REQUEST_ACTION, RestServiceTest.ACTION));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
@@ -154,19 +116,19 @@ public class SubscriberServiceTest {
         RESOURCE.getResponse().asyncIOWriter(writer);
 
         // UC29
-        Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_SUBSCRIBER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
+        Envelope em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_POST_SUBSCRIBER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
         eventBus.ioEvent(em, RESOURCE);
 
         // UC24
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT, ""));
+        em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT, ""));
         eventBus.ioEvent(em, RESOURCE);
 
         // UC25
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_REQUEST_ACTION_PASSTHROUGH, RestServiceTest.ACTION));
+        em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_SUBSCRIBER_REQUEST_ACTION, RestServiceTest.ACTION));
         eventBus.ioEvent(em, RESOURCE);
 
         // UC26
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_JOIN_ACTION, ""));
+        em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_SUBSCRIBER_JOIN_ACTION, ""));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
@@ -185,11 +147,11 @@ public class SubscriberServiceTest {
         RESOURCE.getResponse().asyncIOWriter(writer);
 
         // UC29
-        Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_SUBSCRIBER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
+        Envelope em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_POST_SUBSCRIBER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
         eventBus.ioEvent(em, RESOURCE);
 
         // UC27
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_FAVORITES_END, ""));
+        em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_SUBSCRIBER_FAVORITES_END, ""));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
@@ -206,11 +168,11 @@ public class SubscriberServiceTest {
         RESOURCE.getResponse().asyncIOWriter(writer);
 
         // UC29
-        Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_SUBSCRIBER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
+        Envelope em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_POST_SUBSCRIBER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
         eventBus.ioEvent(em, RESOURCE);
 
         // UC27
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_FAVORITES_START, ""));
+        em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_SUBSCRIBER_FAVORITES_START, ""));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
@@ -228,7 +190,7 @@ public class SubscriberServiceTest {
 
         // UC1
 
-        Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_SUBSCRIBER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
+        Envelope em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_POST_SUBSCRIBER_SESSION_CREATE, "{\"guid\":\"1234\"}"));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
@@ -244,11 +206,11 @@ public class SubscriberServiceTest {
         RESOURCE.getResponse().asyncIOWriter(writer);
 
         // UC29
-        Envelope em = Envelope.newPublisherToServerRequest(UUID, message(DB_POST_SUBSCRIBER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
+        Envelope em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_POST_SUBSCRIBER_SESSION_CREATE, RestServiceTest.AUTHTOKEN));
         eventBus.ioEvent(em, RESOURCE);
 
         // UC30
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_EXTRA, RestServiceTest.AMOUNT_TOKEN));
+        em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_SUBSCRIBER_EXTRA, RestServiceTest.AMOUNT_TOKEN));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
