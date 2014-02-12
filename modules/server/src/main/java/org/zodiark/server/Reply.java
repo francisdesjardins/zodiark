@@ -20,7 +20,7 @@ package org.zodiark.server;
  * event.
  * @param <T>
  */
-public interface Reply<T> {
+public interface Reply<T, U> {
     /**
      * The targeted {@link org.zodiark.service.Service} successfully processed the event delivered by the {@link EventBus}
      * @param response the {@link org.zodiark.service.Service}'s success response
@@ -28,7 +28,9 @@ public interface Reply<T> {
     void ok(T response);
     /**
      * The targeted {@link org.zodiark.service.Service} failed to process the event delivered by the {@link EventBus}
-     * @param response the {@link org.zodiark.service.Service}'s failure response
+     * @param replyException the {@link org.zodiark.service.Service}'s failure response
      */
-    void fail(T response);
+    //void fail(ReplyException<U> replyException);
+    void fail(ReplyException<U> replyException);
+
 }

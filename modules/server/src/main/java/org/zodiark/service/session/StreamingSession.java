@@ -64,7 +64,7 @@ public interface StreamingSession {
      * @param reply a {@link Reply}
      * @return this
      */
-    StreamingSession validateAndJoin(SubscriberEndpoint subscriberEndpoint, Reply<SubscriberEndpoint> reply);
+    StreamingSession validateAndJoin(SubscriberEndpoint subscriberEndpoint, Reply<SubscriberEndpoint, String> reply);
 
     /**
      * Return the {@link PublisherEndpoint} associated with this session.

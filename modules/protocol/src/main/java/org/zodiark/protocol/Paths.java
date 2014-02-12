@@ -90,7 +90,7 @@ public interface Paths {
     /**
      * A Message to retrieve the publisher
      */
-    String RETRIEVE_PUBLISHER = "/publisher/retrieve";
+    String RETRIEVE_PUBLISHER = "/v1/publisher/retrieve";
     /**
      * A Message to retrieve the subscriber
      */
@@ -241,7 +241,7 @@ public interface Paths {
 
     String DB_PUBLISHER_SHARED_PRIVATE_END = "/v1/publisher/{guid}/shared/end";
 
-    String DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT = "/v1/subscriber/{guid}/actions";
+    String DB_SUBSCRIBER_AVAILABLE_ACTIONS = "/v1/subscriber/{guid}/actions";
 
     String DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT = "/v1/publisher/{guid}/settings/actions";
     String DB_SUBSCRIBER_REQUEST_ACTION = "/v1/subscriber/{guid}/action/transaction/request";
@@ -250,7 +250,7 @@ public interface Paths {
     // TODO: Change replace of subscriberGuid
     String DB_SUBSCRIBER_BLOCK = "/v1/publisher/{guid}/subscriber/block";
     String DB_SUBSCRIBER_EJECT = "/v1/publisher/{guid}/subscriber/eject";
-    String DB_SUBSCRIBER_FAVORITES_END = "/v1/subscriber/{guid}/favorite/{favoriteId}end";
+    String DB_SUBSCRIBER_FAVORITES_END = "/v1/subscriber/{guid}/favorite/end";
     String DB_SUBSCRIBER_FAVORITES_START = "/v1/subscriber/{guid}/favorite/";
     String DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT = "/v1/publisher/{guid}/settings/ui/";
 

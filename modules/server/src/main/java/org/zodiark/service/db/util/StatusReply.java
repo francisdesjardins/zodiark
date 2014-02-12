@@ -18,6 +18,7 @@ package org.zodiark.service.db.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
+import org.zodiark.server.ReplyException;
 import org.zodiark.service.db.DBError;
 import org.zodiark.service.db.Status;
 
@@ -44,6 +45,6 @@ public class StatusReply<V> extends ReplyAdapter<Status, DBError> {
     @Override
     public void failure(DBError failure) {
         logger.trace("Error {}", failure);
-        reply.fail(response);
+        reply.fail(ReplyException.DEFAULT);
     }
 }

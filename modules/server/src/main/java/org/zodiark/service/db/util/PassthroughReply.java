@@ -18,6 +18,7 @@ package org.zodiark.service.db.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
+import org.zodiark.server.ReplyException;
 import org.zodiark.service.db.DBError;
 import org.zodiark.service.db.Passthrough;
 
@@ -39,6 +40,6 @@ public class PassthroughReply extends ReplyAdapter<String, DBError> {
     @Override
     public void failure(DBError failure) {
         logger.trace("Error {}", failure);
-        reply.fail(new Passthrough().exception(failure.exception()));
+        reply.fail(ReplyException.DEFAULT);
     }
 }

@@ -18,6 +18,7 @@ package org.zodiark.service.db;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
+import org.zodiark.server.ReplyException;
 import org.zodiark.server.annotation.Retrieve;
 import org.zodiark.service.RetrieveMessage;
 import org.zodiark.service.util.RestService;
@@ -47,13 +48,13 @@ public class ShowStartService extends DBServiceAdapter {
 
             @Override
             public void failure(DBError failure) {
-                reply.fail(p);
+                reply.fail(ReplyException.DEFAULT);
             }
 
             @Override
             public void exception(Exception exception) {
                 logger.trace("", exception);
-                reply.fail(p);
+                reply.fail(ReplyException.DEFAULT);
             }
         });
 

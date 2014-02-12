@@ -24,10 +24,12 @@ import org.zodiark.protocol.Message;
 import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
+import org.zodiark.server.ReplyException;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointUtils;
 import org.zodiark.service.RetrieveMessage;
 import org.zodiark.service.Session;
+import org.zodiark.service.db.Actions;
 import org.zodiark.service.db.TransactionId;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.session.StreamingRequest;
@@ -44,7 +46,7 @@ import static org.zodiark.protocol.Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCASTER_TRACK;
 import static org.zodiark.protocol.Paths.DB_ENDPOINT_STATE;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_SESSION_CREATE;
-import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_EXTRA;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_FAVORITES_END;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_FAVORITES_START;
@@ -60,8 +62,6 @@ import static org.zodiark.protocol.Paths.SERVICE_SUBSCRIBER;
 import static org.zodiark.protocol.Paths.SUBSCRIBER_BROWSER_HANDSHAKE;
 import static org.zodiark.protocol.Paths.SUBSCRIBER_BROWSER_HANDSHAKE_OK;
 import static org.zodiark.protocol.Paths.TERMINATE_SUBSCRIBER_STREAMING_SESSSION;
-import static org.zodiark.protocol.Paths.VALIDATE_SUBSCRIBER_STREAMING_SESSION;
-import static org.zodiark.protocol.Paths.WOWZA_CONNECT;
 
 /**
  * A Service responsible for managing {@link SubscriberEndpoint}
@@ -99,9 +99,6 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             case DB_POST_SUBSCRIBER_SESSION_CREATE:
                 createSession(e, r);
                 break;
-            case VALIDATE_SUBSCRIBER_STREAMING_SESSION:
-                createOrJoinStreamingSession(e, r);
-                break;
             case JOIN_SUBSCRIBER_STREAMING_SESSION:
                 startStreamingSession(e, r);
                 break;
@@ -114,7 +111,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             case SUBSCRIBER_BROWSER_HANDSHAKE:
                 connectEndpoint(e, r);
                 break;
-            case DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT:
+            case DB_SUBSCRIBER_AVAILABLE_ACTIONS:
                 availableActions(e, r);
                 break;
             case DB_SUBSCRIBER_REQUEST_ACTION:
@@ -147,7 +144,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             return;
         }
 
-        eventBus.message(DB_SUBSCRIBER_EXTRA, new RetrieveMessage(s.uuid(), e.getMessage()), new Reply<TransactionId>() {
+        eventBus.message(DB_SUBSCRIBER_EXTRA, new RetrieveMessage(s.uuid(), e.getMessage()), new Reply<TransactionId, String>() {
             @Override
             public void ok(TransactionId success) {
                 s.transactionId(success);
@@ -156,7 +153,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             }
 
             @Override
-            public void fail(TransactionId failure) {
+            public void fail(ReplyException replyException) {
                 error(e, s, utils.constructMessage(DB_SUBSCRIBER_EXTRA, "error"));
             }
         });
@@ -182,11 +179,11 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
 
         if (!utils.validate(s, e)) return;
 
-        if (!s.hasSession() || !s.actionsAvailable()) {
+        if (!s.hasSession() || !s.actionRequested()) {
             error(e, r, new Message().setPath("/error").setData("unauthorized"));
         }
 
-        eventBus.message(DB_SUBSCRIBER_JOIN_ACTION, new RetrieveMessage(s.uuid(), e.getMessage()), new Reply<TransactionId>() {
+        eventBus.message(DB_SUBSCRIBER_JOIN_ACTION, new RetrieveMessage(s.uuid(), e.getMessage()), new Reply<TransactionId, String>() {
             @Override
             public void ok(TransactionId success) {
                 s.transactionId(success);
@@ -195,7 +192,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             }
 
             @Override
-            public void fail(TransactionId failure) {
+            public void fail(ReplyException replyException) {
                 error(e, s, utils.constructMessage(DB_SUBSCRIBER_JOIN_ACTION, "error"));
             }
         });
@@ -206,7 +203,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
 
         if (!utils.validate(s, e)) return;
 
-        if (!s.hasSession() || !s.actionsAvailable()) {
+        if (!s.hasSession() || !s.actionRequested()) {
             error(e, r, new Message().setPath("/error").setData("unauthorized"));
         }
 
@@ -222,10 +219,11 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
 
 
         // Subscriber will be deleted in case an error happens.
-        s.actionsAvailable(true);
+        s.actionRequested(true);
 
 
-        utils.passthroughEvent(DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT, e);
+
+        //utils.passthroughEvent(DB_SUBSCRIBER_AVAILABLE_ACTIONS, e);
 
 
         //eventBus.message(Paths.MESSAGE_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT)
@@ -262,18 +260,18 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             endpoints.put(uuid, s);
 
             final AtomicReference<SubscriberEndpoint> subscriberEndpoint = new AtomicReference<>(s);
-            eventBus.message(DB_ENDPOINT_STATE, new RetrieveMessage(s.uuid(), e.getMessage()), new Reply<EndpointState>() {
+            eventBus.message(DB_ENDPOINT_STATE, new RetrieveMessage(s.uuid(), e.getMessage()), new Reply<EndpointState, String>() {
 
                 @Override
                 public void ok(EndpointState state) {
                     SubscriberEndpoint s = subscriberEndpoint.get();
                     // Subscriber will be deleted in case an error happens.
-                    s.hasSession(true).state(state);
+                    s.hasSession(true).state(state).publisherEndpoint(retrieve(state.publisherUUID()));
                     utils.statusEvent(DB_POST_SUBSCRIBER_SESSION_CREATE, e, s);
                 }
 
                 @Override
-                public void fail(EndpointState response) {
+                public void fail(ReplyException replyException) {
                     error(e, subscriberEndpoint.get(), utils.constructMessage(DB_ENDPOINT_STATE, "error"));
                 }
             });
@@ -281,6 +279,23 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             error(e, r, new Message().setPath("/error").setData("unauthorized"));
         }
         return s;
+    }
+
+    public PublisherEndpoint retrieve(final String uuid) {
+        // TODO: This won't work asynchronous
+        final AtomicReference<PublisherEndpoint> publisher = new AtomicReference<>(null);
+        eventBus.message(RETRIEVE_PUBLISHER, uuid, new Reply<PublisherEndpoint, String>() {
+            @Override
+            public void ok(PublisherEndpoint p) {
+                publisher.set(p);
+            }
+
+            @Override
+            public void fail(ReplyException replyException) {
+                logger.error("Unable to retrieve publisher {}", uuid);
+            }
+        });
+        return publisher.get();
     }
 
     private void availableActions(Envelope e, AtmosphereResource r) {
@@ -293,8 +308,22 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         }
 
         // Subscriber will be deleted in case an error happens.
-        s.actionsAvailable(true);
-        utils.passthroughEvent(DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT, e);
+        s.actionRequested(true);
+
+        eventBus.message(DB_SUBSCRIBER_AVAILABLE_ACTIONS, new RetrieveMessage(s.uuid(), e.getMessage()), new Reply<Actions, String>() {
+
+                    @Override
+                    public void ok(Actions actions) {
+
+                    }
+
+                    @Override
+                    public void fail(ReplyException replyException) {
+                    }
+                });
+
+
+
     }
 
 
@@ -333,44 +362,16 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     @Override
-    public void createOrJoinStreamingSession(final Envelope e, AtmosphereResource r) {
-        String uuid = e.getUuid();
-        try {
-            final SubscriberEndpoint s = utils.retrieve(uuid);
-            final StreamingRequest request = mapper.readValue(e.getMessage().getData(), requestClass.getClass());
-
-            eventBus.message(RETRIEVE_PUBLISHER, request.getPublisherUUID(), new Reply<PublisherEndpoint>() {
-                @Override
-                public void ok(PublisherEndpoint p) {
-                    s.wowzaServerUUID(request.getWowzaUUID()).publisherEndpoint(p);
-
-                    // TODO: Callback is not called at the moment as the dispatching to Wowza is asynchronous
-                    // TODO: Unit test
-                    eventBus.message(WOWZA_CONNECT, s);
-                }
-
-                @Override
-                public void fail(PublisherEndpoint p) {
-                    error(e, s, utils.constructMessage(VALIDATE_SUBSCRIBER_STREAMING_SESSION, "error"));
-                }
-            });
-        } catch (IOException e1) {
-            logger.warn("{}", e1);
-        }
-
-    }
-
-    @Override
     public void retrieveEndpoint(Object subscriberUuid, Reply reply) {
         if (String.class.isAssignableFrom(subscriberUuid.getClass())) {
             SubscriberEndpoint s = endpoints.get(subscriberUuid.toString());
             if (s != null) {
                 reply.ok(s);
             } else {
-                reply.fail(null);
+                reply.fail(ReplyException.DEFAULT);
             }
         } else {
-            reply.fail(null);
+            reply.fail(ReplyException.DEFAULT);
         }
     }
 
@@ -384,14 +385,14 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         }
 
         final SubscriberEndpoint s = utils.retrieve(uuid.getUuid());
-        eventBus.message(BEGIN_SUBSCRIBER_STREAMING_SESSION, new RetrieveMessage(s.uuid(), e.getMessage()), new Reply<RetrieveMessage>() {
+        eventBus.message(BEGIN_SUBSCRIBER_STREAMING_SESSION, new RetrieveMessage(s.uuid(), e.getMessage()), new Reply<RetrieveMessage, String>() {
             @Override
             public void ok(RetrieveMessage ok) {
                 response(e, s, utils.constructMessage(BEGIN_SUBSCRIBER_STREAMING_SESSION, "OK"));
             }
 
             @Override
-            public void fail(RetrieveMessage failure) {
+            public void fail(ReplyException replyException) {
                 error(e, s, utils.constructMessage(BEGIN_SUBSCRIBER_STREAMING_SESSION, "error"));
             }
         });

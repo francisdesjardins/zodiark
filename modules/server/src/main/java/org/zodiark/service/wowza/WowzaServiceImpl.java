@@ -27,6 +27,8 @@ import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
 import javax.inject.Inject;
+
+import org.zodiark.server.ReplyException;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
 import org.zodiark.service.publisher.PublisherEndpoint;
@@ -71,7 +73,7 @@ public class WowzaServiceImpl implements WowzaService {
                 logger.debug("Obfuscation executed");
                 try {
                     final WowzaMessage w = mapper.readValue(e.getMessage().getData(), WowzaMessage.class);
-                    evenBus.message(RETRIEVE_PUBLISHER, w.getPublisherUUID(), new Reply<PublisherEndpoint>() {
+                    evenBus.message(RETRIEVE_PUBLISHER, w.getPublisherUUID(), new Reply<PublisherEndpoint, String>() {
                         @Override
                         public void ok(PublisherEndpoint p) {
                             try {
@@ -87,7 +89,7 @@ public class WowzaServiceImpl implements WowzaService {
                         }
 
                         @Override
-                        public void fail(PublisherEndpoint p) {
+                        public void fail(ReplyException replyException) {
                             logger.error("No Publisher found", w.getPublisherUUID());
                         }
                     });
@@ -122,7 +124,7 @@ public class WowzaServiceImpl implements WowzaService {
                 if (w != null) {
                     w.obfuscate(session, reply);
                 } else {
-                    reply.fail(session);
+                    reply.fail(ReplyException.DEFAULT);
                 }
                 break;
             case WOWZA_DEOBFUSCATE:
@@ -131,7 +133,7 @@ public class WowzaServiceImpl implements WowzaService {
                 if (w != null) {
                     w.deobfuscate(session, reply);
                 } else {
-                    reply.fail(session);
+                    reply.fail(ReplyException.DEFAULT);
                 }
                 break;
             case WOWZA_CONNECT:
@@ -141,7 +143,7 @@ public class WowzaServiceImpl implements WowzaService {
                     if (w != null) {
                         w.isEndpointConnected(p, reply);
                     } else {
-                        reply.fail(p);
+                        reply.fail(ReplyException.DEFAULT);
                     }
                 }
                 break;

@@ -39,7 +39,7 @@ public interface PublisherService extends Service {
     /**
      * Retrieve a {@link PublisherEndpoint} based on a String. It is recommended to pass the {@link PublisherEndpoint#uuid}
      * as a key for retrieving the Endpoint. The {@link Reply#ok(Object)} will be invoked if an {@link PublisherEndpoint}  \
-     * is found, or {@link Reply#fail(Object)} if no {@link PublisherEndpoint} is associated with the key.
+     * is found, or {@link Reply#fail(org.zodiark.server.ReplyException)} if no {@link PublisherEndpoint} is associated with the key.
      *
      * @param publisherEndpointUuid The {@link PublisherEndpoint#uuid}
      * @param reply a {@link Reply}

@@ -25,6 +25,8 @@ import org.zodiark.protocol.Message;
 import org.zodiark.protocol.Paths;
 import org.zodiark.server.Reply;
 import javax.inject.Inject;
+
+import org.zodiark.server.ReplyException;
 import org.zodiark.service.Endpoint;
 import org.zodiark.service.session.StreamingSession;
 import org.zodiark.service.state.EndpointState;
@@ -112,7 +114,7 @@ public class WowzaEndpoint implements Endpoint {
             resource.write(mapper.writeValueAsString(e));
         } catch (Exception e) {
             logger.error("", e);
-            l.fail(p);
+            l.fail(ReplyException.DEFAULT);
         }
 
     }
@@ -181,7 +183,7 @@ public class WowzaEndpoint implements Endpoint {
             resource.write(mapper.writeValueAsString(e));
         } catch (JsonProcessingException e1) {
             logger.error("", e1);
-            reply.fail(session.pendingAction());
+            reply.fail(ReplyException.DEFAULT);
         }
 
     }
@@ -216,7 +218,7 @@ public class WowzaEndpoint implements Endpoint {
             resource.write(mapper.writeValueAsString(e));
         } catch (JsonProcessingException e1) {
             logger.error("", e1);
-            reply.fail(session.pendingAction());
+            reply.fail(ReplyException.DEFAULT);
         }
 
     }

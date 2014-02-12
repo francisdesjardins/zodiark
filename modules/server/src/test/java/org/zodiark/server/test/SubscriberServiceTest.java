@@ -31,7 +31,7 @@ import org.zodiark.service.util.mock.InMemoryDB;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNull;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_SESSION_CREATE;
-import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_EXTRA;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_FAVORITES_END;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_FAVORITES_START;
@@ -73,7 +73,7 @@ public class SubscriberServiceTest {
         eventBus.ioEvent(em, RESOURCE);
 
         // UC24
-        em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT, ""));
+        em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_SUBSCRIBER_AVAILABLE_ACTIONS, ""));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
@@ -94,7 +94,7 @@ public class SubscriberServiceTest {
         eventBus.ioEvent(em, RESOURCE);
 
         // UC24
-        em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT, ""));
+        em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_SUBSCRIBER_AVAILABLE_ACTIONS, ""));
         eventBus.ioEvent(em, RESOURCE);
 
         // UC25
@@ -120,7 +120,7 @@ public class SubscriberServiceTest {
         eventBus.ioEvent(em, RESOURCE);
 
         // UC24
-        em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT, ""));
+        em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_SUBSCRIBER_AVAILABLE_ACTIONS, ""));
         eventBus.ioEvent(em, RESOURCE);
 
         // UC25

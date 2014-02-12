@@ -42,7 +42,8 @@ public class InMemoryDB {
     public final static String SHOWID ="{\"showId\":123234}";
     public final static String MOTD = "{\"motds\": [{\"motdId\": 1, \"title\": \"foo\", \"message\": \"blabla\", \"createdOn\":\"20140125\", \"expiresOn\":\"20140125\", " +
                     "\"expired\": true}]}";
-    public final static String STATE = "{\"username\":\"123\",\"language\":\"fr\",\"showId\":123,\"watchId\":123,\"modeId\":123,\"type\":\"0\",\"administrator\": true}";
+    public final static String STATE = "{\"username\":\"123\",\"language\":\"fr\",\"showId\":123,\"watchId\":123,\"modeId\":123,\"type\":\"0\",\"administrator\": true,\"guid\":\"123456\"}";
+    public final static String ACTIONS = "    [{\"actionId\": 123,\"title\":\"foo\",\"cost\": 123,\"groupDiscount\": 123,\"minimumDurationInSeconds\":30,\"scramble\": true,\"forced\": true,\"createdOn\": \"1502000\"}}}\n";
 
     EndpointMapper<String> mapper = new DefaultEndpointMapper<>();
 
@@ -52,6 +53,8 @@ public class InMemoryDB {
     private final Map<String, String> delete = new HashMap<>();
 
     private final Map<String, String> fakeFailDatabase = new HashMap<>();
+
+
 
 
     public InMemoryDB() {
@@ -80,7 +83,7 @@ public class InMemoryDB {
 
         put.put(Paths.DB_PUBLISHER_SHARED_PRIVATE_END, STATUS_OK);
 
-        get.put(Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT, PASSTHROUGH);
+        get.put(Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS, ACTIONS);
         get.put(Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, PASSTHROUGH);
         put.put(Paths.DB_PUBLISHER_ACTIONS, STATUS_OK);
 

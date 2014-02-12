@@ -25,6 +25,7 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
+import org.zodiark.server.ReplyException;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.publisher.PublisherResults;
@@ -89,7 +90,7 @@ public class ActionServiceImpl implements ActionService {
     public void actionStarted(Envelope e) {
         try {
             final PublisherResults results = mapper.readValue(e.getMessage().getData(), PublisherResults.class);
-            eventBus.message(RETRIEVE_PUBLISHER, results.getUuid(), new Reply<PublisherEndpoint>() {
+            eventBus.message(RETRIEVE_PUBLISHER, results.getUuid(), new Reply<PublisherEndpoint, String>() {
                 @Override
                 public void ok(final PublisherEndpoint p) {
 
@@ -148,7 +149,7 @@ public class ActionServiceImpl implements ActionService {
                 }
 
                 @Override
-                public void fail(PublisherEndpoint p) {
+                public void fail(ReplyException replyException) {
                     logger.error("Unable to retrieve Publishere for {}", results.getUuid());
                 }
             });
@@ -185,12 +186,12 @@ public class ActionServiceImpl implements ActionService {
         final PublisherEndpoint p = s.publisherEndpoint();
 
         if (p.actionInProgress()) {
-            reply.fail(s);
+            reply.fail(ReplyException.DEFAULT);
             return;
         }
         p.action(action);
 
-        eventBus.message(DB_SUBSCRIBER_VALIDATE_STATE, s, new Reply<SubscriberEndpoint>() {
+        eventBus.message(DB_SUBSCRIBER_VALIDATE_STATE, s, new Reply<SubscriberEndpoint, String>() {
             @Override
             public void ok(SubscriberEndpoint s) {
                 logger.trace("Action {} succeeded. Sending request to publisher {}", action, s);
@@ -202,8 +203,8 @@ public class ActionServiceImpl implements ActionService {
             }
 
             @Override
-            public void fail(SubscriberEndpoint s) {
-                reply.fail(s);
+            public void fail(ReplyException replyException) {
+                reply.fail(ReplyException.DEFAULT);
             }
         });
     }
@@ -243,14 +244,14 @@ public class ActionServiceImpl implements ActionService {
         try {
             final Action action = mapper.readValue(e.getMessage().getData(), Action.class);
 
-            eventBus.message(RETRIEVE_SUBSCRIBER, action.getSubscriberUUID(), new Reply<SubscriberEndpoint>() {
+            eventBus.message(RETRIEVE_SUBSCRIBER, action.getSubscriberUUID(), new Reply<SubscriberEndpoint, String>() {
                 @Override
                 public void ok(SubscriberEndpoint s) {
                     action.subscriber(s);
                 }
 
                 @Override
-                public void fail(SubscriberEndpoint s) {
+                public void fail(ReplyException replyException) {
                     logger.error("No Endpoint");
                 }
             });
@@ -263,14 +264,14 @@ public class ActionServiceImpl implements ActionService {
             // Send OK
             l.ok(action);
 
-            eventBus.message(STREAMING_EXECUTE_ACTION, action, new Reply<Action>() {
+            eventBus.message(STREAMING_EXECUTE_ACTION, action, new Reply<Action, String>() {
                 @Override
                 public void ok(Action action) {
 
                 }
 
                 @Override
-                public void fail(Action action) {
+                public void fail(ReplyException replyException) {
 
                 }
             });
@@ -291,7 +292,7 @@ public class ActionServiceImpl implements ActionService {
                 throw new IllegalStateException("Invalid state");
             }
 
-            l.fail(action);
+            l.fail(ReplyException.DEFAULT);
         } catch (IOException e1) {
             logger.error("", e1);
         }

@@ -24,6 +24,7 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
+import org.zodiark.server.ReplyException;
 import org.zodiark.service.Service;
 
 import java.util.Collection;
@@ -40,15 +41,15 @@ public class DefaultEventBus implements EventBus {
     private final ConcurrentHashMap<String, Service> ioServices = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Service> services = new ConcurrentHashMap<>();
     private final ConcurrentLinkedQueue<PathTransformer> transformers = new ConcurrentLinkedQueue<>();
-    private final Reply l = new Reply() {
+    private final Reply l = new Reply<Object, String>() {
         @Override
         public void ok(Object response) {
             logger.trace("completed", response);
         }
 
         @Override
-        public void fail(Object response) {
-            logger.trace("failed", response);
+        public void fail(ReplyException<String> replyException) {
+            logger.trace("failed", replyException);
         }
     };
 

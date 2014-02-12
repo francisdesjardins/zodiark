@@ -16,7 +16,7 @@
 package org.zodiark.service.db.util;
 
 import org.zodiark.server.Reply;
-import org.zodiark.service.db.DBError;
+import org.zodiark.server.ReplyException;
 import org.zodiark.service.util.RestService;
 
 public abstract class ReplyAdapter<T, U> implements RestService.Reply<T, U> {
@@ -28,11 +28,11 @@ public abstract class ReplyAdapter<T, U> implements RestService.Reply<T, U> {
     }
 
     public void fail() {
-        reply.fail(new DBError());
+        reply.fail(ReplyException.DEFAULT);
     }
 
     public void exception(Exception exception) {
-        reply.fail(new DBError().exception(exception).type(DBError.TYPE.UNEXPECTED));
+        reply.fail(ReplyException.DEFAULT);
     }
 }
 

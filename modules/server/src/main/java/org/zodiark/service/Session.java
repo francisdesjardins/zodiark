@@ -55,15 +55,6 @@ public interface Session<T extends Endpoint> {
     public void error(Envelope e, AtmosphereResource r, Message m);
 
     /**
-     * Create or join a Streaming Session. The Session will be created if the {@link Endpoint} is a Publisher, and joined if the
-     * endpoint is a Subscriber. Implementation of this method must make sure the Wowza Server will allow the Endpoint to
-     * create or Join the session.
-     *
-     * @param e an {@link Envelope} from the {@link Endpoint}
-     */
-    public void createOrJoinStreamingSession(Envelope e, AtmosphereResource r);
-
-    /**
      * Start the streaming session. This method will be called by the remote endpoint upon successful completion of
      * {@link #createSession(org.zodiark.protocol.Envelope, org.atmosphere.cpr.AtmosphereResource)}
      * and {@link #createOrJoinStreamingSession(org.zodiark.protocol.Envelope)}

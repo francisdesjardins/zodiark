@@ -18,6 +18,7 @@ package org.zodiark.service.db;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
+import org.zodiark.server.ReplyException;
 import org.zodiark.server.annotation.Retrieve;
 import org.zodiark.service.RetrieveMessage;
 import org.zodiark.service.state.EndpointState;
@@ -28,9 +29,9 @@ import javax.inject.Inject;
 import static org.zodiark.protocol.Paths.DB_ENDPOINT_STATE;
 
 @Retrieve({DB_ENDPOINT_STATE})
-public class GetEndpointState extends DBServiceAdapter {
+public class GetEndpointStateService extends DBServiceAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(GetEndpointState.class);
+    private final Logger logger = LoggerFactory.getLogger(GetEndpointStateService.class);
 
     @Inject
     public RestService restService;
@@ -47,13 +48,13 @@ public class GetEndpointState extends DBServiceAdapter {
 
             @Override
             public void failure(DBError failure) {
-                reply.fail(p);
+                reply.fail(ReplyException.DEFAULT);
             }
 
             @Override
             public void exception(Exception exception) {
                 logger.trace("", exception);
-                reply.fail(p);
+                reply.fail(ReplyException.DEFAULT);
             }
         });
 

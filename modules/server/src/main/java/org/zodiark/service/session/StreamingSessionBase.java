@@ -18,6 +18,7 @@ package org.zodiark.service.session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
+import org.zodiark.server.ReplyException;
 import org.zodiark.service.action.Action;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.subscriber.SubscriberEndpoint;
@@ -63,9 +64,9 @@ public abstract class StreamingSessionBase implements StreamingSession {
      * {@inheritDoc}
      */
     @Override
-    public StreamingSession validateAndJoin(SubscriberEndpoint subscriberEndpoint, Reply<SubscriberEndpoint> reply) {
+    public StreamingSession validateAndJoin(SubscriberEndpoint subscriberEndpoint, Reply<SubscriberEndpoint, String> reply) {
         if (!validateSession(subscriberEndpoint)) {
-            reply.fail(subscriberEndpoint);
+            reply.fail(ReplyException.DEFAULT);
         } else {
             logger.debug("Subscriber {} joined Publisher {}", subscriberEndpoint, endpoint);
             subscribers.add(subscriberEndpoint);

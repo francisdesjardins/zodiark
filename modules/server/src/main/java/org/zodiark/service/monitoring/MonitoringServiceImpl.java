@@ -22,9 +22,11 @@ import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
-import javax.inject.Inject;
+import org.zodiark.server.ReplyException;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
+
+import javax.inject.Inject;
 
 import static org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter.OnDisconnect;
 import static org.zodiark.protocol.Paths.DISCONNECTED_RESOURCE;
@@ -58,7 +60,7 @@ public class MonitoringServiceImpl implements MonitoringService {
                         logger.trace("{} disconnected with {}", r, event);
 
                         // TODO: This message goes into the void right now
-                        eventBus.message(RETRIEVE_PUBLISHER, r.uuid(), new Reply<EndpointAdapter>() {
+                        eventBus.message(RETRIEVE_PUBLISHER, r.uuid(), new Reply<EndpointAdapter, String>() {
                             @Override
                             public void ok(EndpointAdapter p) {
                                 // TODO: This message goes into the void right now
@@ -66,8 +68,8 @@ public class MonitoringServiceImpl implements MonitoringService {
                             }
 
                             @Override
-                            public void fail(EndpointAdapter p) {
-                                logger.error("", p);
+                            public void fail(ReplyException replyException) {
+                                logger.error("", replyException);
                             }
                         });
                     }

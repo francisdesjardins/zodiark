@@ -22,6 +22,7 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.server.Context;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
+import org.zodiark.server.ReplyException;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.action.Action;
 import org.zodiark.service.publisher.PublisherEndpoint;
@@ -110,7 +111,7 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
         final Action completedAction = session.pendingAction();
         session.pendingAction(null);
 
-        eventBus.message(WOWZA_DEOBFUSCATE, session, new Reply<StreamingSession>() {
+        eventBus.message(WOWZA_DEOBFUSCATE, session, new Reply<StreamingSession, String>() {
             @Override
             public void ok(StreamingSession session) {
                 logger.trace("Wowza de-obfuscation executed {}", completedAction);
@@ -118,8 +119,8 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
             }
 
             @Override
-            public void fail(StreamingSession action) {
-                logger.error("Error finishing Session {}", action);
+            public void fail(ReplyException replyException) {
+                logger.error("Error finishing Session {}", replyException);
             }
         });
     }
@@ -137,7 +138,7 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
         }
         session.pendingAction(a);
 
-        eventBus.message(WOWZA_OBFUSCATE, session, new Reply<StreamingSession>() {
+        eventBus.message(WOWZA_OBFUSCATE, session, new Reply<StreamingSession, String>() {
             @Override
             public void ok(StreamingSession session) {
                 logger.trace("Wowza obfuscation executed {}", a);
@@ -147,8 +148,8 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
             }
 
             @Override
-            public void fail(StreamingSession action) {
-                reply.fail(action);
+            public void fail(ReplyException replyException) {
+                reply.fail(ReplyException.DEFAULT);
             }
         });
 
@@ -187,7 +188,7 @@ public class StreamingSessionServiceImpl implements StreamingSessionService {
     public void join(SubscriberEndpoint subscriberEndpoint, Reply reply) {
         boolean hasStreamingSession = hasStreamingSession(subscriberEndpoint.publisherEndpoint());
         if (!hasStreamingSession) {
-            reply.fail(subscriberEndpoint);
+            reply.fail(ReplyException.DEFAULT);
         } else {
             StreamingSession streamingSession = sessions.get(subscriberEndpoint.publisherEndpoint().uuid());
             streamingSession.validateAndJoin(subscriberEndpoint, reply);

@@ -24,6 +24,7 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
+import org.zodiark.server.ReplyException;
 import org.zodiark.service.db.Passthrough;
 import org.zodiark.service.db.Status;
 
@@ -55,7 +56,7 @@ public class EndpointUtils<T extends EndpointAdapter> {
         if (!validateAll(p, e)) ;
 
 
-        statusEvent(path, e, p, new Reply<Status>() {
+        statusEvent(path, e, p, new Reply<Status, String>() {
             @Override
             public void ok(Status status) {
                 logger.trace("Status {}", status);
@@ -63,13 +64,13 @@ public class EndpointUtils<T extends EndpointAdapter> {
             }
 
             @Override
-            public void fail(Status status) {
+            public void fail(ReplyException replyException) {
                 error(e, p, constructMessage(path, writeAsString(new Error().error("Unauthorized"))));
             }
         });
     }
 
-    public void statusEvent(final String path, final Envelope e, final T p, Reply<Status> r) {
+    public void statusEvent(final String path, final Envelope e, final T p, Reply<Status, String> r) {
         eventBus.message(path, new RetrieveMessage(p.uuid(), e.getMessage()), r);
     }
 
@@ -83,15 +84,15 @@ public class EndpointUtils<T extends EndpointAdapter> {
 
         if (!validateShowId(p, e)) return;
 
-        eventBus.message(path, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<Passthrough>() {
+        eventBus.message(path, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<Passthrough, String>() {
             @Override
             public void ok(Passthrough passthrough) {
                 succesPassThrough(e, p, path, passthrough);
             }
 
             @Override
-            public void fail(Passthrough passthrough) {
-                failPassThrough(e, p, passthrough);
+            public void fail(ReplyException replyException) {
+                failPassThrough(e, p, replyException);
             }
         });
     }
@@ -126,9 +127,9 @@ public class EndpointUtils<T extends EndpointAdapter> {
         response(e, p, constructMessage(path, passthrough.response()));
     }
 
-    public void failPassThrough(Envelope e, T p, Passthrough passthrough) {
+    public void failPassThrough(Envelope e, T p, ReplyException passthrough) {
         logger.trace("Passthrough failed {}", passthrough);
-        error(e, p, constructMessage(e.getMessage().getPath(), passthrough.exception().getMessage()));
+        error(e, p, constructMessage(e.getMessage().getPath(), passthrough.throwable().getMessage()));
     }
 
     public void error(Envelope e, T endpoint, Message m) {

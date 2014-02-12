@@ -29,7 +29,7 @@ import org.zodiark.service.util.mock.InMemoryDB;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNull;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_SESSION_CREATE;
-import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_REQUEST_ACTION;
 
 public class CoordinationTest {
@@ -54,7 +54,7 @@ public class CoordinationTest {
         eventBus.ioEvent(em, RESOURCE);
 
         // UC24
-        em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT, ""));
+        em = Envelope.newSubscriberrToServerRequest(UUID, message(DB_SUBSCRIBER_AVAILABLE_ACTIONS, ""));
         eventBus.ioEvent(em, RESOURCE);
 
         // UC25

@@ -26,7 +26,7 @@ public class SubscriberEndpoint extends EndpointAdapter<SubscriberEndpoint> {
 
     private PublisherEndpoint publisherEndpoint;
     private boolean hasSession;
-    private boolean actionsAvailable;
+    private boolean actionRequested;
     private TransactionId transactionId;
 
     public SubscriberEndpoint() {
@@ -52,12 +52,12 @@ public class SubscriberEndpoint extends EndpointAdapter<SubscriberEndpoint> {
         return this;
     }
 
-    public boolean actionsAvailable() {
-        return actionsAvailable;
+    public boolean actionRequested() {
+        return actionRequested;
     }
 
-    public SubscriberEndpoint actionsAvailable(boolean actionsAvailable) {
-        this.actionsAvailable = actionsAvailable;
+    public SubscriberEndpoint actionRequested(boolean actionRequested) {
+        this.actionRequested = actionRequested;
         return this;
     }
 

@@ -371,7 +371,7 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<String> result = new AtomicReference<>();
 
-        restService.get(Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT.replace("{guid}", UUID.randomUUID().toString()), new RestService.Reply<String, DBError>() {
+        restService.get(Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS.replace("{guid}", UUID.randomUUID().toString()), new RestService.Reply<String, DBError>() {
             @Override
             public void success(String success) {
                 result.set(success);

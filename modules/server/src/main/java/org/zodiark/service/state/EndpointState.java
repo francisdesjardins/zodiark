@@ -22,6 +22,8 @@ import org.zodiark.service.db.WatchId;
 
 public class EndpointState {
 
+    public final static String VOID = "-1";
+
     private ShowId showId;
     private String username;
     private WatchId watchId;
@@ -29,6 +31,7 @@ public class EndpointState {
     private ModeId modeId;
     private String type;
     private boolean administrator;
+    private String publisherUUID = VOID;
 
     public EndpointState(){}
 
@@ -95,6 +98,17 @@ public class EndpointState {
     @JsonProperty("administrator")
     public EndpointState administrator(boolean administrator) {
         this.administrator = administrator;
+        return this;
+    }
+
+
+    public String publisherUUID() {
+        return publisherUUID;
+    }
+
+    @JsonProperty("guid")
+    public EndpointState publisherUUID(String publisherUUID) {
+        this.publisherUUID = publisherUUID;
         return this;
     }
 }
