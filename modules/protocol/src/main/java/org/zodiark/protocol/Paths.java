@@ -245,8 +245,8 @@ public interface Paths {
 
     String DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT = "/v1/publisher/{guid}/settings/actions";
     String DB_SUBSCRIBER_REQUEST_ACTION = "/v1/subscriber/{guid}/action/transaction/request";
-    String DB_SUBSCRIBER_JOIN_ACTION = "/v1/subscriber/{guid}/action/transaction/{id}/join";
-    String DB_SUBSCRIBER_CHARGE_ACTION = "/v1/subscriber/{guid}/action/transaction/{id}/charge";
+    String DB_SUBSCRIBER_JOIN_ACTION = "/v1/subscriber/{guid}/action/transaction/{transactionId}/join";
+    String DB_SUBSCRIBER_CHARGE_ACTION = "/v1/subscriber/{guid}/action/transaction/{transactionId}/charge";
     // TODO: Change replace of subscriberGuid
     String DB_SUBSCRIBER_BLOCK = "/v1/publisher/{guid}/subscriber/block";
     String DB_SUBSCRIBER_EJECT = "/v1/publisher/{guid}/subscriber/eject";
@@ -265,8 +265,8 @@ public interface Paths {
     String DB_PUBLISHER_SETTINGS_SHOW_SAVE = "_post" + DB_PUBLISHER_SETTINGS_SHOW;
 
     String DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT = "/v1/publisher/{guid}/settings/errors";
-    String DB_PUBLISHER_PUBLIC_MODE = "/v1/publisher/{guid}/settings/public/start";
-    String DB_PUBLISHER_PUBLIC_MODE_END = "/v1/publisher/{guid}/settings/public/end";
+    String DB_PUBLISHER_PUBLIC_MODE = "/v1/publisher/{guid}/settings/override/state/start";
+    String DB_PUBLISHER_PUBLIC_MODE_END = "/v1/publisher/{guid}/settings/override/state/end";
     String DB_PUBLISHER_ERROR_REPORT = "/v1/publisher/{guid}/error/report";
 
     String DB_PUBLISHER_SUBSCRIBER_PROFILE = "/v1/publisher/{guid}/subscriber/{guid}/profile";

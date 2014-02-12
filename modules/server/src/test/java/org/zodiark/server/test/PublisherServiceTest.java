@@ -394,7 +394,7 @@ public class PublisherServiceTest {
         eventBus.ioEvent(em, RESOURCE);
 
         // UC18
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_BLOCK, "{\"guid\":\"1234\"}"));
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_BLOCK, "{\"guid\":\"1234\", \"reason\":\"blabla\"}"));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
@@ -417,7 +417,7 @@ public class PublisherServiceTest {
         eventBus.ioEvent(em, RESOURCE);
 
         // UC19
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_EJECT, "{\"guid\":\"1234\"}"));
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_SUBSCRIBER_EJECT, "{\"guid\":\"1234\", \"reason\":\"blabla\"}"));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());

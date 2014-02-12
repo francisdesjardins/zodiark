@@ -24,8 +24,9 @@ public class ModeId {
     public final static ModeId VOID = new ModeId(0, MODE.VOID);
     public final static ModeId PUBLIC = new ModeId(1, MODE.PUBLIC);
     public final static ModeId PRIVATE = new ModeId(2, MODE.PRIVATE);
-    public final static ModeId VIEW = new ModeId(3, MODE.VIEW);
+    public final static ModeId MIDPRIVATE = new ModeId(3, MODE.VIEW);
     public final static ModeId SHAREDPRIVATE = new ModeId(4, MODE.SHAREDPRIVATE);
+    public final static ModeId AUDIOTEL = new ModeId(5, MODE.SHAREDPRIVATE);
 
     private int modeId;
     private MODE mode;
