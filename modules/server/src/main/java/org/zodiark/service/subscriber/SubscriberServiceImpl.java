@@ -222,7 +222,6 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         s.actionRequested(true);
 
 
-
         //utils.passthroughEvent(DB_SUBSCRIBER_AVAILABLE_ACTIONS, e);
 
 
@@ -298,8 +297,8 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         return publisher.get();
     }
 
-    private void availableActions(Envelope e, AtmosphereResource r) {
-        SubscriberEndpoint s = utils.retrieve(e.getUuid());
+    private void availableActions(final Envelope e, AtmosphereResource r) {
+        final SubscriberEndpoint s = utils.retrieve(e.getUuid());
 
         if (!utils.validate(s, e)) return;
 
@@ -311,21 +310,19 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         s.actionRequested(true);
 
         eventBus.message(DB_SUBSCRIBER_AVAILABLE_ACTIONS, new RetrieveMessage(s.uuid(), e.getMessage()), new Reply<Actions, String>() {
+            @Override
+            public void ok(Actions actions) {
+                s.actionsAvailable(actions);
+                response(e, s, utils.constructMessage(DB_SUBSCRIBER_AVAILABLE_ACTIONS, utils.writeAsString(actions)));
+            }
 
-                    @Override
-                    public void ok(Actions actions) {
-
-                    }
-
-                    @Override
-                    public void fail(ReplyException replyException) {
-                    }
-                });
-
-
+            @Override
+            public void fail(ReplyException replyException) {
+                error(e, s, utils.errorMessage(DB_SUBSCRIBER_AVAILABLE_ACTIONS, "error"));
+            }
+        });
 
     }
-
 
     @Override
     public void error(Envelope e, SubscriberEndpoint endpoint, Message m) {

@@ -15,12 +15,15 @@
  */
 package org.zodiark.service.db;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.LinkedList;
 
 public class Actions {
     private LinkedList<Action> actions;
 
-    public Actions() {}
+    public Actions() {
+    }
 
     public LinkedList<Action> getActions() {
         return actions;
@@ -28,5 +31,11 @@ public class Actions {
 
     public void setActions(LinkedList<Action> actions) {
         this.actions = actions;
+    }
+
+    @JsonProperty("action")
+    public Actions action(Action action) {
+        actions.add(action);
+        return this;
     }
 }

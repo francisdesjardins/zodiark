@@ -15,7 +15,10 @@
  */
 package org.zodiark.service.util;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -98,5 +101,19 @@ public class ReflectionUtils {
             typeArgumentsAsClasses.add(getClass(baseType));
         }
         return typeArgumentsAsClasses;
+    }
+
+    public static boolean needInjection(Class aClass) {
+        Field[] fields = aClass.getDeclaredFields();
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(Inject.class)) {
+                return true;
+            }
+
+            if (field.isAnnotationPresent(PostConstruct.class)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -16,6 +16,7 @@
 package org.zodiark.service.subscriber;
 
 import org.zodiark.service.EndpointAdapter;
+import org.zodiark.service.db.Actions;
 import org.zodiark.service.db.TransactionId;
 import org.zodiark.service.publisher.PublisherEndpoint;
 
@@ -28,6 +29,7 @@ public class SubscriberEndpoint extends EndpointAdapter<SubscriberEndpoint> {
     private boolean hasSession;
     private boolean actionRequested;
     private TransactionId transactionId;
+    private Actions actionsAvailable;
 
     public SubscriberEndpoint() {
         super();
@@ -49,6 +51,15 @@ public class SubscriberEndpoint extends EndpointAdapter<SubscriberEndpoint> {
 
     public SubscriberEndpoint hasSession(boolean hasSession) {
         this.hasSession = hasSession;
+        return this;
+    }
+
+    public Actions actionsAvailable() {
+        return actionsAvailable;
+    }
+
+    public SubscriberEndpoint actionsAvailable(Actions actionsAvailable) {
+        this.actionsAvailable = actionsAvailable;
         return this;
     }
 

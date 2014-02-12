@@ -77,8 +77,12 @@ public class OKRestService implements RestService {
             String restResponse = db.serve(method, uri, mapper.writeValueAsString(o), InMemoryDB.RESULT.PASS);
 
             try {
-                Object object = context.newInstance(success);
-                r.ok(String.class.isAssignableFrom(success) ? restResponse : mapper.readerForUpdating(object).readValue(restResponse));
+                if (ReflectionUtils.needInjection(success)) {
+                    Object object = context.newInstance(success);
+                    r.ok(String.class.isAssignableFrom(success) ? restResponse : mapper.readerForUpdating(object).readValue(restResponse));
+                } else {
+                    r.ok(mapper.readValue(restResponse, success));
+                }
             } catch (Exception ex) {
                 logger.error("", ex);
                 Object object = context.newInstance(failure);

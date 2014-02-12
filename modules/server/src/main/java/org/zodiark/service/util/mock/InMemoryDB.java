@@ -43,7 +43,20 @@ public class InMemoryDB {
     public final static String MOTD = "{\"motds\": [{\"motdId\": 1, \"title\": \"foo\", \"message\": \"blabla\", \"createdOn\":\"20140125\", \"expiresOn\":\"20140125\", " +
                     "\"expired\": true}]}";
     public final static String STATE = "{\"username\":\"123\",\"language\":\"fr\",\"showId\":123,\"watchId\":123,\"modeId\":123,\"type\":\"0\",\"administrator\": true,\"guid\":\"123456\"}";
-    public final static String ACTIONS = "    [{\"actionId\": 123,\"title\":\"foo\",\"cost\": 123,\"groupDiscount\": 123,\"minimumDurationInSeconds\":30,\"scramble\": true,\"forced\": true,\"createdOn\": \"1502000\"}}}\n";
+    public final static String ACTIONS = "{\n" +
+            "    \"actions\": [\n" +
+            "        {\n" +
+            "            \"actionId\": 123,\n" +
+            "            \"title\": \"foo\",\n" +
+            "            \"cost\": 123,\n" +
+            "            \"groupDiscount\": 123,\n" +
+            "            \"minimumDurationInSeconds\": 30,\n" +
+            "            \"scramble\": true,\n" +
+            "            \"forced\": true,\n" +
+            "            \"createdOn\": \"1502000\"\n" +
+            "        }\n" +
+            "    ]\n" +
+            "}";
 
     EndpointMapper<String> mapper = new DefaultEndpointMapper<>();
 

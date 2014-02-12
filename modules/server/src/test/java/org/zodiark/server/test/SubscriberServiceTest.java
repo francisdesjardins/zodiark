@@ -79,7 +79,7 @@ public class SubscriberServiceTest {
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 2);
         assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.ACTIONS.replaceAll("\n","").replaceAll("\\s",""), writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -134,7 +134,7 @@ public class SubscriberServiceTest {
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 4);
         assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.ACTIONS.replaceAll("\n","").replaceAll("\\s",""), writer.e.poll().getMessage().getData());
         assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
         assertEquals(InMemoryDB.TRANSACTION_ID, writer.e.poll().getMessage().getData());
     }

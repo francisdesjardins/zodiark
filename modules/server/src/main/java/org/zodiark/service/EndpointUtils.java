@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class EndpointUtils<T extends EndpointAdapter> {
 
+    public static final String ERROR_SERVICE = "/error/";
     private final Logger logger = LoggerFactory.getLogger(EndpointUtils.class);
 
     private final EventBus eventBus;
@@ -99,7 +100,7 @@ public class EndpointUtils<T extends EndpointAdapter> {
 
     public boolean validate(T p, Envelope e) {
         if (p == null) {
-            error(e, p, constructMessage("/error", writeAsString(new Error().error("Unauthorized"))));
+            error(e, p, errorMessage(e.getMessage().getPath(), writeAsString(new Error().error("Unauthorized"))));
             return false;
         }
         return true;
@@ -107,7 +108,7 @@ public class EndpointUtils<T extends EndpointAdapter> {
 
     public boolean validateShowId(T p, Envelope e) {
         if (p == null) {
-            error(e, p, constructMessage("/error", writeAsString(new Error().error("Unauthorized"))));
+            error(e, p, constructMessage(e.getMessage().getPath(), writeAsString(new Error().error("Unauthorized"))));
             return false;
         }
         return true;
@@ -128,7 +129,7 @@ public class EndpointUtils<T extends EndpointAdapter> {
 
     public void failPassThrough(Envelope e, T p, ReplyException passthrough) {
         logger.trace("Passthrough failed {}", passthrough);
-        error(e, p, constructMessage(e.getMessage().getPath(), passthrough.throwable().getMessage()));
+        error(e, p, errorMessage(e.getMessage().getPath(), passthrough.throwable().getMessage()));
     }
 
     public void error(Envelope e, T endpoint, Message m) {
@@ -156,6 +157,13 @@ public class EndpointUtils<T extends EndpointAdapter> {
     public Message constructMessage(String path, String status) {
         Message m = new Message();
         m.setPath(path);
+        m.setData(status);
+        return m;
+    }
+
+    public Message errorMessage(String path, String status) {
+        Message m = new Message();
+        m.setPath(ERROR_SERVICE + path);
         m.setData(status);
         return m;
     }
