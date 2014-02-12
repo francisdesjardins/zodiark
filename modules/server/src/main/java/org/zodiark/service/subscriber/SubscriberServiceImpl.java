@@ -22,24 +22,27 @@ import org.slf4j.LoggerFactory;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.server.Context;
-import org.zodiark.service.EndpointUtils;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.On;
+import org.zodiark.service.EndpointUtils;
 import org.zodiark.service.RetrieveMessage;
 import org.zodiark.service.Session;
 import org.zodiark.service.db.TransactionId;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.session.StreamingRequest;
+import org.zodiark.service.state.EndpointState;
 import org.zodiark.service.util.UUID;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.zodiark.protocol.Paths.BEGIN_SUBSCRIBER_STREAMING_SESSION;
 import static org.zodiark.protocol.Paths.BROADCASTER_TRACK;
+import static org.zodiark.protocol.Paths.DB_ENDPOINT_STATE;
 import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_SESSION_CREATE;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_EXTRA;
@@ -127,7 +130,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
                 addFavorites(e, r);
                 break;
             case DB_SUBSCRIBER_EXTRA:
-                tipPublisher(e,r);
+                tipPublisher(e, r);
                 break;
             default:
                 throw new IllegalStateException("Invalid Message Path" + e.getMessage().getPath());
@@ -218,18 +221,14 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         // LA DB peut renvoyée une erreur.
 
 
-
         // Subscriber will be deleted in case an error happens.
         s.actionsAvailable(true);
-
 
 
         utils.passthroughEvent(DB_SUBSCRIBER_AVAILABLE_ACTIONS_PASSTHROUGHT, e);
 
 
         //eventBus.message(Paths.MESSAGE_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT)
-
-
 
 
     }
@@ -251,7 +250,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     }
 
     private void message(String path, SubscriberEndpoint s, Message m) {
-        eventBus.message(path, new RetrieveMessage(s.uuid(),m ));
+        eventBus.message(path, new RetrieveMessage(s.uuid(), m));
     }
 
     @Override
@@ -261,9 +260,23 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         if (s == null || !s.hasSession()) {
             s = createEndpoint(r, e.getMessage());
             endpoints.put(uuid, s);
-            // Subscriber will be deleted in case an error happens.
-            s.hasSession(true);
-            utils.statusEvent(DB_POST_SUBSCRIBER_SESSION_CREATE, e, s);
+
+            final AtomicReference<SubscriberEndpoint> subscriberEndpoint = new AtomicReference<>(s);
+            eventBus.message(DB_ENDPOINT_STATE, new RetrieveMessage(s.uuid(), e.getMessage()), new Reply<EndpointState>() {
+
+                @Override
+                public void ok(EndpointState state) {
+                    SubscriberEndpoint s = subscriberEndpoint.get();
+                    // Subscriber will be deleted in case an error happens.
+                    s.hasSession(true).state(state);
+                    utils.statusEvent(DB_POST_SUBSCRIBER_SESSION_CREATE, e, s);
+                }
+
+                @Override
+                public void fail(EndpointState response) {
+                    error(e, subscriberEndpoint.get(), utils.constructMessage(DB_ENDPOINT_STATE, "error"));
+                }
+            });
         } else {
             error(e, r, new Message().setPath("/error").setData("unauthorized"));
         }
