@@ -16,9 +16,9 @@
 package org.zodiark.service.state;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.zodiark.service.db.ModeId;
-import org.zodiark.service.db.ShowId;
-import org.zodiark.service.db.WatchId;
+import org.zodiark.service.db.result.ModeId;
+import org.zodiark.service.db.result.ShowId;
+import org.zodiark.service.db.result.WatchId;
 
 public class EndpointState {
 

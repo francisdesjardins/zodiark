@@ -61,6 +61,10 @@ public class SubscriberServiceTest {
         server.off();
     }
 
+    private String escape(String s) {
+        return s.replaceAll("\n","").replaceAll("\\s","");
+    }
+
     @Test
     public void uc24Test() throws Exception {
         EventBus eventBus = EventBusFactory.getDefault().eventBus();
@@ -79,7 +83,7 @@ public class SubscriberServiceTest {
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 2);
         assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.ACTIONS.replaceAll("\n","").replaceAll("\\s",""), writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryDB.ACTIONS.replaceAll("\n","").replaceAll("\\s", ""), writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -134,8 +138,8 @@ public class SubscriberServiceTest {
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 4);
         assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.ACTIONS.replaceAll("\n","").replaceAll("\\s",""), writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(escape(InMemoryDB.ACTIONS), writer.e.poll().getMessage().getData());
+        assertEquals(escape(InMemoryDB.ACTION_REQUEST), writer.e.poll().getMessage().getData());
         assertEquals(InMemoryDB.TRANSACTION_ID, writer.e.poll().getMessage().getData());
     }
 

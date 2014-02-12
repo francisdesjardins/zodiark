@@ -57,6 +57,14 @@ public class InMemoryDB {
             "        }\n" +
             "    ]\n" +
             "}";
+    public final static String ACTION_REQUEST="{\n" +
+            "    \"transactionId\": 1234,\n" +
+            "    \"scramble\": true,\n" +
+            "    \"joinDurationInSeconds\": 30,\n" +
+            "    \"minimumDurationInSeconds\": 30,\n" +
+            "    \"maximumDurationsInSeconds\": 30,\n" +
+            "    \"cooldownDurationInSeconds\": 30\n" +
+            "}";
 
     EndpointMapper<String> mapper = new DefaultEndpointMapper<>();
 
@@ -66,9 +74,6 @@ public class InMemoryDB {
     private final Map<String, String> delete = new HashMap<>();
 
     private final Map<String, String> fakeFailDatabase = new HashMap<>();
-
-
-
 
     public InMemoryDB() {
         post.put(DB_POST_PUBLISHER_SESSION_CREATE, STATUS_OK);
@@ -100,11 +105,7 @@ public class InMemoryDB {
         get.put(Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, PASSTHROUGH);
         put.put(Paths.DB_PUBLISHER_ACTIONS, STATUS_OK);
 
-        post.put(Paths.DB_SUBSCRIBER_REQUEST_ACTION, "{\"transactionId\": \"1\",\"clear\":\"true\"," +
-                "\"joinDurationInSeconds\":30," +
-                "\"minimumDurationInSeconds\":30," +
-                "\"maximumDurationsInSeconds\":30," +
-                "\"cooldownDurationInSeconds\":30}");
+        post.put(Paths.DB_SUBSCRIBER_REQUEST_ACTION, ACTION_REQUEST);
 
         post.put(Paths.DB_SUBSCRIBER_JOIN_ACTION, TRANSACTION_ID);
 

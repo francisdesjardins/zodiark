@@ -13,27 +13,20 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.db;
+package org.zodiark.service.db.result;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class WatchId {
-    private int watchId;
+public class FavoriteId {
+    private int favoriteId;
 
-    public WatchId() {
-    }
-
-    public WatchId(int watchId) {
-        this.watchId = watchId;
-    }
-
-    @JsonProperty
-    public WatchId watchId(int watchId) {
-        this.watchId = watchId;
+    @JsonProperty("favoriteId")
+    public FavoriteId favoriteId(int favoriteId) {
+        this.favoriteId = favoriteId;
         return this;
     }
 
-    public int watchId() {
-        return watchId;
+    public int favoriteId() {
+        return favoriteId;
     }
 }

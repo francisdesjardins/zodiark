@@ -13,13 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.db;
+package org.zodiark.service.db.result;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ActionState {
     private int transactionId;
-    private boolean clear;
+    private boolean scramble;
     private int joinDurationInSeconds;
     private int minimumDurationInSeconds;
     private int maximumDurationsInSeconds;
@@ -34,10 +34,20 @@ public class ActionState {
         return this;
     }
 
+    @JsonProperty("transactionId")
+    public int transactionId(){
+        return transactionId;
+    }
+
     @JsonProperty("joinDurationInSeconds")
     public ActionState joinDurationInSeconds(int joinDurationInSeconds) {
         this.joinDurationInSeconds = joinDurationInSeconds;
         return this;
+    }
+
+    @JsonProperty("joinDurationInSeconds")
+    public int joinDurationInSeconds(){
+        return joinDurationInSeconds;
     }
 
     @JsonProperty("minimumDurationInSeconds")
@@ -46,10 +56,20 @@ public class ActionState {
         return this;
     }
 
+    @JsonProperty("minimumDurationInSeconds")
+    public int minimumDurationInSeconds(){
+        return minimumDurationInSeconds;
+    }
+
     @JsonProperty("maximumDurationsInSeconds")
     public ActionState maximumDurationsInSeconds(int maximumDurationsInSeconds) {
         this.maximumDurationsInSeconds = maximumDurationsInSeconds;
         return this;
+    }
+
+    @JsonProperty("maximumDurationsInSeconds")
+    public int maximumDurationsInSeconds(){
+        return maximumDurationsInSeconds;
     }
 
     @JsonProperty("cooldownDurationInSeconds")
@@ -58,9 +78,19 @@ public class ActionState {
         return this;
     }
 
-    @JsonProperty("clear")
-    public ActionState clear(boolean clear) {
-        this.clear = clear;
+    @JsonProperty("cooldownDurationInSeconds")
+    public int cooldownDurationInSeconds(){
+        return cooldownDurationInSeconds;
+    }
+
+    @JsonProperty("scramble")
+    public ActionState scramble(boolean scramble) {
+        this.scramble = scramble;
         return this;
+    }
+
+    @JsonProperty("scramble")
+    public boolean scramble(){
+        return scramble;
     }
 }

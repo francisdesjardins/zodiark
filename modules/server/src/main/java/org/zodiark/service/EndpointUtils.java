@@ -25,7 +25,7 @@ import org.zodiark.protocol.Message;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
 import org.zodiark.server.ReplyException;
-import org.zodiark.service.db.Status;
+import org.zodiark.service.db.result.Status;
 
 import java.util.concurrent.ConcurrentHashMap;
 

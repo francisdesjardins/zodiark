@@ -29,8 +29,9 @@ import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointUtils;
 import org.zodiark.service.RetrieveMessage;
 import org.zodiark.service.Session;
-import org.zodiark.service.db.Actions;
-import org.zodiark.service.db.TransactionId;
+import org.zodiark.service.db.result.ActionState;
+import org.zodiark.service.db.result.Actions;
+import org.zodiark.service.db.result.TransactionId;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.session.StreamingRequest;
 import org.zodiark.service.state.EndpointState;
@@ -198,8 +199,8 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         });
     }
 
-    private void requestAction(Envelope e, AtmosphereResource r) {
-        SubscriberEndpoint s = utils.retrieve(e.getUuid());
+    private void requestAction(final Envelope e, AtmosphereResource r) {
+        final SubscriberEndpoint s = utils.retrieve(e.getUuid());
 
         if (!utils.validate(s, e)) return;
 
@@ -220,14 +221,18 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
 
         // Subscriber will be deleted in case an error happens.
         s.actionRequested(true);
+        eventBus.message(DB_SUBSCRIBER_REQUEST_ACTION, new RetrieveMessage(s.uuid(), e.getMessage()), new Reply<ActionState, String>() {
+            @Override
+            public void ok(ActionState state) {
+                logger.debug("Action Accepted for {}", state);
+                response(e, s, utils.constructMessage(DB_SUBSCRIBER_REQUEST_ACTION, utils.writeAsString(state)));
+            }
 
-
-        //utils.passthroughEvent(DB_SUBSCRIBER_AVAILABLE_ACTIONS, e);
-
-
-        //eventBus.message(Paths.MESSAGE_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT)
-
-
+            @Override
+            public void fail(ReplyException replyException) {
+                error(e, s, utils.errorMessage(DB_SUBSCRIBER_REQUEST_ACTION, "error"));
+            }
+        });
     }
 
     @Override

@@ -15,7 +15,7 @@
  */
 package org.zodiark.service.broadcaster;
 
-import org.zodiark.service.db.Result;
+import org.zodiark.service.db.result.Result;
 
 /**
  * A placeholer for storing words that aren't allowed when using the {@link org.zodiark.service.chat.Chat}

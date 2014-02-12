@@ -16,7 +16,7 @@
 package org.zodiark.service.state;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.zodiark.service.db.Result;
+import org.zodiark.service.db.result.Result;
 
 /**
  * A class for representing the publisher/subscriber authorization token.

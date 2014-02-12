@@ -16,8 +16,8 @@
 package org.zodiark.service.subscriber;
 
 import org.zodiark.service.EndpointAdapter;
-import org.zodiark.service.db.Actions;
-import org.zodiark.service.db.TransactionId;
+import org.zodiark.service.db.result.Actions;
+import org.zodiark.service.db.result.TransactionId;
 import org.zodiark.service.publisher.PublisherEndpoint;
 
 /**

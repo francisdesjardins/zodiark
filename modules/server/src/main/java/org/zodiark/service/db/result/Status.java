@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Jeanfrancois Arcand
+ * Copyright 2013-2014 High-Level Technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,29 +13,27 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.db;
+package org.zodiark.service.db.result;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.LinkedList;
+public class Status implements Result {
+    private String result = "ko";
 
-public class Actions {
-    private LinkedList<Action> actions;
+    public Status() {}
 
-    public Actions() {
-    }
-
-    public LinkedList<Action> getActions() {
-        return actions;
-    }
-
-    public void setActions(LinkedList<Action> actions) {
-        this.actions = actions;
-    }
-
-    @JsonProperty("action")
-    public Actions action(Action action) {
-        actions.add(action);
+    @JsonProperty("result")
+    public Status status(String result) {
+        this.result = result;
         return this;
+    }
+
+    @JsonProperty("result")
+    public String status(){
+        return result;
+    }
+
+    public boolean ok() {
+        return result.equalsIgnoreCase("ok");
     }
 }

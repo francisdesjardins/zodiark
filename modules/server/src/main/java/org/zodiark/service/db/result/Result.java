@@ -13,20 +13,8 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.db;
+package org.zodiark.service.db.result;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+public interface Result {
 
-public class FavoriteId {
-    private int favoriteId;
-
-    @JsonProperty("favoriteId")
-    public FavoriteId favoriteId(int favoriteId) {
-        this.favoriteId = favoriteId;
-        return this;
-    }
-
-    public int favoriteId() {
-        return favoriteId;
-    }
 }
