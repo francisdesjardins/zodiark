@@ -31,6 +31,7 @@ import org.zodiark.service.RetrieveMessage;
 import org.zodiark.service.Session;
 import org.zodiark.service.db.result.ActionState;
 import org.zodiark.service.db.result.Actions;
+import org.zodiark.service.db.result.FavoriteId;
 import org.zodiark.service.db.result.TransactionId;
 import org.zodiark.service.publisher.PublisherEndpoint;
 import org.zodiark.service.session.StreamingRequest;
@@ -150,7 +151,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             public void ok(TransactionId success) {
                 s.transactionId(success);
                 logger.debug("Action Accepted for {}", s);
-                response(e, s, utils.constructMessage(DB_SUBSCRIBER_EXTRA, utils.writeAsString(s.transactionId())));
+                response(e, s, utils.constructMessage(DB_SUBSCRIBER_EXTRA, utils.writeAsString(success)));
             }
 
             @Override
@@ -160,11 +161,22 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         });
     }
 
-    private void addFavorites(Envelope e, AtmosphereResource r) {
-        SubscriberEndpoint s = utils.retrieve(e.getUuid());
+    private void addFavorites(final Envelope e, AtmosphereResource r) {
+        final SubscriberEndpoint s = utils.retrieve(e.getUuid());
         if (!utils.validate(s, e) || !s.hasSession()) return;
 
-        utils.passthroughEvent(DB_SUBSCRIBER_FAVORITES_START, e);
+        eventBus.message(DB_SUBSCRIBER_FAVORITES_START, new RetrieveMessage(s.uuid(), e.getMessage()), new Reply<FavoriteId, String>() {
+            @Override
+            public void ok(FavoriteId success) {
+                logger.debug("Favorite {}", success);
+                response(e, s, utils.constructMessage(DB_SUBSCRIBER_FAVORITES_START, utils.writeAsString(success)));
+            }
+
+            @Override
+            public void fail(ReplyException replyException) {
+                error(e, s, utils.constructMessage(DB_SUBSCRIBER_FAVORITES_START, "error"));
+            }
+        });
     }
 
     private void deleteFavorite(Envelope e, AtmosphereResource r) {

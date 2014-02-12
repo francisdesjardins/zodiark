@@ -26,6 +26,7 @@ public class FavoriteId {
         return this;
     }
 
+    @JsonProperty("favoriteId")
     public int favoriteId() {
         return favoriteId;
     }

@@ -54,7 +54,7 @@ public class OKRestService implements RestService {
     }
 
     @Override
-    public void put(String uri, Object o, Reply  r) {
+    public void put(String uri, Object o, Reply r) {
         send(PUT, uri, o, r);
     }
 
@@ -64,25 +64,21 @@ public class OKRestService implements RestService {
     }
 
     //@Override
-    public void delete(String uri, Object o, Reply  r) {
+    public void delete(String uri, Object o, Reply r) {
         send(DELETE, uri, o, r);
     }
 
-    protected void send(METHOD method, String uri, Object o, Reply  r) {
+    protected void send(METHOD method, String uri, Object o, Reply r) {
         try {
             // Dangerous if the API change.
-            Class<?> success  = ReflectionUtils.getTypeArguments(Reply.class, r.getClass()).get(0);
+            Class<?> success = ReflectionUtils.getTypeArguments(Reply.class, r.getClass()).get(0);
             Class<?> failure = ReflectionUtils.getTypeArguments(Reply.class, r.getClass()).get(1);
 
             String restResponse = db.serve(method, uri, mapper.writeValueAsString(o), InMemoryDB.RESULT.PASS);
 
             try {
-                if (ReflectionUtils.needInjection(success)) {
-                    Object object = context.newInstance(success);
-                    r.ok(String.class.isAssignableFrom(success) ? restResponse : mapper.readerForUpdating(object).readValue(restResponse));
-                } else {
-                    r.ok(mapper.readValue(restResponse, success));
-                }
+                Object object = context.newInstance(success);
+                r.ok(String.class.isAssignableFrom(success) ? restResponse : mapper.readerForUpdating(object).readValue(restResponse));
             } catch (Exception ex) {
                 logger.error("", ex);
                 Object object = context.newInstance(failure);
