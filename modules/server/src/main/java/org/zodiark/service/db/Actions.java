@@ -13,26 +13,20 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.db.util;
+package org.zodiark.service.db;
 
-import org.zodiark.server.Reply;
-import org.zodiark.server.ReplyException;
-import org.zodiark.service.util.RestService;
+import java.util.LinkedList;
 
-public abstract class ReplyAdapter<T, U> implements RestService.Reply<T, U> {
+public class Actions {
+    private LinkedList<Action> actions;
 
-    protected final Reply reply;
+    public Actions() {}
 
-    protected ReplyAdapter(Reply reply) {
-        this.reply = reply;
+    public LinkedList<Action> getActions() {
+        return actions;
     }
 
-    public void fail() {
-        reply.fail(ReplyException.DEFAULT);
-    }
-
-    public void exception(Exception exception) {
-        reply.fail(ReplyException.DEFAULT);
+    public void setActions(LinkedList<Action> actions) {
+        this.actions = actions;
     }
 }
-

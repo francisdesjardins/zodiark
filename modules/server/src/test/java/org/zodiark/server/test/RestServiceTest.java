@@ -17,14 +17,14 @@ package org.zodiark.server.test;
 
 import org.testng.annotations.Test;
 import org.zodiark.protocol.Paths;
+import org.zodiark.server.Reply;
+import org.zodiark.server.ReplyException;
 import org.zodiark.server.ZodiarkObjectFactory;
 import org.zodiark.service.db.ActionState;
-import org.zodiark.service.db.DBError;
 import org.zodiark.service.db.ShowId;
 import org.zodiark.service.db.Status;
 import org.zodiark.service.db.TransactionId;
 import org.zodiark.service.db.WatchId;
-import org.zodiark.service.db.util.ReplyAdapter;
 import org.zodiark.service.state.EndpointState;
 import org.zodiark.service.util.RestService;
 import org.zodiark.service.util.mock.OKRestService;
@@ -56,15 +56,14 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<Status> config = new AtomicReference<>();
         restService.post(DB_POST_PUBLISHER_SESSION_CREATE.replace("{guid}", UUID.randomUUID().toString()),
-                AUTHTOKEN, new ReplyAdapter<Status, DBError>(null) {
+                AUTHTOKEN, new Reply<Status, String>() {
             @Override
-            public void success(Status success) {
-                config.set(success);
+            public void ok(Status response) {
+                config.set(response);
             }
 
             @Override
-            public void failure(DBError failure) {
-
+            public void fail(ReplyException<String> replyException) {
             }
         });
 
@@ -77,19 +76,14 @@ public class RestServiceTest {
         final AtomicReference<ShowId> showId = new AtomicReference<>();
 
         restService.post(DB_PUBLISHER_SHOW_START.replace("{guid}", UUID.randomUUID().toString()),
-                SESSION_CREATE, new RestService.Reply<ShowId, DBError>() {
+                SESSION_CREATE, new Reply<ShowId, String>() {
             @Override
-            public void success(ShowId success) {
+            public void ok(ShowId success) {
                 showId.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(showId.get());
@@ -103,19 +97,14 @@ public class RestServiceTest {
 
         restService.post(DB_POST_SUBSCRIBER_JOIN_SESSION.replace("{guid}", UUID.randomUUID().toString()),
                 "{\"modeId\": \"12345\"}" +
-                        "", new RestService.Reply<WatchId, DBError>() {
+                        "", new Reply<WatchId, String>() {
             @Override
-            public void success(WatchId success) {
+            public void ok(WatchId success) {
                 watchId.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(watchId.get());
@@ -128,19 +117,14 @@ public class RestServiceTest {
         final AtomicReference<String> motds = new AtomicReference<>();
 
         restService.get(DB_GET_WORD_PASSTHROUGH.replace("{guid}", UUID.randomUUID().toString())
-                        , new RestService.Reply<String, DBError>() {
+                        , new Reply<String, String>() {
             @Override
-            public void success(String success) {
+            public void ok(String success) {
                 motds.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(motds.get());
@@ -153,19 +137,14 @@ public class RestServiceTest {
 
         restService.post(DB_POST_SUBSCRIBER_CHARGE_START.replace("{guid}", UUID.randomUUID().toString()),
                 "{\"second\": \"12345\"}" +
-                        "", new RestService.Reply<Status, DBError>() {
+                        "", new Reply<Status, String>() {
             @Override
-            public void success(Status success) {
+            public void ok(Status success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -179,37 +158,27 @@ public class RestServiceTest {
 
         restService.post(DB_PUBLISHER_SHOW_START.replace("{guid}", UUID.randomUUID().toString()),
                 "{\"cameraWidth\": \"1\", \"cameraWidth\": \"1\", \"cameraFPS\": \"1\", \"cameraQuality\": \"1\", \"bandwidthOut\": \"1\", \"bandwidthIn\": \"1\"}" +
-                        "", new RestService.Reply<ShowId, DBError>() {
+                        "", new Reply<ShowId, String>() {
             @Override
-            public void success(ShowId success) {
+            public void ok(ShowId success) {
                 showId.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(showId.get());
 
         final AtomicReference<Status> result = new AtomicReference<>();
-        restService.delete(DB_POST_SUBSCRIBER_CHARGE_END.replace("{guid}", UUID.randomUUID().toString()).replace("@showId", "" + showId.get().showId()), null, new RestService.Reply<Status, DBError>() {
+        restService.delete(DB_POST_SUBSCRIBER_CHARGE_END.replace("{guid}", UUID.randomUUID().toString()).replace("@showId", "" + showId.get().showId()), null, new Reply<Status, String>() {
             @Override
-            public void success(Status success) {
+            public void ok(Status success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -223,19 +192,14 @@ public class RestServiceTest {
 
         restService.post(Paths.DB_POST_PUBLISHER_ONDEMAND_START.replace("{guid}", UUID.randomUUID().toString()),
                 "{\"second\": \"12345\"}" +
-                        "", new RestService.Reply<Status, DBError>() {
+                        "", new Reply<Status, String>() {
             @Override
-            public void success(Status success) {
+            public void ok(Status success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -249,19 +213,14 @@ public class RestServiceTest {
 
         restService.post(Paths.DB_POST_PUBLISHER_ONDEMAND_KEEPALIVE.replace("{guid}", UUID.randomUUID().toString()),
                 "{\"second\": \"12345\"}" +
-                        "", new RestService.Reply<Status, DBError>() {
+                        "", new Reply<Status, String>() {
             @Override
-            public void success(Status success) {
+            public void ok(Status success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -275,19 +234,14 @@ public class RestServiceTest {
 
         restService.delete(Paths.DB_POST_PUBLISHER_ONDEMAND_END.replace("{guid}", UUID.randomUUID().toString()),
                 "{\"second\": \"12345\"}" +
-                        "", new RestService.Reply<Status, DBError>() {
+                        "", new Reply<Status, String>() {
             @Override
-            public void success(Status success) {
+            public void ok(Status success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -299,19 +253,14 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<String> result = new AtomicReference<>();
 
-        restService.get(Paths.DB_GET_SUBSCRIBER_STATUS_TO_PUBLISHER_PASSTHROUGHT.replace("{guid}", UUID.randomUUID().toString()), new RestService.Reply<String, DBError>() {
+        restService.get(Paths.DB_GET_SUBSCRIBER_STATUS_TO_PUBLISHER_PASSTHROUGHT.replace("{guid}", UUID.randomUUID().toString()), new Reply<String, String>() {
             @Override
-            public void success(String success) {
+            public void ok(String success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -323,19 +272,14 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
-        restService.post(Paths.DB_PUBLISHER_SHARED_PRIVATE_START.replace("{guid}", UUID.randomUUID().toString()), "", new RestService.Reply<Status, DBError>() {
+        restService.post(Paths.DB_PUBLISHER_SHARED_PRIVATE_START.replace("{guid}", UUID.randomUUID().toString()), "", new Reply<Status, String>() {
             @Override
-            public void success(Status success) {
+            public void ok(Status success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -347,19 +291,14 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
-        restService.put(Paths.DB_PUBLISHER_SHARED_PRIVATE_END.replace("{guid}", UUID.randomUUID().toString()), "", new RestService.Reply<Status, DBError>() {
+        restService.put(Paths.DB_PUBLISHER_SHARED_PRIVATE_END.replace("{guid}", UUID.randomUUID().toString()), "", new Reply<Status, String>() {
             @Override
-            public void success(Status success) {
+            public void ok(Status success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -371,19 +310,14 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<String> result = new AtomicReference<>();
 
-        restService.get(Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS.replace("{guid}", UUID.randomUUID().toString()), new RestService.Reply<String, DBError>() {
+        restService.get(Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS.replace("{guid}", UUID.randomUUID().toString()), new Reply<String, String>() {
             @Override
-            public void success(String success) {
+            public void ok(String success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -395,19 +329,14 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<String> result = new AtomicReference<>();
 
-        restService.get(Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT.replace("{guid}", UUID.randomUUID().toString()), new RestService.Reply<String, DBError>() {
+        restService.get(Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT.replace("{guid}", UUID.randomUUID().toString()), new Reply<String, String>() {
             @Override
-            public void success(String success) {
+            public void ok(String success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -419,19 +348,14 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<ActionState> result = new AtomicReference<>();
 
-        restService.post(Paths.DB_SUBSCRIBER_REQUEST_ACTION.replace("{guid}", UUID.randomUUID().toString()), ACTION, new RestService.Reply<ActionState, DBError>() {
+        restService.post(Paths.DB_SUBSCRIBER_REQUEST_ACTION.replace("{guid}", UUID.randomUUID().toString()), ACTION, new Reply<ActionState, String>() {
             @Override
-            public void success(ActionState success) {
+            public void ok(ActionState success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -443,19 +367,14 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<TransactionId> result = new AtomicReference<>();
 
-        restService.post(Paths.DB_SUBSCRIBER_JOIN_ACTION.replace("{guid}", UUID.randomUUID().toString()), "", new RestService.Reply<TransactionId, DBError>() {
+        restService.post(Paths.DB_SUBSCRIBER_JOIN_ACTION.replace("{guid}", UUID.randomUUID().toString()), "", new Reply<TransactionId, String>() {
             @Override
-            public void success(TransactionId success) {
+            public void ok(TransactionId success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -467,19 +386,14 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
-        restService.post(Paths.DB_SUBSCRIBER_CHARGE_ACTION.replace("{guid}", UUID.randomUUID().toString()), "", new RestService.Reply<Status, DBError>() {
+        restService.post(Paths.DB_SUBSCRIBER_CHARGE_ACTION.replace("{guid}", UUID.randomUUID().toString()), "", new Reply<Status, String>() {
             @Override
-            public void success(Status success) {
+            public void ok(Status success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -491,19 +405,14 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
-        restService.post(Paths.DB_SUBSCRIBER_BLOCK.replace("{guid}", UUID.randomUUID().toString()), "", new RestService.Reply<Status, DBError>() {
+        restService.post(Paths.DB_SUBSCRIBER_BLOCK.replace("{guid}", UUID.randomUUID().toString()), "", new Reply<Status, String>() {
             @Override
-            public void success(Status success) {
+            public void ok(Status success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -515,19 +424,14 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
-        restService.post(Paths.DB_SUBSCRIBER_EJECT.replace("{guid}", UUID.randomUUID().toString()), "", new RestService.Reply<Status, DBError>() {
+        restService.post(Paths.DB_SUBSCRIBER_EJECT.replace("{guid}", UUID.randomUUID().toString()), "", new Reply<Status, String>() {
             @Override
-            public void success(Status success) {
+            public void ok(Status success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -539,19 +443,14 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
-        restService.delete(Paths.DB_SUBSCRIBER_FAVORITES_END.replace("{guid}", UUID.randomUUID().toString()), "", new RestService.Reply<Status, DBError>() {
+        restService.delete(Paths.DB_SUBSCRIBER_FAVORITES_END.replace("{guid}", UUID.randomUUID().toString()), "", new Reply<Status, String>() {
             @Override
-            public void success(Status success) {
+            public void ok(Status success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -563,19 +462,14 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<String> result = new AtomicReference<>();
 
-        restService.get(Paths.DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT.replace("{guid}", UUID.randomUUID().toString()), new RestService.Reply<String, DBError>() {
+        restService.get(Paths.DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT.replace("{guid}", UUID.randomUUID().toString()), new Reply<String, String>() {
             @Override
-            public void success(String success) {
+            public void ok(String success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -589,19 +483,14 @@ public class RestServiceTest {
 
         restService.put(Paths.DB_PUBLISHER_SAVE_CONFIG.replace("{guid}", UUID.randomUUID().toString()),
                 CONFIG,
-                new RestService.Reply<Status, DBError>() {
+                new Reply<Status, String>() {
                     @Override
-                    public void success(Status success) {
+                    public void ok(Status success) {
                         result.set(success);
                     }
 
                     @Override
-                    public void failure(DBError failure) {
-                    }
-
-                    @Override
-                    public void exception(Exception exception) {
-                        exception.printStackTrace();
+                    public void fail(ReplyException<String> replyException) {
                     }
                 });
         assertNotNull(result.get());
@@ -614,19 +503,14 @@ public class RestServiceTest {
         final AtomicReference<String> result = new AtomicReference<>();
 
         restService.get(Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT.replace("{guid}", UUID.randomUUID().toString()),
-                new RestService.Reply<String, DBError>() {
+                new Reply<String, String>() {
                     @Override
-                    public void success(String success) {
+                    public void ok(String success) {
                         result.set(success);
                     }
 
                     @Override
-                    public void failure(DBError failure) {
-                    }
-
-                    @Override
-                    public void exception(Exception exception) {
-                        exception.printStackTrace();
+                    public void fail(ReplyException<String> replyException) {
                     }
                 });
         assertNotNull(result.get());
@@ -639,19 +523,14 @@ public class RestServiceTest {
         final AtomicReference<String> result = new AtomicReference<>();
 
         restService.get(Paths.DB_PUBLISHER_SETTINGS_SHOW.replace("{guid}", UUID.randomUUID().toString()),
-                new RestService.Reply<String, DBError>() {
+                new Reply<String, String>() {
                     @Override
-                    public void success(String success) {
+                    public void ok(String success) {
                         result.set(success);
                     }
 
                     @Override
-                    public void failure(DBError failure) {
-                    }
-
-                    @Override
-                    public void exception(Exception exception) {
-                        exception.printStackTrace();
+                    public void fail(ReplyException<String> replyException) {
                     }
                 });
         assertNotNull(result.get());
@@ -664,19 +543,14 @@ public class RestServiceTest {
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.put(Paths.DB_PUBLISHER_SETTINGS_SHOW.replace("{guid}", UUID.randomUUID().toString()), SHOWTYPE_ID,
-                new RestService.Reply<Status, DBError>() {
+                new Reply<Status, String>() {
                     @Override
-                    public void success(Status success) {
+                    public void ok(Status success) {
                         result.set(success);
                     }
 
                     @Override
-                    public void failure(DBError failure) {
-                    }
-
-                    @Override
-                    public void exception(Exception exception) {
-                        exception.printStackTrace();
+                    public void fail(ReplyException<String> replyException) {
                     }
                 });
         assertNotNull(result.get());
@@ -689,19 +563,14 @@ public class RestServiceTest {
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.post(Paths.DB_PUBLISHER_PUBLIC_MODE.replace("{guid}", UUID.randomUUID().toString()), "",
-                new RestService.Reply<Status, DBError>() {
+                new Reply<Status, String>() {
                     @Override
-                    public void success(Status success) {
+                    public void ok(Status success) {
                         result.set(success);
                     }
 
                     @Override
-                    public void failure(DBError failure) {
-                    }
-
-                    @Override
-                    public void exception(Exception exception) {
-                        exception.printStackTrace();
+                    public void fail(ReplyException<String> replyException) {
                     }
                 });
         assertNotNull(result.get());
@@ -714,19 +583,14 @@ public class RestServiceTest {
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.delete(Paths.DB_PUBLISHER_PUBLIC_MODE_END.replace("{guid}", UUID.randomUUID().toString()), "",
-                new RestService.Reply<Status, DBError>() {
+                new Reply<Status, String>() {
                     @Override
-                    public void success(Status success) {
+                    public void ok(Status success) {
                         result.set(success);
                     }
 
                     @Override
-                    public void failure(DBError failure) {
-                    }
-
-                    @Override
-                    public void exception(Exception exception) {
-                        exception.printStackTrace();
+                    public void fail(ReplyException<String> replyException) {
                     }
                 });
         assertNotNull(result.get());
@@ -739,19 +603,14 @@ public class RestServiceTest {
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.post(Paths.DB_PUBLISHER_ERROR_REPORT.replace("{guid}", UUID.randomUUID().toString()), PUBLISHER_ERROR,
-                new RestService.Reply<Status, DBError>() {
+                new Reply<Status, String>() {
                     @Override
-                    public void success(Status success) {
+                    public void ok(Status success) {
                         result.set(success);
                     }
 
                     @Override
-                    public void failure(DBError failure) {
-                    }
-
-                    @Override
-                    public void exception(Exception exception) {
-                        exception.printStackTrace();
+                    public void fail(ReplyException<String> replyException) {
                     }
                 });
         assertNotNull(result.get());
@@ -764,19 +623,14 @@ public class RestServiceTest {
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.put(Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE.replace("{guid}", UUID.randomUUID().toString()), PROFILE,
-                new RestService.Reply<Status, DBError>() {
+                new Reply<Status, String>() {
                     @Override
-                    public void success(Status success) {
+                    public void ok(Status success) {
                         result.set(success);
                     }
 
                     @Override
-                    public void failure(DBError failure) {
-                    }
-
-                    @Override
-                    public void exception(Exception exception) {
-                        exception.printStackTrace();
+                    public void fail(ReplyException<String> replyException) {
                     }
                 });
         assertNotNull(result.get());
@@ -788,19 +642,14 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<TransactionId> result = new AtomicReference<>();
 
-        restService.post(Paths.DB_SUBSCRIBER_EXTRA.replace("{guid}", UUID.randomUUID().toString()), AMOUNT_TOKEN, new RestService.Reply<TransactionId, DBError>() {
+        restService.post(Paths.DB_SUBSCRIBER_EXTRA.replace("{guid}", UUID.randomUUID().toString()), AMOUNT_TOKEN, new Reply<TransactionId, String>() {
             @Override
-            public void success(TransactionId success) {
+            public void ok(TransactionId success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -812,19 +661,14 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<String> result = new AtomicReference<>();
 
-        restService.put(Paths.DB_SUBSCRIBER_CONFIG_PASSTHROUGHT.replace("{guid}", UUID.randomUUID().toString()), "", new RestService.Reply<String, DBError>() {
+        restService.put(Paths.DB_SUBSCRIBER_CONFIG_PASSTHROUGHT.replace("{guid}", UUID.randomUUID().toString()), "", new Reply<String, String>() {
             @Override
-            public void success(String success) {
+            public void ok(String success) {
                 result.set(success);
             }
 
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());
@@ -836,19 +680,13 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<EndpointState> result = new AtomicReference<>();
 
-        restService.get(Paths.DB_ENDPOINT_STATE.replace("{guid}", UUID.randomUUID().toString()), new RestService.Reply<EndpointState, DBError>() {
+        restService.get(Paths.DB_ENDPOINT_STATE.replace("{guid}", UUID.randomUUID().toString()), new Reply<EndpointState, String>() {
             @Override
-            public void success(EndpointState success) {
+            public void ok(EndpointState success) {
                 result.set(success);
             }
-
             @Override
-            public void failure(DBError failure) {
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                exception.printStackTrace();
+            public void fail(ReplyException<String> replyException) {
             }
         });
         assertNotNull(result.get());

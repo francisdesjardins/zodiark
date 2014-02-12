@@ -18,7 +18,6 @@ package org.zodiark.service.db;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
-import org.zodiark.server.ReplyException;
 import org.zodiark.server.annotation.Retrieve;
 import org.zodiark.service.RetrieveMessage;
 import org.zodiark.service.util.RestService;
@@ -31,12 +30,12 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_SETTINGS_SHOW_SAVE;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT;
 
 @Retrieve({DB_PUBLISHER_SETTINGS_SHOW_SAVE,
-           DB_PUBLISHER_SAVE_CONFIG_PUT,
-           DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT,
-           DB_PUBLISHER_ACTIONS})
-public class PutStatusService extends DBServiceAdapter {
+        DB_PUBLISHER_SAVE_CONFIG_PUT,
+        DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT,
+        DB_PUBLISHER_ACTIONS})
+public class PutService extends DBServiceAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(PutStatusService.class);
+    private final Logger logger = LoggerFactory.getLogger(PutService.class);
 
     @Inject
     public RestService restService;
@@ -45,24 +44,6 @@ public class PutStatusService extends DBServiceAdapter {
     public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
         final RetrieveMessage p = RetrieveMessage.class.cast(message);
-        restService.put(path.replace("{guid}", p.uuid()),
-                p.message(), new RestService.Reply<Status, DBError>() {
-            @Override
-            public void success(Status success) {
-                reply.ok(success);
-            }
-
-            @Override
-            public void failure(DBError failure) {
-                reply.fail(ReplyException.DEFAULT);
-            }
-
-            @Override
-            public void exception(Exception exception) {
-                logger.trace("", exception);
-                reply.fail(ReplyException.DEFAULT);
-            }
-        });
-
+        restService.put(path.replace("{guid}", p.uuid()), p.message(), reply);
     }
 }

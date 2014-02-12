@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Jeanfrancois Arcand
+ * Copyright 2014 Jeanfrancois Arcand
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -20,27 +20,28 @@ import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.Retrieve;
 import org.zodiark.service.RetrieveMessage;
-import org.zodiark.service.db.util.PassthroughReply;
 import org.zodiark.service.util.RestService;
 
 import javax.inject.Inject;
 
-import static org.zodiark.protocol.Paths.DB_GET_WORD_PASSTHROUGH;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_GET;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SETTINGS_SHOW_GET_PASSTHROUGHT;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_GET;
+import static org.zodiark.protocol.Paths.DB_POST_PUBLISHER_ONDEMAND_END;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_ERROR_REPORT;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_PUBLIC_MODE_END;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_END;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
+import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_FAVORITES_END;
 
-@Retrieve({DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT,
-        DB_PUBLISHER_LOAD_CONFIG_GET,
-        DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT,
-        DB_PUBLISHER_SETTINGS_SHOW_GET_PASSTHROUGHT,
-        DB_GET_WORD_PASSTHROUGH,
-        DB_PUBLISHER_SUBSCRIBER_PROFILE_GET})
-public class GetPassthoughService extends DBServiceAdapter {
+@Retrieve({
+        DB_PUBLISHER_ERROR_REPORT,
+        DB_POST_PUBLISHER_ONDEMAND_END,
+        DB_PUBLISHER_SHARED_PRIVATE_END,
+        DB_PUBLISHER_PUBLIC_MODE_END,
+        DB_SUBSCRIBER_FAVORITES_END,
+        DB_PUBLISHER_SHOW_END
+})
+public class DeleteService extends DBServiceAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(GetPassthoughService.class);
+    private final Logger logger = LoggerFactory.getLogger(DeleteService.class);
 
     @Inject
     public RestService restService;
@@ -49,6 +50,8 @@ public class GetPassthoughService extends DBServiceAdapter {
     public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
         final RetrieveMessage p = RetrieveMessage.class.cast(message);
-        restService.get(path.replace("{guid}", p.uuid()), new PassthroughReply(reply));
+        restService.delete(DB_PUBLISHER_SHOW_END.replace("{guid}", p.uuid()),
+                p.message(), reply);
+
     }
 }

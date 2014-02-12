@@ -15,6 +15,8 @@
  */
 package org.zodiark.service.util;
 
+import org.zodiark.server.Reply;
+
 /**
  * The REST API to use for interacting with a remote database/web service. Implementation must follow REST principle.
  * Implementation of this class must have an empty, default constructor so they can be injected by the {@link org.zodiark.server.ZodiarkObjectFactory}
@@ -29,12 +31,4 @@ public interface RestService {
 
     void delete(String uri, Object o, Reply r);
 
-    public static interface Reply<T,U> {
-
-        void success(T success);
-
-        void failure(U failure);
-
-        void exception(Exception exception);
-    }
 }

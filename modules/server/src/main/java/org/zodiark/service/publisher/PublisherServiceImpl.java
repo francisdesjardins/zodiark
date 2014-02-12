@@ -34,7 +34,6 @@ import org.zodiark.service.Error;
 import org.zodiark.service.RetrieveMessage;
 import org.zodiark.service.Session;
 import org.zodiark.service.db.ModeId;
-import org.zodiark.service.db.Passthrough;
 import org.zodiark.service.db.ShowId;
 import org.zodiark.service.db.Status;
 import org.zodiark.service.state.EndpointState;
@@ -475,14 +474,14 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                         public void ok(final Status status) {
                             logger.trace("{} succeed for {}", DB_POST_PUBLISHER_SESSION_CREATE, p);
 
-                            eventBus.message(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<Passthrough, String>() {
+                            eventBus.message(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<String, String>() {
                                 @Override
-                                public void ok(Passthrough passthrough) {
+                                public void ok(String passthrough) {
                                     utils.succesPassThrough(e, p, DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, passthrough);
 
-                                    eventBus.message(DB_PUBLISHER_LOAD_CONFIG_GET, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<Passthrough, String>() {
+                                    eventBus.message(DB_PUBLISHER_LOAD_CONFIG_GET, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<String, String>() {
                                         @Override
-                                        public void ok(Passthrough passthrough) {
+                                        public void ok(String passthrough) {
                                             utils.succesPassThrough(e, p, DB_PUBLISHER_LOAD_CONFIG, passthrough);
                                             utils.passthroughEvent(DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT, e, p);
                                         }

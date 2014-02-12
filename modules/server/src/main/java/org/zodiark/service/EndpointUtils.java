@@ -25,7 +25,6 @@ import org.zodiark.protocol.Message;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.Reply;
 import org.zodiark.server.ReplyException;
-import org.zodiark.service.db.Passthrough;
 import org.zodiark.service.db.Status;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,9 +83,9 @@ public class EndpointUtils<T extends EndpointAdapter> {
 
         if (!validateShowId(p, e)) return;
 
-        eventBus.message(path, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<Passthrough, String>() {
+        eventBus.message(path, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<String, String>() {
             @Override
-            public void ok(Passthrough passthrough) {
+            public void ok(String passthrough) {
                 succesPassThrough(e, p, path, passthrough);
             }
 
@@ -122,9 +121,9 @@ public class EndpointUtils<T extends EndpointAdapter> {
         return true;
     }
 
-    public void succesPassThrough(Envelope e, T p, String path, Passthrough passthrough) {
+    public void succesPassThrough(Envelope e, T p, String path, String passthrough) {
         logger.trace("Passthrough succeed {}", passthrough);
-        response(e, p, constructMessage(path, passthrough.response()));
+        response(e, p, constructMessage(path, passthrough));
     }
 
     public void failPassThrough(Envelope e, T p, ReplyException passthrough) {

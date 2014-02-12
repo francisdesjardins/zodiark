@@ -19,10 +19,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.server.Context;
+import org.zodiark.server.Reply;
+import org.zodiark.server.ReplyException;
+import org.zodiark.service.util.ReflectionUtils;
 import org.zodiark.service.util.RestService;
 
 import javax.inject.Inject;
-import java.lang.reflect.Method;
 
 import static org.zodiark.service.util.mock.OKRestService.METHOD.DELETE;
 import static org.zodiark.service.util.mock.OKRestService.METHOD.GET;
@@ -52,7 +54,7 @@ public class OKRestService implements RestService {
     }
 
     @Override
-    public void put(String uri, Object o, Reply r) {
+    public void put(String uri, Object o, Reply  r) {
         send(PUT, uri, o, r);
     }
 
@@ -61,45 +63,32 @@ public class OKRestService implements RestService {
         send(POST, uri, o, r);
     }
 
-    protected void send(METHOD method, String uri, Object o, Reply r) {
+    //@Override
+    public void delete(String uri, Object o, Reply  r) {
+        send(DELETE, uri, o, r);
+    }
+
+    protected void send(METHOD method, String uri, Object o, Reply  r) {
         try {
-            Class<?> success = null;
-            Class<?> failure = null;
-            for (Method m : r.getClass().getMethods()) {
-                switch (m.getName()) {
-                    case "success":
-                        if (!((Class) m.getGenericParameterTypes()[0]).getName().equals(Object.class.getName())) {
-                            success = (Class) m.getGenericParameterTypes()[0];
-                        }
-                        break;
-                    case "failure":
-                        if (!((Class) m.getGenericParameterTypes()[0]).getName().equals(Object.class.getName())) {
-                            failure = (Class) m.getGenericParameterTypes()[0];
-                        }
-                        break;
-                    case "exception":
-                        break;
-                }
-            }
+            // Dangerous if the API change.
+            Class<?> success  = ReflectionUtils.getTypeArguments(Reply.class, r.getClass()).get(0);
+            Class<?> failure = ReflectionUtils.getTypeArguments(Reply.class, r.getClass()).get(1);
 
             String restResponse = db.serve(method, uri, mapper.writeValueAsString(o), InMemoryDB.RESULT.PASS);
 
             try {
                 Object object = context.newInstance(success);
-                r.success(String.class.isAssignableFrom(success) ? restResponse : mapper.readerForUpdating(object).readValue(restResponse));
+                r.ok(String.class.isAssignableFrom(success) ? restResponse : mapper.readerForUpdating(object).readValue(restResponse));
             } catch (Exception ex) {
-                logger.error("",ex);
+                logger.error("", ex);
                 Object object = context.newInstance(failure);
-                r.failure(String.class.isAssignableFrom(failure) ? restResponse : mapper.readerForUpdating(object).readValue(restResponse));
+                ReplyException<Object> e = new ReplyException<>();
+                e.error(String.class.isAssignableFrom(failure) ? restResponse : mapper.readerForUpdating(object).readValue(restResponse));
+                r.fail(e);
             }
         } catch (Exception e) {
             logger.error("", e);
-            r.exception(e);
+            r.fail(new ReplyException(e, null));
         }
-    }
-
-    @Override
-    public void delete(String uri, Object o, Reply r) {
-        send(DELETE, uri, o, r);
     }
 }

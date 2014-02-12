@@ -13,29 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.db;
+package org.zodiark.server;
 
-public class Passthrough implements Result {
-    private String passthrough = "";
-    private Exception exception;
-
-    public Passthrough() {}
-
-    public Passthrough response(String passthrough) {
-        this.passthrough = passthrough;
-        return this;
-    }
-
-    public String response() {
-        return passthrough;
-    }
-
-    public Exception exception(){
-        return exception;
-    }
-
-    public Passthrough exception(Exception exception) {
-        this.exception = exception;
-        return this;
-    }
+/**
+ * Internal interface, not for use. This is used for reflection.
+ */
+interface ReplyType<T, U> {
 }
