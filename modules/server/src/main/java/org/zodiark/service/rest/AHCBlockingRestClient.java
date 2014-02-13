@@ -50,6 +50,9 @@ public class AHCBlockingRestClient implements RestClient {
         nettyConfig.addProperty("child.keepAlive", "true");
 
         dbLocation = dbTarget.toURL().toString();
+        if  (dbLocation.endsWith("/")) {
+            dbLocation.substring(0, dbLocation.length() -1);
+        }
 
         client = new AsyncHttpClient(b.setAsyncHttpClientProviderConfig(nettyConfig).build());
         logger.debug("AHC Client ready", client);
@@ -57,7 +60,7 @@ public class AHCBlockingRestClient implements RestClient {
 
     @Override
     public String serve(RestServiceImpl.METHOD m, String url, String body) throws IOException {
-        url = dbLocation + url;
+        url = dbLocation. + url;
         logger.debug("Invoking DB with {}", url);
         Response response = null;
         try {
