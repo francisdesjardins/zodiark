@@ -153,12 +153,12 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             public void ok(TransactionId success) {
                 s.transactionId(success);
                 logger.debug("Action Accepted for {}", s);
-                response(e, s, utils.constructMessage(DB_SUBSCRIBER_EXTRA, utils.writeAsString(success)));
+                response(e, s, utils.constructMessage(DB_SUBSCRIBER_EXTRA, utils.writeAsString(success), e.getMessage().getUUID()));
             }
 
             @Override
             public void fail(ReplyException replyException) {
-                error(e, s, utils.constructMessage(DB_SUBSCRIBER_EXTRA, "error"));
+                error(e, s, utils.errorMessage("error", e.getMessage().getUUID()));
             }
         });
     }
@@ -171,12 +171,12 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             @Override
             public void ok(FavoriteId success) {
                 logger.debug("Favorite {}", success);
-                response(e, s, utils.constructMessage(DB_SUBSCRIBER_FAVORITES_START, utils.writeAsString(success)));
+                response(e, s, utils.constructMessage(DB_SUBSCRIBER_FAVORITES_START, utils.writeAsString(success), e.getMessage().getUUID()));
             }
 
             @Override
             public void fail(ReplyException replyException) {
-                error(e, s, utils.constructMessage(DB_SUBSCRIBER_FAVORITES_START, "error"));
+                error(e, s, utils.errorMessage("error", e.getMessage().getUUID()));
             }
         });
     }
@@ -203,12 +203,12 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             public void ok(TransactionId success) {
                 s.transactionId(success);
                 logger.debug("Action Accepted for {}", s);
-                response(e, s, utils.constructMessage(DB_SUBSCRIBER_JOIN_ACTION, utils.writeAsString(s.transactionId())));
+                response(e, s, utils.constructMessage(DB_SUBSCRIBER_JOIN_ACTION, utils.writeAsString(s.transactionId()), e.getMessage().getUUID()));
             }
 
             @Override
             public void fail(ReplyException replyException) {
-                error(e, s, utils.constructMessage(DB_SUBSCRIBER_JOIN_ACTION, "error"));
+                error(e, s, utils.errorMessage("error", e.getMessage().getUUID()));
             }
         });
     }
@@ -243,7 +243,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
 
         List<Action> actions = s.actionsAvailable().getActions();
         if (error || actions == null || actions.isEmpty() || !actions.contains(requestedAction)) {
-            error(e, s, utils.errorMessage(DB_SUBSCRIBER_REQUEST_ACTION, "error"));
+            error(e, s, utils.errorMessage("error", e.getMessage().getUUID()));
         }
 
         // Subscriber will be deleted in case an error happens.
@@ -252,12 +252,12 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             @Override
             public void ok(ActionState state) {
                 logger.debug("Action Accepted for {}", state);
-                response(e, s, utils.constructMessage(DB_SUBSCRIBER_REQUEST_ACTION, utils.writeAsString(state)));
+                response(e, s, utils.constructMessage(DB_SUBSCRIBER_REQUEST_ACTION, utils.writeAsString(state),e.getMessage().getUUID()));
             }
 
             @Override
             public void fail(ReplyException replyException) {
-                error(e, s, utils.errorMessage(DB_SUBSCRIBER_REQUEST_ACTION, "error"));
+                error(e, s, utils.errorMessage("error",e.getMessage().getUUID()));
             }
         });
     }
@@ -303,7 +303,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
 
                 @Override
                 public void fail(ReplyException replyException) {
-                    error(e, subscriberEndpoint.get(), utils.constructMessage(DB_ENDPOINT_STATE, "error"));
+                    error(e, subscriberEndpoint.get(), utils.constructMessage(DB_ENDPOINT_STATE, "error", e.getMessage().getUUID()));
                 }
             });
         } else {
@@ -345,12 +345,12 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
             @Override
             public void ok(Actions actions) {
                 s.actionsAvailable(actions);
-                response(e, s, utils.constructMessage(DB_SUBSCRIBER_AVAILABLE_ACTIONS, utils.writeAsString(actions)));
+                response(e, s, utils.constructMessage(DB_SUBSCRIBER_AVAILABLE_ACTIONS, utils.writeAsString(actions), e.getMessage().getUUID()));
             }
 
             @Override
             public void fail(ReplyException replyException) {
-                error(e, s, utils.errorMessage(DB_SUBSCRIBER_AVAILABLE_ACTIONS, "error"));
+                error(e, s, utils.errorMessage("error",e.getMessage().getUUID()));
             }
         });
 
@@ -370,7 +370,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
     public void connectEndpoint(Envelope e, AtmosphereResource r) {
         logger.info("Subscriber Connected {}", e);
         SubscriberEndpoint s = createEndpoint(r, e.getMessage());
-        response(e, s, utils.constructMessage(SUBSCRIBER_BROWSER_HANDSHAKE_OK, "OK"));
+        response(e, s, utils.constructMessage(SUBSCRIBER_BROWSER_HANDSHAKE_OK, "OK", e.getMessage().getUUID()));
     }
 
     // TODO: Remove
@@ -379,7 +379,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         try {
             SubscriberResults result = mapper.readValue(e.getMessage().getData(), SubscriberResults.class);
             SubscriberEndpoint p = endpoints.get(result.getUuid());
-            error(e, p, utils.constructMessage(ERROR_STREAMING_SESSION, "error"));
+            error(e, p, utils.constructMessage(ERROR_STREAMING_SESSION, "error", e.getMessage().getUUID()));
         } catch (IOException e1) {
             logger.warn("{}", e1);
         }
@@ -418,12 +418,12 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         eventBus.message(BEGIN_SUBSCRIBER_STREAMING_SESSION, new RetrieveMessage(s.uuid(), e.getMessage()), new Reply<RetrieveMessage, String>() {
             @Override
             public void ok(RetrieveMessage ok) {
-                response(e, s, utils.constructMessage(BEGIN_SUBSCRIBER_STREAMING_SESSION, "OK"));
+                response(e, s, utils.constructMessage(BEGIN_SUBSCRIBER_STREAMING_SESSION, "OK", e.getMessage().getUUID()));
             }
 
             @Override
             public void fail(ReplyException replyException) {
-                error(e, s, utils.constructMessage(BEGIN_SUBSCRIBER_STREAMING_SESSION, "error"));
+                error(e, s, utils.constructMessage(BEGIN_SUBSCRIBER_STREAMING_SESSION, "error", e.getMessage().getUUID()));
             }
         });
     }

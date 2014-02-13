@@ -195,12 +195,12 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
                 } else {
                     p.state().modeId(ModeId.VOID);
                 }
-                response(e, p, utils.constructMessage(path, utils.writeAsString(status)));
+                response(e, p, utils.constructMessage(path, utils.writeAsString(status), e.getMessage().getUUID()));
             }
 
             @Override
             public void fail(ReplyException replyException) {
-                error(e, p, utils.constructMessage(path, utils.writeAsString(new org.zodiark.service.Error().error("Unauthorized"))));
+                error(e, p, utils.constructMessage(path, utils.writeAsString(new org.zodiark.service.Error().error("Unauthorized")), e.getMessage().getUUID()));
             }
         });
     }
@@ -367,7 +367,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 
             @Override
             public void fail(ReplyException replyException) {
-                error(e, p, utils.constructMessage(WOWZA_CONNECT, "error"));
+                error(e, p, utils.constructMessage(WOWZA_CONNECT, "error", e.getMessage().getUUID()));
             }
         });
     }
@@ -387,13 +387,13 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             public void ok(ShowId showId) {
                 logger.trace("Publisher ready {}", p);
                 p.state().showId(showId);
-                response(e, p, utils.constructMessage(DB_PUBLISHER_SHOW_START, utils.writeAsString(p.state().showId())));
+                response(e, p, utils.constructMessage(DB_PUBLISHER_SHOW_START, utils.writeAsString(p.state().showId()), e.getMessage().getUUID()));
             }
 
             @Override
             public void fail(ReplyException replyException) {
                 // TODO: Wrong error message
-                error(e, p, utils.constructMessage(DB_PUBLISHER_SHOW_START, utils.writeAsString(new Error().error("Unauthorized"))));
+                error(e, p, utils.constructMessage(DB_PUBLISHER_SHOW_START, utils.writeAsString(new Error().error("Unauthorized")), e.getMessage().getUUID()));
             }
         }).message(BROADCASTER_CREATE, p);
     }
@@ -447,7 +447,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     public PublisherEndpoint createSession(final Envelope e, final AtmosphereResource r) {
 
         if (!e.getMessage().hasData()) {
-            error(e, r, utils.constructMessage(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, "error"));
+            error(e, r, utils.errorMessage("error", e.getMessage().getUUID()));
             return null;
         }
 
@@ -462,17 +462,16 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 
             e.getMessage().setData(injectIp(r.getRequest().getRemoteAddr(), data));
 
-            eventBus.message(DB_ENDPOINT_STATE, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<EndpointState, String>() {
+            eventBus.message(DB_POST_PUBLISHER_SESSION_CREATE, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<Status, String>() {
                 @Override
-                public void ok(EndpointState state) {
+                public void ok(final Status status) {
                     final PublisherEndpoint p = publisher.get();
-                    p.state(state);
+                    logger.trace("{} succeed for {}", DB_POST_PUBLISHER_SESSION_CREATE, p);
 
-                    eventBus.message(DB_POST_PUBLISHER_SESSION_CREATE, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<Status, String>() {
+                    eventBus.message(DB_ENDPOINT_STATE, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<EndpointState, String>() {
                         @Override
-                        public void ok(final Status status) {
-                            logger.trace("{} succeed for {}", DB_POST_PUBLISHER_SESSION_CREATE, p);
-
+                        public void ok(EndpointState state) {
+                            p.state(state);
                             eventBus.message(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, new RetrieveMessage(p.uuid(), e.getMessage()), new Reply<String, String>() {
                                 @Override
                                 public void ok(String passthrough) {
@@ -501,14 +500,15 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
 
                         @Override
                         public void fail(ReplyException replyException) {
-                            error(e, publisher.get(), utils.constructMessage(DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT, "error"));
+                            error(e, publisher.get(), utils.errorMessage("error", e.getMessage().getUUID()));
                         }
                     });
+
                 }
 
                 @Override
                 public void fail(ReplyException replyException) {
-                    error(e, publisher.get(), utils.constructMessage(DB_ENDPOINT_STATE, "error"));
+                    error(e, publisher.get(), utils.constructMessage(DB_POST_PUBLISHER_SESSION_CREATE, "error", e.getMessage().getUUID()));
                 }
             });
 

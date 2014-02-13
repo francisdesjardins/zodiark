@@ -66,6 +66,7 @@ public class Message {
     public String toString() {
         return "{" +
                 "path:'" + path + '\'' +
+                ", uuid:'" + uuid + '\'' +
                 ", data:'" + data + '\'' +
                 '}';
     }

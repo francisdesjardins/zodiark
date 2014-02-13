@@ -82,6 +82,9 @@ public class AHCBlockingRestClient implements RestClient {
             throw new IOException(ex);
         }
 
+        if (response.getStatusCode() > 299) {
+            throw new IllegalStateException(response.getStatusCode() + " " + response.getStatusText());
+        }
         return response.getResponseBody();
     }
 }

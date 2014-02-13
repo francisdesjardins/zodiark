@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class EndpointUtils<T extends EndpointAdapter> {
 
-    public static final String ERROR_SERVICE = "/error/";
+    public static final String ERROR_SERVICE = "/error";
     private final Logger logger = LoggerFactory.getLogger(EndpointUtils.class);
 
     private final EventBus eventBus;
@@ -60,12 +60,12 @@ public class EndpointUtils<T extends EndpointAdapter> {
             @Override
             public void ok(Status status) {
                 logger.trace("Status {}", status);
-                response(e, p, constructMessage(path, writeAsString(status)));
+                response(e, p, constructMessage(path, writeAsString(status), e.getMessage().getUUID()));
             }
 
             @Override
             public void fail(ReplyException replyException) {
-                error(e, p, constructMessage(path, writeAsString(new Error().error("Unauthorized"))));
+                error(e, p, errorMessage(writeAsString(new Error().error("Unauthorized")), e.getMessage().getUUID()));
             }
         });
     }
@@ -100,7 +100,7 @@ public class EndpointUtils<T extends EndpointAdapter> {
 
     public boolean validate(T p, Envelope e) {
         if (p == null) {
-            error(e, p, errorMessage(e.getMessage().getPath(), writeAsString(new Error().error("Unauthorized"))));
+            error(e, p, errorMessage(writeAsString(new Error().error("Unauthorized")), e.getMessage().getUUID()));
             return false;
         }
         return true;
@@ -108,7 +108,7 @@ public class EndpointUtils<T extends EndpointAdapter> {
 
     public boolean validateShowId(T p, Envelope e) {
         if (p == null) {
-            error(e, p, constructMessage(e.getMessage().getPath(), writeAsString(new Error().error("Unauthorized"))));
+            error(e, p, constructMessage(e.getMessage().getPath(), writeAsString(new Error().error("Unauthorized")), e.getMessage().getUUID()));
             return false;
         }
         return true;
@@ -124,12 +124,12 @@ public class EndpointUtils<T extends EndpointAdapter> {
 
     public void succesPassThrough(Envelope e, T p, String path, String passthrough) {
         logger.trace("Passthrough succeed {}", passthrough);
-        response(e, p, constructMessage(path, passthrough));
+        response(e, p, constructMessage(path, passthrough, e.getMessage().getUUID()));
     }
 
     public void failPassThrough(Envelope e, T p, ReplyException passthrough) {
         logger.trace("Passthrough failed {}", passthrough);
-        error(e, p, errorMessage(e.getMessage().getPath(), passthrough.throwable().getMessage()));
+        error(e, p, errorMessage(passthrough.throwable().getMessage(), e.getMessage().getUUID()));
     }
 
     public void error(Envelope e, T endpoint, Message m) {
@@ -141,7 +141,7 @@ public class EndpointUtils<T extends EndpointAdapter> {
     }
 
     public void error(Envelope e, AtmosphereResource r, Message m) {
-        Envelope error = Envelope.newServerReply(e, errorMessage(m.getPath(), "/error"));
+        Envelope error = Envelope.newServerReply(e, errorMessage("/error", e.getMessage().getUUID()));
         eventBus.ioEvent(error, r);
     }
 
@@ -154,17 +154,19 @@ public class EndpointUtils<T extends EndpointAdapter> {
     }
 
 
-    public Message constructMessage(String path, String status) {
+    public Message constructMessage(String path, String status, String uuid) {
         Message m = new Message();
         m.setPath(path);
         m.setData(status);
+        m.setUUID(uuid);
         return m;
     }
 
-    public Message errorMessage(String path, String status) {
+    public Message errorMessage(String status, String uuid) {
         Message m = new Message();
-        m.setPath(ERROR_SERVICE + path);
+        m.setPath(ERROR_SERVICE);
         m.setData(status);
+        m.setUUID(uuid);
         return m;
     }
 
