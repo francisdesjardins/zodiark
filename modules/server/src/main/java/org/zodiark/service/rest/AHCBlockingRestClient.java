@@ -61,7 +61,8 @@ public class AHCBlockingRestClient implements RestClient {
     @Override
     public String serve(RestServiceImpl.METHOD m, String url, String body) throws IOException {
         url = dbLocation + url;
-        logger.debug("Invoking DB with {}", url);
+        // TODO: Don't do that in Prod!
+        logger.debug("Invoking DB with {} and body", url, body);
         Response response = null;
         try {
             switch (m) {
