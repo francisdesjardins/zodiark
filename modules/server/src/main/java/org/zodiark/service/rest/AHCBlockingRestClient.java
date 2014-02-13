@@ -62,7 +62,7 @@ public class AHCBlockingRestClient implements RestClient {
     public String serve(RestServiceImpl.METHOD m, String url, String body) throws IOException {
         url = dbLocation + url;
         // TODO: Don't do that in Prod!
-        logger.debug("Invoking DB with {} and body", url, body);
+        logger.debug("Invoking DB with {} and body {}", url, body);
         Response response = null;
         try {
             switch (m) {
@@ -73,7 +73,7 @@ public class AHCBlockingRestClient implements RestClient {
                     response = client.preparePost(url).setBody(body).execute().get();
                     break;
                 case PUT:
-                    response = client.preparePost(url).setBody(body).execute().get();
+                    response = client.preparePut(url).setBody(body).execute().get();
                     break;
                 case DELETE:
                     response = client.preparePost(url).setBody(body).execute().get();
