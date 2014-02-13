@@ -47,7 +47,7 @@ public class RestServiceTest {
     public static final String PUBLISHER_ERROR = "{\"source\":\"xxx\",\"error\":\"xxx\",\"info\":\"xxx\"}";
     public static final String CONFIG_PASSTROUGHT = "{\"performerId\":\"12334\",\"colorPerformer\":\"xxx\",\"colorClient\":\"xxx\",\"colorAdmin\":\"xxx\",\"colorSystem\":\"xxx\",\"colorVip\":\"xxx\",\"fontSizeChat\":\"xxx\",\"fontSizeMenu\":\"xxx\",\"shortcut1\":\"xxx\",\"shortcut2\":\"xxx\",\"shortcut3\":\"xxx\",\"shortcut4\":\"xxx\",\"shortcut5\":\"xxx\",\"shortcut6\":\"xxx\",\"shortcut7\":\"xxx\",\"shortcut8\":\"xxx\",\"shortcut9\":\"xxx\",\"shortcut10\":\"xxx\",\"welcomeMessage\":\"xxx\"}\n";
     public static final String PROFILE = "{\"guid\":\"12234\", \"profileFullname\":\"xxx\",\"profileAge\":\"xxx\",\"profileGender\":\"xxx\",\"profileNote\":\"xxx\"}";
-    public static final String ACTION = "\"{\"actionId\":123\"}";
+    public static final String ACTION = "{\"actionId\":123}";
     public static final String AMOUNT_TOKEN = "{\"amountTokens\":234}";
     public static final String SHOWTYPE_ID = "{\"showTypeId\":1234}";
 

@@ -91,4 +91,22 @@ public class Action {
     public void setCreatedOn(String createdOn) {
         this.createdOn = createdOn;
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Action action = (Action) o;
+
+        if (actionId != action.actionId) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return actionId;
+    }
 }

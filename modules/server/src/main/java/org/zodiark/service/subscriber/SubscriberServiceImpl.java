@@ -29,6 +29,7 @@ import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointUtils;
 import org.zodiark.service.RetrieveMessage;
 import org.zodiark.service.Session;
+import org.zodiark.service.db.result.Action;
 import org.zodiark.service.db.result.ActionState;
 import org.zodiark.service.db.result.Actions;
 import org.zodiark.service.db.result.FavoriteId;
@@ -41,6 +42,7 @@ import org.zodiark.service.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -230,6 +232,19 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
 
         // LA DB peut renvoyée une erreur.
 
+        boolean error = false;
+        Action requestedAction = null;
+        try {
+            requestedAction = mapper.readValue(e.getMessage().getData(), Action.class);
+        } catch (IOException e1) {
+            logger.error("{}", e1);
+            error = true;
+        }
+
+        List<Action> actions = s.actionsAvailable().getActions();
+        if (error || actions == null || actions.isEmpty() || !actions.contains(requestedAction)) {
+            error(e, s, utils.errorMessage(DB_SUBSCRIBER_REQUEST_ACTION, "error"));
+        }
 
         // Subscriber will be deleted in case an error happens.
         s.actionRequested(true);
@@ -358,6 +373,7 @@ public class SubscriberServiceImpl implements SubscriberService, Session<Subscri
         response(e, s, utils.constructMessage(SUBSCRIBER_BROWSER_HANDSHAKE_OK, "OK"));
     }
 
+    // TODO: Remove
     @Override
     public void errorStreamingSession(Envelope e) {
         try {
