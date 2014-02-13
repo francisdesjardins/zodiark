@@ -269,9 +269,8 @@ public interface Paths {
     String DB_PUBLISHER_PUBLIC_MODE_END = "/v1/publisher/{guid}/settings/override/state/end";
     String DB_PUBLISHER_ERROR_REPORT = "/v1/publisher/{guid}/error/report";
 
-    String DB_PUBLISHER_SUBSCRIBER_PROFILE = "/v1/publisher/{guid}/subscriber/{guid}/profile";
-    String DB_PUBLISHER_SUBSCRIBER_PROFILE_GET = "_get" + DB_PUBLISHER_SUBSCRIBER_PROFILE;
-    String DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT = "_put" + DB_PUBLISHER_SUBSCRIBER_PROFILE;;
+    String DB_PUBLISHER_SUBSCRIBER_PROFILE_GET_PASSTHROUGH = "/v1/publisher/{guid}/subscriber/{subscriberId}/profile";
+    String DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT = "/v1/publisher/{guid}/subscriber/profile";;
 
 
     String DB_PUBLISHER_ACTIONS = "/v1/publisher/{guid}/actions";

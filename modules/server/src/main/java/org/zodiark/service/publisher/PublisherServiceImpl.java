@@ -72,8 +72,7 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_START;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_START_POST;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_GET;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_GET_PASSTHROUGH;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_BLOCK;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_EJECT;
@@ -148,7 +147,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             case DB_GET_WORD_PASSTHROUGH:
                 getMotd(e, r);
                 break;
-            case DB_PUBLISHER_SUBSCRIBER_PROFILE:
+            case DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT:
                 getOrUpdateSubscriberProfile(path, e);
                 break;
             case DB_PUBLISHER_SHARED_PRIVATE_START:
@@ -249,7 +248,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         Message m = e.getMessage();
         if (!m.hasData()) {
             // TODO: UC15
-            utils.passthroughEvent(DB_PUBLISHER_SUBSCRIBER_PROFILE_GET, e);
+            utils.passthroughEvent(DB_PUBLISHER_SUBSCRIBER_PROFILE_GET_PASSTHROUGH, e);
         } else {
             String[] paths = path.split("/");
 

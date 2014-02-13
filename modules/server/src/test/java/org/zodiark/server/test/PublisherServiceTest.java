@@ -45,7 +45,8 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHARED_PRIVATE_START;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_GET_PASSTHROUGH;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_BLOCK;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_EJECT;
 
@@ -62,7 +63,7 @@ public class PublisherServiceTest {
 
     @BeforeMethod
     public void before() {
-        server = new ZodiarkServer().on();
+        server = new ZodiarkServer().serve("http://0.0.0.0:" + Utils.findFreePort()).on();
     }
 
     @AfterMethod
@@ -325,7 +326,7 @@ public class PublisherServiceTest {
         eventBus.ioEvent(em, RESOURCE);
 
         // UC15
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SUBSCRIBER_PROFILE, ""));
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SUBSCRIBER_PROFILE_GET_PASSTHROUGH, ""));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());
@@ -503,7 +504,7 @@ public class PublisherServiceTest {
         eventBus.ioEvent(em, RESOURCE);
 
         // UC22
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SUBSCRIBER_PROFILE, RestServiceTest.PROFILE));
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT, RestServiceTest.PROFILE));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());

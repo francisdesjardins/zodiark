@@ -40,6 +40,7 @@ import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_REQUEST_ACTION;
 
 public class SubscriberServiceTest {
 
+
     public final static String UUID = java.util.UUID.randomUUID().toString();
     public final static AtmosphereFramework framework = new AtmosphereFramework().init();
     public final static AtmosphereResource RESOURCE = AtmosphereResourceFactory.getDefault().create(framework.getAtmosphereConfig(), UUID);
@@ -53,7 +54,7 @@ public class SubscriberServiceTest {
 
     @BeforeMethod
     public void before() {
-        server = new ZodiarkServer().on();
+        server = new ZodiarkServer().serve("http://0.0.0.0:" + Utils.findFreePort()).on();
     }
 
     @AfterMethod

@@ -42,7 +42,7 @@ public class CoordinationTest {
         return new Message().setPath(path).setData(message);
     }
 
-    @Test(enabled = false)
+    @Test(enabled = true)
     public void uc31Test() throws Exception {
         EventBus eventBus = EventBusFactory.getDefault().eventBus();
 

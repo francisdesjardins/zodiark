@@ -30,7 +30,7 @@ import static org.zodiark.protocol.Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHRO
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_LOAD_CONFIG_GET;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SETTINGS_SHOW_GET_PASSTHROUGHT;
-import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_GET;
+import static org.zodiark.protocol.Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_GET_PASSTHROUGH;
 import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS;
 
 @Retrieve({DB_ENDPOINT_STATE,
@@ -39,7 +39,7 @@ import static org.zodiark.protocol.Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS;
         DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT,
         DB_PUBLISHER_SETTINGS_SHOW_GET_PASSTHROUGHT,
         DB_GET_WORD_PASSTHROUGH,
-        DB_PUBLISHER_SUBSCRIBER_PROFILE_GET,
+        DB_PUBLISHER_SUBSCRIBER_PROFILE_GET_PASSTHROUGH,
         DB_SUBSCRIBER_AVAILABLE_ACTIONS})
 public class GetService extends DBServiceAdapter {
 

@@ -622,7 +622,7 @@ public class RestServiceTest {
         RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
-        restService.put(Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE.replace("{guid}", UUID.randomUUID().toString()), PROFILE,
+        restService.put(Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT.replace("{guid}", UUID.randomUUID().toString()), PROFILE,
                 new Reply<Status, String>() {
                     @Override
                     public void ok(Status success) {
