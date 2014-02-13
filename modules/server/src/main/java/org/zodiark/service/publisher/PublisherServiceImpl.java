@@ -525,7 +525,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     }
 
     private String injectIp(String remoteAddr, String data) {
-        return data.replaceAll("\\s+", "").replace("\"\"", "\"" + remoteAddr + "\"");
+        return data.replace("ip\":\"\"", "ip\":\"" + remoteAddr + "\"");
     }
 
     @Override

@@ -44,6 +44,6 @@ public class PutService extends DBServiceAdapter {
     public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
         final RetrieveMessage p = RetrieveMessage.class.cast(message);
-        restService.put(path.replace("{guid}", p.uuid()), p.message(), reply);
+        restService.put(path.replace("{guid}", p.uuid()), p.message().getData(), reply);
     }
 }

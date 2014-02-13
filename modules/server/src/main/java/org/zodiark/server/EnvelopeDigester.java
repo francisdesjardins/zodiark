@@ -15,6 +15,7 @@
  */
 package org.zodiark.server;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.config.service.AtmosphereInterceptorService;
 import org.atmosphere.cpr.Action;
@@ -95,14 +96,23 @@ public class EnvelopeDigester extends AtmosphereInterceptorAdapter {
         return new Envelope.Builder()
                 .path(new Path(notNull(envelope.get("path"))))
                 .to(new To(notNull(envelope.get("to"))))
+
                 .from(new From(notNull(envelope.get("from"))))
                 .traceId(new TraceId((int) envelope.get("traceId")))
                 .message(new Message().setPath(notNull(message.get("path")))
-                        .setData(notNull(message.get("data")))
+                        .setData(notNull(encodeJSON(message.get("data"))))
                         .setUUID(notNull(message.get("uuid"))))
                 .protocol(new Protocol(notNull(envelope.get("protocol"))))
                 .uuid(notNull(envelope.get("uuid")))
                 .build();
+    }
+
+    private String encodeJSON(Object data) throws JsonProcessingException {
+        if (String.class.isAssignableFrom(data.getClass())) {
+            return data.toString();
+        }
+
+        return mapper.writeValueAsString(data);
     }
 
     private String notNull(Object o) {

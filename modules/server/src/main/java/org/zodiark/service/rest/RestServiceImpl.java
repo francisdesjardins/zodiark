@@ -48,7 +48,7 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public void get(String uri, Reply r) {
-        send(GET, uri, null, r);
+        send(GET, uri, "", r);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class RestServiceImpl implements RestService {
             Class<?> success = ReflectionUtils.getTypeArguments(Reply.class, r.getClass()).get(0);
             Class<?> failure = ReflectionUtils.getTypeArguments(Reply.class, r.getClass()).get(1);
 
-            String restResponse = rest.serve(method, uri, mapper.writeValueAsString(o));
+            String restResponse = rest.serve(method, uri, o == null ? "" : o.toString());
 
             try {
                 Object object = context.newInstance(success);

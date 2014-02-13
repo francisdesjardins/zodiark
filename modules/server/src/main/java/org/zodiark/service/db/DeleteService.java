@@ -51,7 +51,7 @@ public class DeleteService extends DBServiceAdapter {
         logger.trace("Servicing {}", path);
         final RetrieveMessage p = RetrieveMessage.class.cast(message);
         restService.delete(DB_PUBLISHER_SHOW_END.replace("{guid}", p.uuid()),
-                p.message(), reply);
+                p.message().getData(), reply);
 
     }
 }

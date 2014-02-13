@@ -60,6 +60,6 @@ public class PostService extends DBServiceAdapter {
     public void reactTo(String path, Object message, final Reply reply) {
         logger.trace("Servicing {}", path);
         final RetrieveMessage p = RetrieveMessage.class.cast(message);
-        restService.post(path.replace("{guid}", p.uuid()), p.message(), reply);
+        restService.post(path.replace("{guid}", p.uuid()), p.message().getData(), reply);
     }
 }
