@@ -32,6 +32,7 @@ public class EndpointState {
     private String type;
     private boolean administrator;
     private String publisherUUID = VOID;
+    private boolean anonymous = true;
 
     public EndpointState(){}
 
@@ -111,4 +112,15 @@ public class EndpointState {
         this.publisherUUID = publisherUUID;
         return this;
     }
+
+    public boolean anonymous() {
+        return anonymous;
+    }
+
+    @JsonProperty("anonymous")
+    public EndpointState anonymous(boolean anonymous) {
+        this.anonymous = anonymous;
+        return this;
+    }
+
 }

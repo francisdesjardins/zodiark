@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.util.mock;
+package org.zodiark.service.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -22,23 +22,20 @@ import org.zodiark.server.Context;
 import org.zodiark.server.Reply;
 import org.zodiark.server.ReplyException;
 import org.zodiark.service.util.ReflectionUtils;
-import org.zodiark.service.util.RestService;
 
 import javax.inject.Inject;
 
-import static org.zodiark.service.util.mock.OKRestService.METHOD.DELETE;
-import static org.zodiark.service.util.mock.OKRestService.METHOD.GET;
-import static org.zodiark.service.util.mock.OKRestService.METHOD.POST;
-import static org.zodiark.service.util.mock.OKRestService.METHOD.PUT;
+import static org.zodiark.service.rest.RestService.METHOD.DELETE;
+import static org.zodiark.service.rest.RestService.METHOD.GET;
+import static org.zodiark.service.rest.RestService.METHOD.POST;
+import static org.zodiark.service.rest.RestService.METHOD.PUT;
 
 /**
  * Mock class for testing purpose only. This class does nothing.
  */
-public class OKRestService implements RestService {
+public class RestServiceImpl implements RestService {
 
-    private final Logger logger = LoggerFactory.getLogger(OKRestService.class);
-
-    public enum METHOD {GET, PUT, POST, DELETE}
+    private final Logger logger = LoggerFactory.getLogger(RestServiceImpl.class);
 
     @Inject
     public Context context;
@@ -46,7 +43,8 @@ public class OKRestService implements RestService {
     @Inject
     public ObjectMapper mapper;
 
-    protected final InMemoryDB db = new InMemoryDB();
+    @Inject
+    public RestClient rest;
 
     @Override
     public void get(String uri, Reply r) {
@@ -70,11 +68,10 @@ public class OKRestService implements RestService {
 
     protected void send(METHOD method, String uri, Object o, Reply r) {
         try {
-            // Dangerous if the API change.
             Class<?> success = ReflectionUtils.getTypeArguments(Reply.class, r.getClass()).get(0);
             Class<?> failure = ReflectionUtils.getTypeArguments(Reply.class, r.getClass()).get(1);
 
-            String restResponse = db.serve(method, uri, mapper.writeValueAsString(o), InMemoryDB.RESULT.PASS);
+            String restResponse = rest.serve(method, uri, mapper.writeValueAsString(o));
 
             try {
                 Object object = context.newInstance(success);

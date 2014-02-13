@@ -19,8 +19,8 @@ import org.testng.annotations.Test;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EnvelopeDigester;
 import org.zodiark.server.ZodiarkObjectFactory;
-import org.zodiark.service.util.mock.InMemoryDB;
-import org.zodiark.service.util.mock.OKRestService;
+import org.zodiark.service.rest.InMemoryRestClient;
+import org.zodiark.service.rest.RestService;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -33,10 +33,10 @@ public class InternalObjectTest {
 
     @Test
     public void basicPass() {
-        InMemoryDB localDb = new InMemoryDB();
+        InMemoryRestClient localDb = new InMemoryRestClient();
 
-        String s = localDb.serve(OKRestService.METHOD.POST, "/v1/publisher/{guid}/session/create", "{\"username\": \"foo\", \"password\":\"12345\", \"ip\": \"127.0.0.1\", \"referrer\":\"zzzz\"}",
-                InMemoryDB.RESULT.PASS);
+        String s = localDb.serve(RestService.METHOD.POST, "/v1/publisher/{guid}/session/create", "{\"username\": \"foo\", \"password\":\"12345\", \"ip\": \"127.0.0.1\", \"referrer\":\"zzzz\"}",
+                InMemoryRestClient.RESULT.PASS);
 
         assertNotNull(s);
 

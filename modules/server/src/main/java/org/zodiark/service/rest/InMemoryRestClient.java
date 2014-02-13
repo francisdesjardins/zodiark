@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.util.mock;
+package org.zodiark.service.rest;
 
 import org.atmosphere.util.DefaultEndpointMapper;
 import org.atmosphere.util.EndpointMapper;
@@ -31,7 +31,7 @@ import static org.zodiark.protocol.Paths.DB_POST_SUBSCRIBER_JOIN_SESSION;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_END;
 import static org.zodiark.protocol.Paths.DB_PUBLISHER_SHOW_START;
 
-public class InMemoryDB {
+public class InMemoryRestClient implements RestClient {
 
     public enum RESULT {PASS, FAIL}
 
@@ -75,7 +75,7 @@ public class InMemoryDB {
 
     private final Map<String, String> fakeFailDatabase = new HashMap<>();
 
-    public InMemoryDB() {
+    public InMemoryRestClient() {
         post.put(DB_POST_PUBLISHER_SESSION_CREATE, STATUS_OK);
         get.put(DB_ENDPOINT_STATE, STATE);
 
@@ -140,7 +140,12 @@ public class InMemoryDB {
         post.put(Paths.DB_SUBSCRIBER_FAVORITES_START, FAVORITE_ID);
     }
 
-    public String serve(OKRestService.METHOD m, String url, String body, RESULT passOrFail) {
+    @Override
+    public String serve(RestServiceImpl.METHOD m, String url, String body) {
+        return serve(m, url, body, RESULT.PASS);
+    }
+
+    public String serve(RestService.METHOD m, String url, String body, RESULT passOrFail) {
         String bdResult;
         if (RESULT.PASS.equals(passOrFail)) {
             switch(m) {

@@ -25,9 +25,9 @@ import org.zodiark.service.db.result.ShowId;
 import org.zodiark.service.db.result.Status;
 import org.zodiark.service.db.result.TransactionId;
 import org.zodiark.service.db.result.WatchId;
+import org.zodiark.service.rest.RestServiceImpl;
 import org.zodiark.service.state.EndpointState;
-import org.zodiark.service.util.RestService;
-import org.zodiark.service.util.mock.OKRestService;
+import org.zodiark.service.rest.RestService;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -53,7 +53,7 @@ public class RestServiceTest {
 
     @Test
     public void createPublisherService() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<Status> config = new AtomicReference<>();
         restService.post(DB_POST_PUBLISHER_SESSION_CREATE.replace("{guid}", UUID.randomUUID().toString()),
                 AUTHTOKEN, new Reply<Status, String>() {
@@ -72,7 +72,7 @@ public class RestServiceTest {
 
     @Test
     public void showIdTest() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<ShowId> showId = new AtomicReference<>();
 
         restService.post(DB_PUBLISHER_SHOW_START.replace("{guid}", UUID.randomUUID().toString()),
@@ -92,7 +92,7 @@ public class RestServiceTest {
 
     @Test
     public void watchIdService() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<WatchId> watchId = new AtomicReference<>();
 
         restService.post(DB_POST_SUBSCRIBER_JOIN_SESSION.replace("{guid}", UUID.randomUUID().toString()),
@@ -113,7 +113,7 @@ public class RestServiceTest {
 
     @Test
     public void motdTest() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<String> motds = new AtomicReference<>();
 
         restService.get(DB_GET_WORD_PASSTHROUGH.replace("{guid}", UUID.randomUUID().toString())
@@ -132,7 +132,7 @@ public class RestServiceTest {
 
     @Test
     public void chargeStartTest() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.post(DB_POST_SUBSCRIBER_CHARGE_START.replace("{guid}", UUID.randomUUID().toString()),
@@ -153,7 +153,7 @@ public class RestServiceTest {
 
     @Test
     public void chargeEndTest() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<ShowId> showId = new AtomicReference<>();
 
         restService.post(DB_PUBLISHER_SHOW_START.replace("{guid}", UUID.randomUUID().toString()),
@@ -187,7 +187,7 @@ public class RestServiceTest {
 
     @Test
     public void onDemandStartTest() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.post(Paths.DB_POST_PUBLISHER_ONDEMAND_START.replace("{guid}", UUID.randomUUID().toString()),
@@ -208,7 +208,7 @@ public class RestServiceTest {
 
     @Test
     public void onDemandKeepAlive() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.post(Paths.DB_POST_PUBLISHER_ONDEMAND_KEEPALIVE.replace("{guid}", UUID.randomUUID().toString()),
@@ -229,7 +229,7 @@ public class RestServiceTest {
 
     @Test
     public void onDemandEndTest() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.delete(Paths.DB_POST_PUBLISHER_ONDEMAND_END.replace("{guid}", UUID.randomUUID().toString()),
@@ -250,7 +250,7 @@ public class RestServiceTest {
 
     @Test
     public void onSubscriberProfileTest() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<String> result = new AtomicReference<>();
 
         restService.get(Paths.DB_GET_SUBSCRIBER_STATUS_TO_PUBLISHER_PASSTHROUGHT.replace("{guid}", UUID.randomUUID().toString()), new Reply<String, String>() {
@@ -269,7 +269,7 @@ public class RestServiceTest {
 
     @Test
     public void sharedPrivateStartTest() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.post(Paths.DB_PUBLISHER_SHARED_PRIVATE_START.replace("{guid}", UUID.randomUUID().toString()), "", new Reply<Status, String>() {
@@ -288,7 +288,7 @@ public class RestServiceTest {
 
     @Test
     public void sharedPrivateEndTest() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.put(Paths.DB_PUBLISHER_SHARED_PRIVATE_END.replace("{guid}", UUID.randomUUID().toString()), "", new Reply<Status, String>() {
@@ -307,7 +307,7 @@ public class RestServiceTest {
 
     @Test
     public void availableSubscriberActions() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<String> result = new AtomicReference<>();
 
         restService.get(Paths.DB_SUBSCRIBER_AVAILABLE_ACTIONS.replace("{guid}", UUID.randomUUID().toString()), new Reply<String, String>() {
@@ -326,7 +326,7 @@ public class RestServiceTest {
 
     @Test
     public void availablePublisherActions() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<String> result = new AtomicReference<>();
 
         restService.get(Paths.DB_PUBLISHER_AVAILABLE_ACTIONS_PASSTHROUGHT.replace("{guid}", UUID.randomUUID().toString()), new Reply<String, String>() {
@@ -345,7 +345,7 @@ public class RestServiceTest {
 
     @Test
     public void subscriberRequestAction() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<ActionState> result = new AtomicReference<>();
 
         restService.post(Paths.DB_SUBSCRIBER_REQUEST_ACTION.replace("{guid}", UUID.randomUUID().toString()), ACTION, new Reply<ActionState, String>() {
@@ -364,7 +364,7 @@ public class RestServiceTest {
 
     @Test
     public void subscriberJoinAction() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<TransactionId> result = new AtomicReference<>();
 
         restService.post(Paths.DB_SUBSCRIBER_JOIN_ACTION.replace("{guid}", UUID.randomUUID().toString()), "", new Reply<TransactionId, String>() {
@@ -383,7 +383,7 @@ public class RestServiceTest {
 
     @Test
     public void chargeSubscriberAction() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.post(Paths.DB_SUBSCRIBER_CHARGE_ACTION.replace("{guid}", UUID.randomUUID().toString()), "", new Reply<Status, String>() {
@@ -402,7 +402,7 @@ public class RestServiceTest {
 
     @Test
     public void blockSubscriberFromPublisher() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.post(Paths.DB_SUBSCRIBER_BLOCK.replace("{guid}", UUID.randomUUID().toString()), "", new Reply<Status, String>() {
@@ -421,7 +421,7 @@ public class RestServiceTest {
 
     @Test
     public void ejectSubscriberFromPublisher() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.post(Paths.DB_SUBSCRIBER_EJECT.replace("{guid}", UUID.randomUUID().toString()), "", new Reply<Status, String>() {
@@ -440,7 +440,7 @@ public class RestServiceTest {
 
     @Test
     public void endSubscriberFromPublisher() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.delete(Paths.DB_SUBSCRIBER_FAVORITES_END.replace("{guid}", UUID.randomUUID().toString()), "", new Reply<Status, String>() {
@@ -459,7 +459,7 @@ public class RestServiceTest {
 
     @Test
     public void loadPublisherConfig() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<String> result = new AtomicReference<>();
 
         restService.get(Paths.DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT.replace("{guid}", UUID.randomUUID().toString()), new Reply<String, String>() {
@@ -478,7 +478,7 @@ public class RestServiceTest {
 
     @Test
     public void putPublisherConfig() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.put(Paths.DB_PUBLISHER_SAVE_CONFIG.replace("{guid}", UUID.randomUUID().toString()),
@@ -499,7 +499,7 @@ public class RestServiceTest {
 
     @Test
     public void errorPublisherConfig() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<String> result = new AtomicReference<>();
 
         restService.get(Paths.DB_PUBLISHER_LOAD_CONFIG_ERROR_PASSTHROUGHT.replace("{guid}", UUID.randomUUID().toString()),
@@ -519,7 +519,7 @@ public class RestServiceTest {
 
     @Test
     public void showPublisherConfig() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<String> result = new AtomicReference<>();
 
         restService.get(Paths.DB_PUBLISHER_SETTINGS_SHOW.replace("{guid}", UUID.randomUUID().toString()),
@@ -539,7 +539,7 @@ public class RestServiceTest {
 
     @Test
     public void putPublisherShow() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.put(Paths.DB_PUBLISHER_SETTINGS_SHOW.replace("{guid}", UUID.randomUUID().toString()), SHOWTYPE_ID,
@@ -559,7 +559,7 @@ public class RestServiceTest {
 
     @Test
     public void postPublisherPublicShow() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.post(Paths.DB_PUBLISHER_PUBLIC_MODE.replace("{guid}", UUID.randomUUID().toString()), "",
@@ -579,7 +579,7 @@ public class RestServiceTest {
 
     @Test
     public void deletePublisherPublicShow() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.delete(Paths.DB_PUBLISHER_PUBLIC_MODE_END.replace("{guid}", UUID.randomUUID().toString()), "",
@@ -599,7 +599,7 @@ public class RestServiceTest {
 
     @Test
     public void reportPublishErrorTest() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.post(Paths.DB_PUBLISHER_ERROR_REPORT.replace("{guid}", UUID.randomUUID().toString()), PUBLISHER_ERROR,
@@ -619,7 +619,7 @@ public class RestServiceTest {
 
     @Test
     public void publisherSubscriberProfile() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.put(Paths.DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT.replace("{guid}", UUID.randomUUID().toString()), PROFILE,
@@ -639,7 +639,7 @@ public class RestServiceTest {
 
     @Test
     public void subscriberExtra() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<TransactionId> result = new AtomicReference<>();
 
         restService.post(Paths.DB_SUBSCRIBER_EXTRA.replace("{guid}", UUID.randomUUID().toString()), AMOUNT_TOKEN, new Reply<TransactionId, String>() {
@@ -658,7 +658,7 @@ public class RestServiceTest {
 
     @Test
     public void subscriberConfig() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<String> result = new AtomicReference<>();
 
         restService.put(Paths.DB_SUBSCRIBER_CONFIG_PASSTHROUGHT.replace("{guid}", UUID.randomUUID().toString()), "", new Reply<String, String>() {
@@ -677,7 +677,7 @@ public class RestServiceTest {
 
     @Test
     public void stateTest() throws IllegalAccessException, InstantiationException {
-        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, OKRestService.class);
+        RestService restService = new ZodiarkObjectFactory().newClassInstance(null, RestService.class, RestServiceImpl.class);
         final AtomicReference<EndpointState> result = new AtomicReference<>();
 
         restService.get(Paths.DB_ENDPOINT_STATE.replace("{guid}", UUID.randomUUID().toString()), new Reply<EndpointState, String>() {

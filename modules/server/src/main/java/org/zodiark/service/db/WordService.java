@@ -21,7 +21,7 @@ import org.zodiark.server.Reply;
 import javax.inject.Inject;
 import org.zodiark.server.annotation.Retrieve;
 import org.zodiark.service.EndpointAdapter;
-import org.zodiark.service.util.RestService;
+import org.zodiark.service.rest.RestService;
 
 /**
  * Retrieve the list of banned word for the {@link org.zodiark.service.chat.Chat} Service.

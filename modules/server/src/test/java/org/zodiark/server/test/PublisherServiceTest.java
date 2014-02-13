@@ -27,7 +27,7 @@ import org.zodiark.protocol.Message;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusFactory;
 import org.zodiark.server.ZodiarkServer;
-import org.zodiark.service.util.mock.InMemoryDB;
+import org.zodiark.service.rest.InMemoryRestClient;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNull;
@@ -84,9 +84,9 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 3);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -107,10 +107,10 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 4);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.SHOWID, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.SHOWID, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -135,11 +135,11 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 5);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.SHOWID, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.SHOWID, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -159,10 +159,10 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 4);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -187,11 +187,11 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 5);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.SHOWID, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.SHOWID, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -211,10 +211,10 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 4);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -234,10 +234,10 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 4);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -257,10 +257,10 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 4);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -284,11 +284,11 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 5);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -308,10 +308,10 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 4);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.MOTD, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.MOTD, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -331,10 +331,10 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 4);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -354,10 +354,10 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 4);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -377,10 +377,10 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 4);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -400,10 +400,10 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 4);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -423,10 +423,10 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 4);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -451,11 +451,11 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 5);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.SHOWID, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.SHOWID, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -480,11 +480,11 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 5);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.SHOWID, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.SHOWID, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -509,11 +509,11 @@ public class PublisherServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 5);
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.SHOWID, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.SHOWID, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -534,9 +534,9 @@ public class PublisherServiceTest {
 
          assertNull(writer.error.get());
          assertEquals(writer.e.size(), 4);
-         assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-         assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-         assertEquals(InMemoryDB.PASSTHROUGH, writer.e.poll().getMessage().getData());
-         assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+         assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+         assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+         assertEquals(InMemoryRestClient.PASSTHROUGH, writer.e.poll().getMessage().getData());
+         assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
      }
 }

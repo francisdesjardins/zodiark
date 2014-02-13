@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.zodiark.service.util;
+package org.zodiark.service.rest;
 
 import org.zodiark.server.Reply;
 
@@ -22,6 +22,8 @@ import org.zodiark.server.Reply;
  * Implementation of this class must have an empty, default constructor so they can be injected by the {@link org.zodiark.server.ZodiarkObjectFactory}
  */
 public interface RestService {
+
+    public enum METHOD {GET, PUT, POST, DELETE}
 
     void get(String uri, Reply r);
 

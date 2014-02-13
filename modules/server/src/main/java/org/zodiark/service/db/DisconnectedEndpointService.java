@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.zodiark.server.Reply;
 import org.zodiark.server.annotation.On;
 import org.zodiark.service.EndpointAdapter;
-import org.zodiark.service.util.RestService;
+import org.zodiark.service.rest.RestService;
 
 import javax.inject.Inject;
 

@@ -141,7 +141,7 @@ public class EndpointUtils<T extends EndpointAdapter> {
     }
 
     public void error(Envelope e, AtmosphereResource r, Message m) {
-        Envelope error = Envelope.newServerReply(e, m);
+        Envelope error = Envelope.newServerReply(e, errorMessage(m.getPath(), "/error"));
         eventBus.ioEvent(error, r);
     }
 

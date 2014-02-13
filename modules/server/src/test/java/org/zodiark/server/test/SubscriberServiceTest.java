@@ -26,7 +26,7 @@ import org.zodiark.protocol.Message;
 import org.zodiark.server.EventBus;
 import org.zodiark.server.EventBusFactory;
 import org.zodiark.server.ZodiarkServer;
-import org.zodiark.service.util.mock.InMemoryDB;
+import org.zodiark.service.rest.InMemoryRestClient;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNull;
@@ -83,8 +83,8 @@ public class SubscriberServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 2);
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
-        assertEquals(escape(InMemoryDB.ACTIONS), writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(escape(InMemoryRestClient.ACTIONS), writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -108,9 +108,9 @@ public class SubscriberServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 3);
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
-        assertEquals(escape(InMemoryDB.ACTIONS), writer.e.poll().getMessage().getData());
-        assertEquals(escape(InMemoryDB.ACTION_REQUEST), writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(escape(InMemoryRestClient.ACTIONS), writer.e.poll().getMessage().getData());
+        assertEquals(escape(InMemoryRestClient.ACTION_REQUEST), writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -138,10 +138,10 @@ public class SubscriberServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 4);
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
-        assertEquals(escape(InMemoryDB.ACTIONS), writer.e.poll().getMessage().getData());
-        assertEquals(escape(InMemoryDB.ACTION_REQUEST), writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.TRANSACTION_ID, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(escape(InMemoryRestClient.ACTIONS), writer.e.poll().getMessage().getData());
+        assertEquals(escape(InMemoryRestClient.ACTION_REQUEST), writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.TRANSACTION_ID, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -161,8 +161,8 @@ public class SubscriberServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 2);
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -182,8 +182,8 @@ public class SubscriberServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 2);
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.FAVORITE_ID, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.FAVORITE_ID, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -200,7 +200,7 @@ public class SubscriberServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 1);
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
     }
 
     @Test
@@ -220,7 +220,7 @@ public class SubscriberServiceTest {
 
         assertNull(writer.error.get());
         assertEquals(writer.e.size(), 2);
-        assertEquals(InMemoryDB.STATUS_OK, writer.e.poll().getMessage().getData());
-        assertEquals(InMemoryDB.TRANSACTION_ID, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.STATUS_OK, writer.e.poll().getMessage().getData());
+        assertEquals(InMemoryRestClient.TRANSACTION_ID, writer.e.poll().getMessage().getData());
     }
 }
