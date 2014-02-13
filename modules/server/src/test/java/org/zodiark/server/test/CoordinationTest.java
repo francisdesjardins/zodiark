@@ -18,6 +18,8 @@ package org.zodiark.server.test;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceFactory;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
@@ -40,6 +42,16 @@ public class CoordinationTest {
 
     public Message message(String path, String message) {
         return new Message().setPath(path).setData(message);
+    }
+
+    @BeforeMethod
+    public void before() {
+        server = new ZodiarkServer().serve("http://0.0.0.0:" + Utils.findFreePort()).on();
+    }
+
+    @AfterMethod
+    public void after() {
+        server.off();
     }
 
     @Test(enabled = false)

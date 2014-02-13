@@ -15,8 +15,6 @@
  */
 package org.zodiark.service.db.result;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class Action {
     public int actionId;
     public String title;
@@ -34,7 +32,6 @@ public class Action {
         return actionId;
     }
 
-    @JsonProperty("actionId")
     public void setActionId(int actionId) {
         this.actionId = actionId;
     }
@@ -43,7 +40,6 @@ public class Action {
         return title;
     }
 
-    @JsonProperty("title")
     public void setTitle(String title) {
         this.title = title;
     }
@@ -52,7 +48,6 @@ public class Action {
         return cost;
     }
 
-    @JsonProperty("cost")
     public void setCost(int cost) {
         this.cost = cost;
     }
@@ -61,7 +56,6 @@ public class Action {
         return groupDiscount;
     }
 
-    @JsonProperty("groupDiscount")
     public void setGroupDiscount(int groupDiscount) {
         this.groupDiscount = groupDiscount;
     }
@@ -70,7 +64,6 @@ public class Action {
         return minimumDurationInSeconds;
     }
 
-    @JsonProperty("minimumDurationInSeconds")
     public void setMinimumDurationInSeconds(int minimumDurationInSeconds) {
         this.minimumDurationInSeconds = minimumDurationInSeconds;
     }
@@ -79,7 +72,6 @@ public class Action {
         return scramble;
     }
 
-    @JsonProperty("scramble")
     public void setScramble(boolean scramble) {
         this.scramble = scramble;
     }
@@ -88,7 +80,6 @@ public class Action {
         return forced;
     }
 
-    @JsonProperty("forced")
     public void setForced(boolean forced) {
         this.forced = forced;
     }
@@ -97,7 +88,6 @@ public class Action {
         return createdOn;
     }
 
-    @JsonProperty("createdOn")
     public void setCreatedOn(String createdOn) {
         this.createdOn = createdOn;
     }

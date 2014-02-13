@@ -229,7 +229,7 @@ public class PublisherServiceTest {
         eventBus.ioEvent(em, RESOURCE);
 
         // UC8
-        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SAVE_CONFIG, RestServiceTest.CONFIG));
+        em = Envelope.newPublisherToServerRequest(UUID, message(DB_PUBLISHER_SAVE_CONFIG, RestServiceTest.CONFIG_PASSTROUGHT));
         eventBus.ioEvent(em, RESOURCE);
 
         assertNull(writer.error.get());

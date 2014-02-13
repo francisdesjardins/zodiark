@@ -254,11 +254,11 @@ public interface Paths {
     String DB_SUBSCRIBER_FAVORITES_START = "/v1/subscriber/{guid}/favorite/";
     String DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT = "/v1/publisher/{guid}/settings/ui/";
 
-    String DB_PUBLISHER_SAVE_CONFIG = "/v1/publisher/{guid}/settings/ui";
-    String DB_PUBLISHER_SAVE_CONFIG_PUT = "_put/v1/publisher/{guid}/settings/ui";
+    String DB_PUBLISHER_SAVE_CONFIG = DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT;
+    String DB_PUBLISHER_SAVE_CONFIG_PUT = "_put" + DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT;
 
-    String DB_PUBLISHER_LOAD_CONFIG = "/v1/publisher/{guid}/settings/ui";
-    String DB_PUBLISHER_LOAD_CONFIG_GET = "_get/v1/publisher/{guid}/settings/ui";
+    String DB_PUBLISHER_LOAD_CONFIG = DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT;
+    String DB_PUBLISHER_LOAD_CONFIG_GET = "_get" + DB_PUBLISHER_LOAD_CONFIG_PASSTHROUGHT;
 
     String DB_PUBLISHER_SETTINGS_SHOW = "/v1/publisher/{guid}/settings/show";
     String DB_PUBLISHER_SETTINGS_SHOW_GET_PASSTHROUGHT = "_get" + DB_PUBLISHER_SETTINGS_SHOW;
@@ -270,11 +270,11 @@ public interface Paths {
     String DB_PUBLISHER_ERROR_REPORT = "/v1/publisher/{guid}/error/report";
 
     String DB_PUBLISHER_SUBSCRIBER_PROFILE_GET_PASSTHROUGH = "/v1/publisher/{guid}/subscriber/{subscriberId}/profile";
-    String DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT = "/v1/publisher/{guid}/subscriber/profile";;
+    String DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT = "/v1/publisher/{guid}/subscriber/profile";
 
 
     String DB_PUBLISHER_ACTIONS = "/v1/publisher/{guid}/actions";
-    String DB_SUBSCRIBER_EXTRA = "/v1/subscriber/{guid}/tip/transaction/request";
+    String DB_SUBSCRIBER_EXTRA= "/v1/subscriber/{guid}/tip/transaction/request";
     String DB_ENDPOINT_STATE = "/v1/zodiark/session/{guid}";
 
     String DB_SUBSCRIBER_CONFIG_PASSTHROUGHT = "/v1/subscriber/{guid}/settings/ui";
@@ -287,5 +287,9 @@ public interface Paths {
     // Internal Message
 
     String MESSAGE_ACTION_VALIDATE = "/v1/action/{actionID}/validate";
+
+
+    // Internal Message
+    String BLOCKED_EXPRESSION = "/v1/zodiark/blocked/expressions";
 
 }

@@ -147,8 +147,11 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
             case DB_GET_WORD_PASSTHROUGH:
                 getMotd(e, r);
                 break;
+            case DB_PUBLISHER_SUBSCRIBER_PROFILE_GET_PASSTHROUGH:
+                getSubscriberProfile(path, e);
+                break;
             case DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT:
-                getOrUpdateSubscriberProfile(path, e);
+                updateSubscriberProfile(path, e);
                 break;
             case DB_PUBLISHER_SHARED_PRIVATE_START:
                 sharedPrivateSession(e, r);
@@ -244,23 +247,20 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
         utils.statusEvent(DB_PUBLISHER_SHARED_PRIVATE_START_POST, e);
     }
 
-    private void getOrUpdateSubscriberProfile(String path, Envelope e) {
-        Message m = e.getMessage();
-        if (!m.hasData()) {
-            // TODO: UC15
-            utils.passthroughEvent(DB_PUBLISHER_SUBSCRIBER_PROFILE_GET_PASSTHROUGH, e);
-        } else {
-            String[] paths = path.split("/");
+    private void getSubscriberProfile(String path, Envelope e) {
+        utils.passthroughEvent(path, e);
+    }
 
-            PublisherEndpoint p = utils.retrieve(e.getUuid());
-            if (!utils.validate(p, e)) return;
+    private void updateSubscriberProfile(String path, Envelope e) {
+        String[] paths = path.split("/");
 
-            // TODO: utils.validate Subscriber
-            boolean subscriberOk = validateSubscriberState(paths[5], p);
+        PublisherEndpoint p = utils.retrieve(e.getUuid());
+        if (!utils.validate(p, e)) return;
 
-            utils.statusEvent(DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT, e, p);
-        }
+        // TODO: utils.validate Subscriber
+        boolean subscriberOk = validateSubscriberState(paths[5], p);
 
+        utils.statusEvent(DB_PUBLISHER_SUBSCRIBER_PROFILE_PUT, e, p);
     }
 
     private void getMotd(Envelope e, AtmosphereResource r) {
@@ -525,7 +525,7 @@ public class PublisherServiceImpl implements PublisherService, Session<Publisher
     }
 
     private String injectIp(String remoteAddr, String data) {
-        return data.replaceAll("\\s+","").replace("\"\"", "\"" + remoteAddr + "\"");
+        return data.replaceAll("\\s+", "").replace("\"\"", "\"" + remoteAddr + "\"");
     }
 
     @Override

@@ -51,7 +51,26 @@ public class SubscriberTest {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
+    public final static int findFreePort() {
+        ServerSocket socket = null;
 
+        try {
+            socket = new ServerSocket(0);
+
+            return socket.getLocalPort();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return 8080;
+    }
 
     private ZodiarkServer server;
     private int port = findFreePort();

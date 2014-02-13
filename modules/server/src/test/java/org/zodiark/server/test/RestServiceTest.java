@@ -45,8 +45,8 @@ public class RestServiceTest {
     public static final String SESSION_CREATE =  "{\"cameraWidth\": \"1\", \"cameraHeight\": \"1\", \"cameraFPS\": \"1\", \"cameraQuality\": \"1\", \"bandwidthOut\": \"1\", \"bandwidthIn\": \"1\"}";
     public static final String AUTHTOKEN = "{\"username\": \"foo\", \"password\":\"12345\", \"ip\": \"\", \"referrer\":\"zzzz\"}";
     public static final String PUBLISHER_ERROR = "{\"source\":\"xxx\",\"error\":\"xxx\",\"info\":\"xxx\"}";
-    public static final String CONFIG = "{\"colorPerformer\":\"xxx\",\"colorClient\":\"xxx\",\"colorAdmin\":\"xxx\",\"colorSystem\":\"xxx\",\"colorVip\":\"xxx\",\"fontSizeChat\":\"xxx\",\"fontSizeMenu\":\"xxx\",\"shortcut1\":\"xxx\",\"shortcut2\":\"xxx\",\"shortcut3\":\"xxx\",\"shortcut4\":\"xxx\",\"shortcut5\":\"xxx\",\"shortcut6\":\"xxx\",\"shortcut7\":\"xxx\",\"shortcut8\":\"xxx\",\"shortcut9\":\"xxx\",\"shortcut10\":\"xxx\",\"welcomeMessage\":\"xxx\"}\n";
-    public static final String PROFILE = "{\"profileFullname\":\"xxx\",\"profileAge\":\"xxx\",\"profileGender\":\"xxx\",\"profileNote\":\"xxx\"}";
+    public static final String CONFIG_PASSTROUGHT = "{\"performerId\":\"12334\",\"colorPerformer\":\"xxx\",\"colorClient\":\"xxx\",\"colorAdmin\":\"xxx\",\"colorSystem\":\"xxx\",\"colorVip\":\"xxx\",\"fontSizeChat\":\"xxx\",\"fontSizeMenu\":\"xxx\",\"shortcut1\":\"xxx\",\"shortcut2\":\"xxx\",\"shortcut3\":\"xxx\",\"shortcut4\":\"xxx\",\"shortcut5\":\"xxx\",\"shortcut6\":\"xxx\",\"shortcut7\":\"xxx\",\"shortcut8\":\"xxx\",\"shortcut9\":\"xxx\",\"shortcut10\":\"xxx\",\"welcomeMessage\":\"xxx\"}\n";
+    public static final String PROFILE = "{\"guid\":\"12234\", \"profileFullname\":\"xxx\",\"profileAge\":\"xxx\",\"profileGender\":\"xxx\",\"profileNote\":\"xxx\"}";
     public static final String ACTION = "\"{\"actionId\":123\"}";
     public static final String AMOUNT_TOKEN = "{\"amountTokens\":234}";
     public static final String SHOWTYPE_ID = "{\"showTypeId\":1234}";
@@ -482,7 +482,7 @@ public class RestServiceTest {
         final AtomicReference<Status> result = new AtomicReference<>();
 
         restService.put(Paths.DB_PUBLISHER_SAVE_CONFIG.replace("{guid}", UUID.randomUUID().toString()),
-                CONFIG,
+                CONFIG_PASSTROUGHT,
                 new Reply<Status, String>() {
                     @Override
                     public void ok(Status success) {
