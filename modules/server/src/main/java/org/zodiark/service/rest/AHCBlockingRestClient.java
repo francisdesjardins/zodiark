@@ -28,9 +28,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 
-public class AHCRestClient implements RestClient {
+public class AHCBlockingRestClient implements RestClient {
 
-    private final Logger logger = LoggerFactory.getLogger(AHCRestClient.class);
+    private final Logger logger = LoggerFactory.getLogger(AHCBlockingRestClient.class);
 
     private AsyncHttpClient client;
 

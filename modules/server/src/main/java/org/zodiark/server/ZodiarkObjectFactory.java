@@ -22,7 +22,7 @@ import org.atmosphere.cpr.AtmosphereObjectFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zodiark.service.db.result.Result;
-import org.zodiark.service.rest.AHCRestClient;
+import org.zodiark.service.rest.AHCBlockingRestClient;
 import org.zodiark.service.rest.InMemoryRestClient;
 import org.zodiark.service.rest.RestClient;
 import org.zodiark.service.rest.RestService;
@@ -136,8 +136,8 @@ public class ZodiarkObjectFactory implements AtmosphereObjectFactory {
         } else {
             implementatble(RestClient.class, new Implementable<RestClient>() {
                 @Override
-                public Class<AHCRestClient> extend(Class<RestClient> t) {
-                    return AHCRestClient.class;
+                public Class<AHCBlockingRestClient> extend(Class<RestClient> t) {
+                    return AHCBlockingRestClient.class;
                 }
             });
         }
