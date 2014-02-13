@@ -22,7 +22,6 @@ import org.zodiark.protocol.Envelope;
 import org.zodiark.protocol.Message;
 import org.zodiark.protocol.Path;
 import org.zodiark.protocol.Paths;
-import org.zodiark.server.EchoService;
 import org.zodiark.server.ZodiarkServer;
 
 import java.io.IOException;
@@ -75,8 +74,6 @@ public class ZodiarkClientTest {
 
     @Test
     public void echoTest() throws IOException, InterruptedException {
-        server.service(EchoService.class);
-
         final AtomicReference<Envelope> answer = new AtomicReference<>();
         final ZodiarkClient c = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
         final CountDownLatch latch = new CountDownLatch(1);
@@ -99,8 +96,6 @@ public class ZodiarkClientTest {
 
     @Test
     public void echoPingPongTest() throws IOException, InterruptedException {
-        server.service(EchoService.class);
-
         final AtomicReference<Envelope> answer = new AtomicReference<>();
         final ZodiarkClient c = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
         final CountDownLatch latch = new CountDownLatch(1);
@@ -119,7 +114,7 @@ public class ZodiarkClientTest {
             }
         }).open().send(Envelope.newClientToServerRequest(new Message(new Path("/echo"), TEST)));
 
-        latch.await(5, TimeUnit.SECONDS);
+        latch.await(10, TimeUnit.SECONDS);
         assertNotNull(answer.get());
         assertEquals(TEST, answer.get().getMessage().getData());
         assertEquals(3, answer.get().getTraceId());
@@ -128,8 +123,6 @@ public class ZodiarkClientTest {
 
     @Test
     public void errorTest() throws IOException, InterruptedException {
-        server.service(EchoService.class);
-
         final AtomicReference<Envelope> answer = new AtomicReference<>();
         final ZodiarkClient c = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
         final CountDownLatch latch = new CountDownLatch(1);
@@ -155,8 +148,6 @@ public class ZodiarkClientTest {
 
     @Test
     public void connectTest() throws IOException, InterruptedException {
-        server.service(EchoService.class);
-
         final AtomicReference<Envelope> answer = new AtomicReference<>();
         final ZodiarkClient c = new ZodiarkClient.Builder().path("http://127.0.0.1:" + port).build();
         final CountDownLatch latch = new CountDownLatch(1);
