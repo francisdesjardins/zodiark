@@ -16,6 +16,11 @@
 package org.zodiark.protocol;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * An Envelope is the vehicule for exchanging data between Zodiark's Endpoint. All communication must be serialized using an Envelope.
@@ -312,5 +317,38 @@ public class Envelope {
                 .message(message)
                 .uuid(envelope.getUuid())
                 .build();
+    }
+
+    public final static Envelope newEnvelope(String m, ObjectMapper mapper) throws IOException {
+        HashMap<String, Object> envelope = (HashMap<String, Object>) mapper.readValue(m, HashMap.class);
+        return newEnvelope(envelope, mapper);
+    }
+
+    public final static Envelope newEnvelope(HashMap<String, Object> envelope, ObjectMapper mapper) throws IOException {
+        HashMap<String, Object> message = (HashMap<String, Object>) envelope.get("message");
+        return new Envelope.Builder()
+                .path(new Path(notNull(envelope.get("path"))))
+                .to(new To(notNull(envelope.get("to"))))
+
+                .from(new From(notNull(envelope.get("from"))))
+                .traceId(new TraceId((int) envelope.get("traceId")))
+                .message(new Message().setPath(notNull(message.get("path")))
+                        .setData(notNull(encodeJSON(message.get("data"), mapper)))
+                        .setUUID(notNull(message.get("uuid"))))
+                .protocol(new Protocol(notNull(envelope.get("protocol"))))
+                .uuid(notNull(envelope.get("uuid")))
+                .build();
+    }
+
+    private final static String encodeJSON(Object data, ObjectMapper mapper) throws JsonProcessingException {
+        if (String.class.isAssignableFrom(data.getClass())) {
+            return data.toString();
+        }
+
+        return mapper.writeValueAsString(data);
+    }
+
+    private final static String notNull(Object o) {
+        return o == null ? "" : o.toString();
     }
 }

@@ -15,6 +15,8 @@
  */
 package org.zodiark.protocol;
 
+import com.fasterxml.jackson.annotation.JsonRawValue;
+
 import java.util.UUID;
 
 public class Message {
@@ -40,6 +42,7 @@ public class Message {
         return this;
     }
 
+    @JsonRawValue
     public String getData() {
         return data;
     }

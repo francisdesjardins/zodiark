@@ -38,18 +38,19 @@ public class Writer extends AsyncIOWriterAdapter {
 
     @Override
     public AsyncIOWriter write(AtmosphereResponse r, String data) throws IOException {
-        e.add(mapper.readValue(data, Envelope.class));
+        e.add(Envelope.newEnvelope(data, mapper));
         return this;
     }
 
     @Override
     public AsyncIOWriter write(AtmosphereResponse r, byte[] data) throws IOException {
-        e.add(mapper.readValue(data, Envelope.class));
+        e.add(Envelope.newEnvelope(new String(data, "UTF-8"), mapper));
         return this;
     }
 
     @Override
     public AsyncIOWriter write(AtmosphereResponse r, byte[] data, int offset, int length) throws IOException {
+        e.add(Envelope.newEnvelope(new String(data, offset, length, "UTF-8"), mapper));
         return this;
     }
 }

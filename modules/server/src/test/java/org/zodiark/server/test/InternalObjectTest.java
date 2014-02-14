@@ -15,6 +15,7 @@
  */
 package org.zodiark.server.test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.annotations.Test;
 import org.zodiark.protocol.Envelope;
 import org.zodiark.server.EnvelopeDigester;
@@ -64,7 +65,7 @@ public class InternalObjectTest {
         message.put("uuid", "1234");
         map.put("message", message);
 
-        Envelope e = digester.newEnvelope(map);
+        Envelope e = Envelope.newEnvelope(map, new ObjectMapper());
 
         assertNotNull(e);
         assertEquals(e.getMessage().getPath(),"/1/2/3");

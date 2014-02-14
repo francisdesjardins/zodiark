@@ -35,13 +35,12 @@ public class InMemoryRestClient implements RestClient {
 
     public enum RESULT {PASS, FAIL}
 
-    public final static String PASSTHROUGH = "{\"no_need_to_parse\": \"_something_\"}";
+    public final static String PASSTHROUGH = "{\"no_need_to_parse\":\"_something_\"}";
     public final static String STATUS_OK = "{\"result\":\"OK\"}";
     public final static String TRANSACTION_ID = "{\"transactionId\":1234}";
     public final static String FAVORITE_ID = "{\"favoriteId\":1234}";
     public final static String SHOWID ="{\"showId\":123234}";
-    public final static String MOTD = "{\"motds\": [{\"motdId\": 1, \"title\": \"foo\", \"message\": \"blabla\", \"createdOn\":\"20140125\", \"expiresOn\":\"20140125\", " +
-                    "\"expired\": true}]}";
+    public final static String MOTD = "{\"motds\":[{\"motdId\":1,\"title\":\"foo\",\"message\":\"blabla\",\"createdOn\":\"20140125\",\"expiresOn\":\"20140125\",\"expired\":true}]}";
     public final static String STATE = "{\"username\":\"123\",\"language\":\"fr\",\"showId\":123,\"watchId\":123,\"modeId\":123,\"type\":\"0\",\"administrator\": true,\"guid\":\"123456\"}";
     public final static String ACTIONS = "{\n" +
             "    \"actions\": [\n" +
