@@ -21,8 +21,12 @@ import java.util.UUID;
 
 public class Message {
 
+    private static final String START_JSON = "{";
+    private static final String END_JSON = "}";
+    private static final String QUOTE = "\"";
+
     private String path;
-    private String data;
+    private String data = "";
     private String uuid = UUID.randomUUID().toString();
 
     public Message(){
@@ -44,7 +48,7 @@ public class Message {
 
     @JsonRawValue
     public String getData() {
-        return data;
+        return encodeIntoJSON();
     }
 
     public Message setData(String data) {
@@ -65,12 +69,20 @@ public class Message {
         return data != null && !data.isEmpty() && !data.equalsIgnoreCase("null");
     }
 
+    private String encodeIntoJSON(){
+        if (data.startsWith(START_JSON) || data.startsWith(QUOTE)) {
+            return data;
+        } else {
+            return QUOTE + data + QUOTE;
+        }
+    }
+
     @Override
     public String toString() {
-        return "{" +
+        return START_JSON +
                 "path:'" + path + '\'' +
                 ", uuid:'" + uuid + '\'' +
-                ", data:'" + data + '\'' +
-                '}';
+                ", data:'" + encodeIntoJSON() + '\'' +
+                END_JSON;
     }
 }

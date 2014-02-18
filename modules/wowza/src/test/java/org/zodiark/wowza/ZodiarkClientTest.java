@@ -36,7 +36,7 @@ import static org.testng.AssertJUnit.assertNotNull;
 
 public class ZodiarkClientTest {
 
-    public final static String TEST = "This is a test";
+    public final static String TEST = "\"This is a test\"";
 
     public final static int findFreePort()  {
         ServerSocket socket = null;

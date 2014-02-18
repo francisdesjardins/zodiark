@@ -30,7 +30,7 @@ public class ZodiarkDecoder implements Decoder<String, Envelope> {
     public Envelope decode(Event event, String s) {
         if (event.equals(Event.MESSAGE)) {
             try {
-                return mapper.readValue(s, Envelope.class);
+                return Envelope.newEnvelope(s, mapper);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

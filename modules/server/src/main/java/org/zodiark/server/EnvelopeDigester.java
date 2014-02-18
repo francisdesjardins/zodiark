@@ -52,6 +52,7 @@ public class EnvelopeDigester extends AtmosphereInterceptorAdapter {
             String message = IOUtils.readEntirely(r).toString();
             if (!message.isEmpty()) {
                 try {
+                    logger.debug("Original Message {}", message);
                     final Envelope e = Envelope.newEnvelope(message, mapper);
 
                     if (e.getUuid() == null || e.getUuid().isEmpty()) {
